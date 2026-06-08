@@ -18,20 +18,20 @@ class MetaEditFragment : Fragment() {
     private val args: MetaEditFragmentArgs by navArgs()
 
     private val fieldKeys = listOf(
-        "family" to "Family",
-        "subfamily" to "Subfamily",
-        "fullName" to "Full Name",
-        "version" to "Version",
-        "postscript" to "PostScript",
+        "family"       to "Family",
+        "subfamily"    to "Subfamily",
+        "fullName"     to "Full Name",
+        "version"      to "Version",
+        "postscript"   to "PostScript",
         "manufacturer" to "Manufacturer",
-        "designer" to "Designer",
-        "description" to "Description",
-        "trademark" to "Trademark",
-        "license" to "License",
-        "licenseURL" to "License URL",
-        "vendorURL" to "Vendor URL",
-        "designerURL" to "Designer URL",
-        "sampleText" to "Sample Text"
+        "designer"     to "Designer",
+        "description"  to "Description",
+        "trademark"    to "Trademark",
+        "license"      to "License",
+        "licenseURL"   to "License URL",
+        "vendorURL"    to "Vendor URL",
+        "designerURL"  to "Designer URL",
+        "sampleText"   to "Sample Text"
     )
 
     private val fieldBindings = mutableListOf<Pair<String, ItemEditFieldBinding>>()
@@ -44,27 +44,40 @@ class MetaEditFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val font = FontRepository.getById(args.fontId) ?: run { findNavController().popBackStack(); return }
-        val m = font.effectiveMeta
+        val font = FontRepository.getById(args.fontId)
+            ?: run { findNavController().popBackStack(); return }
+
+        val originalMeta = font.meta  // raw parsed values
+        val savedOverrides = FontRepository.getMetaOverrides(font.id) // previously saved edits
+
+        // Map of original values from parsed font
+        val originalValues = mapOf(
+            "family"       to originalMeta.family,
+            "subfamily"    to originalMeta.subfamily,
+            "fullName"     to originalMeta.fullName,
+            "version"      to originalMeta.version,
+            "postscript"   to originalMeta.postscript,
+            "manufacturer" to originalMeta.manufacturer,
+            "designer"     to originalMeta.designer,
+            "description"  to originalMeta.description,
+            "trademark"    to originalMeta.trademark,
+            "license"      to originalMeta.license,
+            "licenseURL"   to originalMeta.licenseURL,
+            "vendorURL"    to originalMeta.vendorURL,
+            "designerURL"  to originalMeta.designerURL,
+            "sampleText"   to originalMeta.sampleText
+        )
 
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-
-        val currentValues = mapOf(
-            "family" to m.family, "subfamily" to m.subfamily, "fullName" to m.fullName,
-            "version" to m.version, "postscript" to m.postscript,
-            "manufacturer" to m.manufacturer, "designer" to m.designer,
-            "description" to m.description, "trademark" to m.trademark,
-            "license" to m.license, "licenseURL" to m.licenseURL,
-            "vendorURL" to m.vendorURL, "designerURL" to m.designerURL,
-            "sampleText" to m.sampleText
-        )
 
         val inflater = LayoutInflater.from(requireContext())
         fieldKeys.forEach { (key, label) ->
             val fb = ItemEditFieldBinding.inflate(inflater, binding.formContainer, false)
             fb.tvFieldLabel.text = label
-            fb.etFieldValue.setText(font.metaOverrides[key] ?: currentValues[key] ?: "")
-            fb.etFieldValue.hint = currentValues[key] ?: ""
+            // Show saved override if exists, otherwise show original parsed value
+            val currentValue = savedOverrides[key] ?: originalValues[key] ?: ""
+            fb.etFieldValue.setText(currentValue)
+            fb.etFieldValue.hint = originalValues[key]?.ifEmpty { "—" } ?: "—"
             binding.formContainer.addView(fb.root)
             fieldBindings.add(key to fb)
         }
@@ -73,7 +86,10 @@ class MetaEditFragment : Fragment() {
             val overrides = mutableMapOf<String, String>()
             fieldBindings.forEach { (key, fb) ->
                 val text = fb.etFieldValue.text?.toString() ?: ""
-                if (text.isNotBlank()) overrides[key] = text
+                // Only save if different from original (no point overriding with same value)
+                if (text.isNotBlank() && text != (originalValues[key] ?: "")) {
+                    overrides[key] = text
+                }
             }
             FontRepository.saveMetaOverrides(font.id, overrides, requireContext())
             findNavController().popBackStack()
