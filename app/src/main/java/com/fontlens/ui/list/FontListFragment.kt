@@ -2,7 +2,9 @@ package com.fontlens.ui.list
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.DocumentsContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,21 +26,15 @@ class FontListFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var adapter: FontListAdapter
 
-    private val pickFonts = registerForActivityResult(
+    private val pickFolder = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            val data = result.data ?: return@registerForActivityResult
-            val uris = mutableListOf<android.net.Uri>()
-            data.clipData?.let { clip ->
-                for (i in 0 until clip.itemCount) uris.add(clip.getItemAt(i).uri)
-            } ?: data.data?.let { uris.add(it) }
-
-            lifecycleScope.launch {
-                val items = FontLoader.loadFontsFromUris(requireContext(), uris)
-                FontRepository.addFonts(items)
-                refresh()
-            }
+            val uri = result.data?.data ?: return@registerForActivityResult
+            requireContext().contentResolver.takePersistableUriPermission(
+                uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+            loadFontsFromFolder(uri)
         }
     }
 
@@ -65,26 +61,65 @@ class FontListFragment : Fragment() {
 
         binding.rvFonts.layoutManager = LinearLayoutManager(requireContext())
         binding.rvFonts.adapter = adapter
-
-        binding.fabAdd.setOnClickListener { openFilePicker() }
-
+        binding.fabAdd.setOnClickListener { openFolderPicker() }
         binding.etSearch.addTextChangedListener { refresh(it?.toString() ?: "") }
-
         refresh()
     }
 
-    private fun openFilePicker() {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "*/*"
-            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf(
-                "font/ttf", "font/otf", "application/x-font-ttf",
-                "application/x-font-otf", "application/font-woff",
-                "application/font-woff2", "application/octet-stream"
-            ))
-            putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+    private fun openFolderPicker() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+        pickFolder.launch(intent)
+    }
+
+    private fun loadFontsFromFolder(folderUri: Uri) {
+        val cr = requireContext().contentResolver
+        val docId = DocumentsContract.getTreeDocumentId(folderUri)
+        val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(folderUri, docId)
+
+        val fontUris = mutableListOf<Uri>()
+        val fontExtensions = setOf("ttf", "otf", "woff", "woff2", "ttc")
+
+        cr.query(
+            childrenUri,
+            arrayOf(
+                DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+                DocumentsContract.Document.COLUMN_MIME_TYPE
+            ),
+            null, null, null
+        )?.use { cursor ->
+            val idCol   = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID)
+            val nameCol = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
+            while (cursor.moveToNext()) {
+                val name = cursor.getString(nameCol) ?: continue
+                val ext  = name.substringAfterLast(".").lowercase()
+                if (ext in fontExtensions) {
+                    val childDocId = cursor.getString(idCol)
+                    val fileUri = DocumentsContract.buildDocumentUriUsingTree(folderUri, childDocId)
+                    fontUris.add(fileUri)
+                }
+            }
         }
-        pickFonts.launch(intent)
+
+        if (fontUris.isEmpty()) {
+            android.widget.Toast.makeText(
+                requireContext(),
+                "No font files found in this folder",
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        lifecycleScope.launch {
+            val items = FontLoader.loadFontsFromUris(requireContext(), fontUris)
+            FontRepository.addFonts(items)
+            refresh()
+            android.widget.Toast.makeText(
+                requireContext(),
+                "${items.size} font(s) loaded",
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     fun refresh(query: String = binding.etSearch.text?.toString() ?: "") {
@@ -94,7 +129,7 @@ class FontListFragment : Fragment() {
 
         binding.tvCount.text = filtered.size.toString()
         binding.layoutEmpty.visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE
-        binding.rvFonts.visibility = if (filtered.isEmpty()) View.GONE else View.VISIBLE
+        binding.rvFonts.visibility     = if (filtered.isEmpty()) View.GONE   else View.VISIBLE
         adapter.submitList(filtered)
     }
 
