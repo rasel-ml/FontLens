@@ -1,6 +1,7 @@
 package com.fontlens.ui.list
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -28,8 +29,6 @@ class FontListFragment : Fragment() {
     private var _binding: FragmentFontListBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: FontListAdapter
-
-    // Only reload saved folders once per app session, not every tab switch
     private var initialLoadDone = false
 
     private val pickFolder = registerForActivityResult(
@@ -55,12 +54,38 @@ class FontListFragment : Fragment() {
 
         adapter = FontListAdapter(
             onFontClick = { font ->
-                val action = FontListFragmentDirections.actionListToPreview(font.id)
-                findNavController().navigate(action)
+                findNavController().navigate(
+                    FontListFragmentDirections.actionListToPreview(font.id)
+                )
             },
             onFavoriteClick = { font ->
                 FontRepository.toggleFavorite(font.id, requireContext())
                 adapter.notifyDataSetChanged()
+            },
+            onRemoveClick = { font ->
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Remove from Library")
+                    .setMessage("Remove \"${font.effectiveMeta.family.ifEmpty { font.displayName }}\" from the library?\n\nThe file will NOT be deleted from storage.")
+                    .setPositiveButton("Remove") { _, _ ->
+                        FontRepository.removeFont(font.id, requireContext())
+                        refresh()
+                        Toast.makeText(requireContext(), "Removed from library", Toast.LENGTH_SHORT).show()
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            },
+            onRemoveLongClick = { font ->
+                AlertDialog.Builder(requireContext())
+                    .setTitle("⚠ Delete from Storage")
+                    .setMessage("Permanently delete \"${font.effectiveMeta.family.ifEmpty { font.displayName }}\" from your device?\n\nThis cannot be undone.")
+                    .setPositiveButton("Delete") { _, _ ->
+                        val deleted = FontRepository.removeFontFromStorage(font.id, requireContext())
+                        refresh()
+                        val msg = if (deleted) "File deleted from storage" else "Removed from library (file could not be deleted)"
+                        Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
             },
             isFavorite = { FontRepository.isFavorite(it) },
             getSample  = { FontRepository.getSampleText(it) }
@@ -71,7 +96,6 @@ class FontListFragment : Fragment() {
         binding.fabAdd.setOnClickListener { openFolderPicker() }
         binding.etSearch.addTextChangedListener { refresh(it?.toString() ?: "") }
 
-        // Only load from saved folders on first creation, not on tab switches
         if (!initialLoadDone) {
             initialLoadDone = true
             reloadSavedFolders()
@@ -81,16 +105,9 @@ class FontListFragment : Fragment() {
     }
 
     private fun reloadSavedFolders() {
-        val savedUris = FontRepository.getSavedFolderUris()
-        if (savedUris.isEmpty()) { refresh(); return }
-
-        // Only load fonts not already in the repository
-        val newUris = savedUris.filter { folderUri ->
-            // Check if this folder was already loaded this session
-            !FontRepository.isFolderLoaded(folderUri)
-        }
+        val newUris = FontRepository.getSavedFolderUris()
+            .filter { !FontRepository.isFolderLoaded(it) }
         if (newUris.isEmpty()) { refresh(); return }
-
         lifecycleScope.launch {
             for (uri in newUris) {
                 try { loadFontsFromFolder(uri, showToast = false) }
@@ -112,28 +129,22 @@ class FontListFragment : Fragment() {
             val fontUris = withContext(Dispatchers.IO) {
                 collectFontUris(folderUri, recursive)
             }
-
             if (fontUris.isEmpty()) {
                 loadingDialog.dismissAllowingStateLoss()
                 if (showToast) Toast.makeText(requireContext(), "No font files found", Toast.LENGTH_SHORT).show()
                 return@launch
             }
-
             val items = FontLoader.loadFontsFromUris(
                 context = requireContext(),
                 uris = fontUris,
                 onProgress = { loaded, total ->
-                    lifecycleScope.launch {
-                        loadingDialog.updateProgress(loaded, total)
-                    }
+                    lifecycleScope.launch { loadingDialog.updateProgress(loaded, total) }
                 }
             )
-
             FontRepository.addFonts(items)
             FontRepository.markFolderLoaded(folderUri)
             refresh()
             loadingDialog.dismissAllowingStateLoss()
-
             if (showToast) Toast.makeText(
                 requireContext(), "${items.size} font(s) loaded", Toast.LENGTH_SHORT
             ).show()
@@ -144,7 +155,6 @@ class FontListFragment : Fragment() {
         val cr = requireContext().contentResolver
         val fontExtensions = setOf("ttf", "otf", "woff", "woff2", "ttc")
         val result = mutableListOf<Uri>()
-
         fun scanFolder(treeUri: Uri, docId: String) {
             val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(treeUri, docId)
             cr.query(
@@ -153,8 +163,7 @@ class FontListFragment : Fragment() {
                     DocumentsContract.Document.COLUMN_DOCUMENT_ID,
                     DocumentsContract.Document.COLUMN_DISPLAY_NAME,
                     DocumentsContract.Document.COLUMN_MIME_TYPE
-                ),
-                null, null, null
+                ), null, null, null
             )?.use { cursor ->
                 val idCol   = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID)
                 val nameCol = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
@@ -173,7 +182,6 @@ class FontListFragment : Fragment() {
                 }
             }
         }
-
         scanFolder(folderUri, DocumentsContract.getTreeDocumentId(folderUri))
         return result
     }

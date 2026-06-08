@@ -234,7 +234,7 @@
                             android:id="@+id/switch_recursive"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="true"
+                            android:checked="false"
                             android:thumbTint="@color/accent"
                             android:trackTint="@color/switch_track_color" />
             

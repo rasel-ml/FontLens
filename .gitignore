@@ -12,7 +12,7 @@ captures/
 .externalNativeBuild/
 .cxx/
 
-# Keystore (never commit signing keys)
+# Keystore
 *.jks
 *.keystore
 
