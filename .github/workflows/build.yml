@@ -26,14 +26,14 @@ jobs:
           distribution: 'temurin'
 
       - name: Cache Gradle distribution (bin.zip)
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.gradle/wrapper/dists
           key: gradle-dist-8.7
           restore-keys: gradle-dist-8.7
 
       - name: Cache Gradle build cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.gradle/caches
           key: gradle-cache-${{ hashFiles('**/*.gradle*') }}

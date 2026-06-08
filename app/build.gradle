@@ -56,4 +56,5 @@ dependencies {
     implementation 'androidx.preference:preference-ktx:1.2.1'
     implementation 'androidx.documentfile:documentfile:1.0.1'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+    implementation 'androidx.drawerlayout:drawerlayout:1.2.0'
 }

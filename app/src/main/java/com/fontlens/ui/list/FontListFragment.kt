@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.fontlens.MainActivity
 import com.fontlens.data.FontRepository
 import com.fontlens.databinding.FragmentFontListBinding
 import com.fontlens.ui.LoadingDialog
@@ -40,6 +41,7 @@ class FontListFragment : Fragment() {
                 uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
             )
             FontRepository.saveFolderUri(uri, requireContext())
+            (activity as? MainActivity)?.refreshDrawer()
             loadFontsFromFolder(uri, showToast = true)
         }
     }
@@ -54,9 +56,7 @@ class FontListFragment : Fragment() {
 
         adapter = FontListAdapter(
             onFontClick = { font ->
-                findNavController().navigate(
-                    FontListFragmentDirections.actionListToPreview(font.id)
-                )
+                findNavController().navigate(FontListFragmentDirections.actionListToPreview(font.id))
             },
             onFavoriteClick = { font ->
                 FontRepository.toggleFavorite(font.id, requireContext())
@@ -71,8 +71,7 @@ class FontListFragment : Fragment() {
                         refresh()
                         Toast.makeText(requireContext(), "Removed from library", Toast.LENGTH_SHORT).show()
                     }
-                    .setNegativeButton("Cancel", null)
-                    .show()
+                    .setNegativeButton("Cancel", null).show()
             },
             onRemoveLongClick = { font ->
                 AlertDialog.Builder(requireContext())
@@ -81,11 +80,12 @@ class FontListFragment : Fragment() {
                     .setPositiveButton("Delete") { _, _ ->
                         val deleted = FontRepository.removeFontFromStorage(font.id, requireContext())
                         refresh()
-                        val msg = if (deleted) "File deleted from storage" else "Removed from library (file could not be deleted)"
-                        Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(),
+                            if (deleted) "File deleted from storage"
+                            else "Removed from library (file could not be deleted)",
+                            Toast.LENGTH_SHORT).show()
                     }
-                    .setNegativeButton("Cancel", null)
-                    .show()
+                    .setNegativeButton("Cancel", null).show()
             },
             isFavorite = { FontRepository.isFavorite(it) },
             getSample  = { FontRepository.getSampleText(it) }
@@ -93,6 +93,12 @@ class FontListFragment : Fragment() {
 
         binding.rvFonts.layoutManager = LinearLayoutManager(requireContext())
         binding.rvFonts.adapter = adapter
+
+        // Hamburger icon opens drawer
+        binding.btnHamburger.setOnClickListener {
+            (activity as? MainActivity)?.openDrawer()
+        }
+
         binding.fabAdd.setOnClickListener { openFolderPicker() }
         binding.etSearch.addTextChangedListener { refresh(it?.toString() ?: "") }
 
@@ -116,6 +122,11 @@ class FontListFragment : Fragment() {
         }
     }
 
+    /** Called from MainActivity drawer reload button */
+    fun reloadFolder(uri: Uri) {
+        loadFontsFromFolder(uri, showToast = true)
+    }
+
     private fun openFolderPicker() {
         pickFolder.launch(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE))
     }
@@ -126,14 +137,14 @@ class FontListFragment : Fragment() {
         loadingDialog.show(parentFragmentManager, LoadingDialog.TAG)
 
         lifecycleScope.launch {
-            val fontUris = withContext(Dispatchers.IO) {
-                collectFontUris(folderUri, recursive)
-            }
+            val fontUris = withContext(Dispatchers.IO) { collectFontUris(folderUri, recursive) }
+
             if (fontUris.isEmpty()) {
                 loadingDialog.dismissAllowingStateLoss()
                 if (showToast) Toast.makeText(requireContext(), "No font files found", Toast.LENGTH_SHORT).show()
                 return@launch
             }
+
             val items = FontLoader.loadFontsFromUris(
                 context = requireContext(),
                 uris = fontUris,
@@ -145,9 +156,7 @@ class FontListFragment : Fragment() {
             FontRepository.markFolderLoaded(folderUri)
             refresh()
             loadingDialog.dismissAllowingStateLoss()
-            if (showToast) Toast.makeText(
-                requireContext(), "${items.size} font(s) loaded", Toast.LENGTH_SHORT
-            ).show()
+            if (showToast) Toast.makeText(requireContext(), "${items.size} font(s) loaded", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -157,14 +166,11 @@ class FontListFragment : Fragment() {
         val result = mutableListOf<Uri>()
         fun scanFolder(treeUri: Uri, docId: String) {
             val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(treeUri, docId)
-            cr.query(
-                childrenUri,
-                arrayOf(
-                    DocumentsContract.Document.COLUMN_DOCUMENT_ID,
-                    DocumentsContract.Document.COLUMN_DISPLAY_NAME,
-                    DocumentsContract.Document.COLUMN_MIME_TYPE
-                ), null, null, null
-            )?.use { cursor ->
+            cr.query(childrenUri, arrayOf(
+                DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+                DocumentsContract.Document.COLUMN_MIME_TYPE
+            ), null, null, null)?.use { cursor ->
                 val idCol   = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID)
                 val nameCol = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
                 val mimeCol = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_MIME_TYPE)

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:background="@drawable/bg_drawer_item"
+    android:padding="10dp"
+    android:layout_marginBottom="4dp">
+
+    <!-- Folder icon -->
+    <TextView
+        android:layout_width="28dp"
+        android:layout_height="wrap_content"
+        android:text="📁"
+        android:textSize="16sp"
+        android:gravity="center" />
+
+    <!-- Folder path -->
+    <TextView
+        android:id="@+id/tv_folder_path"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp"
+        android:maxLines="2"
+        android:ellipsize="middle" />
+
+    <!-- Reload button -->
+    <TextView
+        android:id="@+id/btn_reload"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:gravity="center"
+        android:text="↺"
+        android:textSize="18sp"
+        android:textColor="@color/accent"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless" />
+
+    <!-- Remove folder button -->
+    <TextView
+        android:id="@+id/btn_remove_folder"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:gravity="center"
+        android:text="✕"
+        android:textSize="14sp"
+        android:textColor="@color/text_muted"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless" />
+
+</LinearLayout>
