@@ -29,6 +29,9 @@ class FontListFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var adapter: FontListAdapter
 
+    // Only reload saved folders once per app session, not every tab switch
+    private var initialLoadDone = false
+
     private val pickFolder = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -68,14 +71,28 @@ class FontListFragment : Fragment() {
         binding.fabAdd.setOnClickListener { openFolderPicker() }
         binding.etSearch.addTextChangedListener { refresh(it?.toString() ?: "") }
 
-        reloadSavedFolders()
+        // Only load from saved folders on first creation, not on tab switches
+        if (!initialLoadDone) {
+            initialLoadDone = true
+            reloadSavedFolders()
+        } else {
+            refresh()
+        }
     }
 
     private fun reloadSavedFolders() {
         val savedUris = FontRepository.getSavedFolderUris()
         if (savedUris.isEmpty()) { refresh(); return }
+
+        // Only load fonts not already in the repository
+        val newUris = savedUris.filter { folderUri ->
+            // Check if this folder was already loaded this session
+            !FontRepository.isFolderLoaded(folderUri)
+        }
+        if (newUris.isEmpty()) { refresh(); return }
+
         lifecycleScope.launch {
-            for (uri in savedUris) {
+            for (uri in newUris) {
                 try { loadFontsFromFolder(uri, showToast = false) }
                 catch (_: Exception) {}
             }
@@ -88,8 +105,6 @@ class FontListFragment : Fragment() {
 
     private fun loadFontsFromFolder(folderUri: Uri, showToast: Boolean) {
         val recursive = FontRepository.settings.folderRecursive
-
-        // Show loading dialog
         val loadingDialog = LoadingDialog()
         loadingDialog.show(parentFragmentManager, LoadingDialog.TAG)
 
@@ -104,22 +119,18 @@ class FontListFragment : Fragment() {
                 return@launch
             }
 
-            // Update dialog with total count
-            loadingDialog.updateMessage("Loading fonts…")
-
             val items = FontLoader.loadFontsFromUris(
                 context = requireContext(),
                 uris = fontUris,
                 onProgress = { loaded, total ->
-                    // Switch to main thread to update UI
                     lifecycleScope.launch {
                         loadingDialog.updateProgress(loaded, total)
-                        loadingDialog.updateMessage("Loading fonts…")
                     }
                 }
             )
 
             FontRepository.addFonts(items)
+            FontRepository.markFolderLoaded(folderUri)
             refresh()
             loadingDialog.dismissAllowingStateLoss()
 
@@ -177,6 +188,6 @@ class FontListFragment : Fragment() {
         adapter.submitList(filtered)
     }
 
-    override fun onResume() { super.onResume(); refresh() }
+    override fun onResume() { super.onResume(); if (initialLoadDone) refresh() }
     override fun onDestroyView() { super.onDestroyView(); _binding = null }
 }

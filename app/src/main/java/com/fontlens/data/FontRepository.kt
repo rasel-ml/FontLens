@@ -12,15 +12,16 @@ object FontRepository {
     var settings = AppSettings()
 
     private val overridesCache = mutableMapOf<String, Map<String, String>>()
-    // Persisted folder URIs so we can reload fonts on app restart
     private val savedFolderUris = mutableSetOf<String>()
+    // Tracks which folders have been loaded this app session (resets on restart)
+    private val loadedFolderUris = mutableSetOf<String>()
 
     private val gson = Gson()
-    private const val PREFS          = "fontlens_prefs"
-    private const val KEY_SETTINGS   = "settings"
-    private const val KEY_FAVORITES  = "favorites"
-    private const val KEY_OVERRIDES  = "meta_overrides"
-    private const val KEY_FOLDERS    = "folder_uris"
+    private const val PREFS         = "fontlens_prefs"
+    private const val KEY_SETTINGS  = "settings"
+    private const val KEY_FAVORITES = "favorites"
+    private const val KEY_OVERRIDES = "meta_overrides"
+    private const val KEY_FOLDERS   = "folder_uris"
 
     fun getAll(): List<FontItem> = fonts.toList()
 
@@ -44,15 +45,19 @@ object FontRepository {
         save(context)
     }
 
-    /** Call this every time the user picks a folder so it's remembered across restarts */
     fun saveFolderUri(uri: Uri, context: Context) {
         savedFolderUris.add(uri.toString())
         save(context)
     }
 
-    /** Returns all previously picked folder URIs */
     fun getSavedFolderUris(): List<Uri> =
         savedFolderUris.map { Uri.parse(it) }
+
+    /** Returns true if this folder was already loaded this session */
+    fun isFolderLoaded(uri: Uri) = loadedFolderUris.contains(uri.toString())
+
+    /** Call after successfully loading fonts from a folder */
+    fun markFolderLoaded(uri: Uri) { loadedFolderUris.add(uri.toString()) }
 
     fun saveMetaOverrides(fontId: String, overrides: Map<String, String>, context: Context) {
         fonts.find { it.id == fontId }?.let { it.metaOverrides = overrides }
@@ -74,12 +79,10 @@ object FontRepository {
     fun load(context: Context) {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
-        // Settings
         prefs.getString(KEY_SETTINGS, null)?.let {
             try { settings = gson.fromJson(it, AppSettings::class.java) } catch (_: Exception) {}
         }
 
-        // Favorites
         prefs.getString(KEY_FAVORITES, "[]")?.let {
             try {
                 val type = object : TypeToken<Set<String>>() {}.type
@@ -88,7 +91,6 @@ object FontRepository {
             } catch (_: Exception) {}
         }
 
-        // Meta overrides
         prefs.getString(KEY_OVERRIDES, "{}")?.let {
             try {
                 val type = object : TypeToken<Map<String, Map<String, String>>>() {}.type
@@ -98,7 +100,6 @@ object FontRepository {
             } catch (_: Exception) {}
         }
 
-        // Saved folder URIs
         prefs.getString(KEY_FOLDERS, "[]")?.let {
             try {
                 val type = object : TypeToken<Set<String>>() {}.type
