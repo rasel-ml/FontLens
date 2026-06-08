@@ -33,10 +33,13 @@ class FontListFragment : Fragment() {
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val uri = result.data?.data ?: return@registerForActivityResult
+            // Persist permission across reboots
             requireContext().contentResolver.takePersistableUriPermission(
                 uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
             )
-            loadFontsFromFolder(uri)
+            // Save URI so it reloads on next launch
+            FontRepository.saveFolderUri(uri, requireContext())
+            loadFontsFromFolder(uri, showToast = true)
         }
     }
 
@@ -65,7 +68,23 @@ class FontListFragment : Fragment() {
         binding.rvFonts.adapter = adapter
         binding.fabAdd.setOnClickListener { openFolderPicker() }
         binding.etSearch.addTextChangedListener { refresh(it?.toString() ?: "") }
-        refresh()
+
+        // Reload fonts from all previously picked folders on every launch
+        reloadSavedFolders()
+    }
+
+    private fun reloadSavedFolders() {
+        val savedUris = FontRepository.getSavedFolderUris()
+        if (savedUris.isEmpty()) { refresh(); return }
+        lifecycleScope.launch {
+            for (uri in savedUris) {
+                try {
+                    loadFontsFromFolder(uri, showToast = false)
+                } catch (_: Exception) {
+                    // URI permission may have expired — ignore silently
+                }
+            }
+        }
     }
 
     private fun openFolderPicker() {
@@ -73,22 +92,20 @@ class FontListFragment : Fragment() {
         pickFolder.launch(intent)
     }
 
-    private fun loadFontsFromFolder(folderUri: Uri) {
+    private fun loadFontsFromFolder(folderUri: Uri, showToast: Boolean) {
         val recursive = FontRepository.settings.folderRecursive
         lifecycleScope.launch {
             val fontUris = withContext(Dispatchers.IO) {
                 collectFontUris(folderUri, recursive)
             }
-
             if (fontUris.isEmpty()) {
-                Toast.makeText(requireContext(), "No font files found", Toast.LENGTH_SHORT).show()
+                if (showToast) Toast.makeText(requireContext(), "No font files found", Toast.LENGTH_SHORT).show()
                 return@launch
             }
-
             val items = FontLoader.loadFontsFromUris(requireContext(), fontUris)
             FontRepository.addFonts(items)
             refresh()
-            Toast.makeText(requireContext(), "${items.size} font(s) loaded", Toast.LENGTH_SHORT).show()
+            if (showToast) Toast.makeText(requireContext(), "${items.size} font(s) loaded", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -112,23 +129,21 @@ class FontListFragment : Fragment() {
                 val nameCol = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
                 val mimeCol = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_MIME_TYPE)
                 while (cursor.moveToNext()) {
-                    val childId  = cursor.getString(idCol)   ?: continue
-                    val name     = cursor.getString(nameCol) ?: continue
-                    val mime     = cursor.getString(mimeCol) ?: ""
-                    val ext      = name.substringAfterLast(".").lowercase()
-
-                    if (ext in fontExtensions) {
-                        result.add(DocumentsContract.buildDocumentUriUsingTree(treeUri, childId))
-                    } else if (recursive && mime == DocumentsContract.Document.MIME_TYPE_DIR) {
-                        // Recurse into subfolder
-                        scanFolder(treeUri, childId)
+                    val childId = cursor.getString(idCol)   ?: continue
+                    val name    = cursor.getString(nameCol) ?: continue
+                    val mime    = cursor.getString(mimeCol) ?: ""
+                    val ext     = name.substringAfterLast(".").lowercase()
+                    when {
+                        ext in fontExtensions ->
+                            result.add(DocumentsContract.buildDocumentUriUsingTree(treeUri, childId))
+                        recursive && mime == DocumentsContract.Document.MIME_TYPE_DIR ->
+                            scanFolder(treeUri, childId)
                     }
                 }
             }
         }
 
-        val rootDocId = DocumentsContract.getTreeDocumentId(folderUri)
-        scanFolder(folderUri, rootDocId)
+        scanFolder(folderUri, DocumentsContract.getTreeDocumentId(folderUri))
         return result
     }
 
@@ -136,7 +151,6 @@ class FontListFragment : Fragment() {
         val all = FontRepository.getAll()
         val filtered = if (query.isBlank()) all
         else all.filter { it.displayName.contains(query, ignoreCase = true) }
-
         binding.tvCount.text = filtered.size.toString()
         binding.layoutEmpty.visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE
         binding.rvFonts.visibility     = if (filtered.isEmpty()) View.GONE   else View.VISIBLE

@@ -1,6 +1,7 @@
 package com.fontlens.data
 
 import android.content.Context
+import android.net.Uri
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -10,14 +11,16 @@ object FontRepository {
     private val favorites = mutableSetOf<String>()
     var settings = AppSettings()
 
-    // Keep overrides in memory so they survive font reloads
     private val overridesCache = mutableMapOf<String, Map<String, String>>()
+    // Persisted folder URIs so we can reload fonts on app restart
+    private val savedFolderUris = mutableSetOf<String>()
 
     private val gson = Gson()
-    private const val PREFS = "fontlens_prefs"
-    private const val KEY_SETTINGS = "settings"
-    private const val KEY_FAVORITES = "favorites"
-    private const val KEY_META_OVERRIDES = "meta_overrides"
+    private const val PREFS          = "fontlens_prefs"
+    private const val KEY_SETTINGS   = "settings"
+    private const val KEY_FAVORITES  = "favorites"
+    private const val KEY_OVERRIDES  = "meta_overrides"
+    private const val KEY_FOLDERS    = "folder_uris"
 
     fun getAll(): List<FontItem> = fonts.toList()
 
@@ -28,7 +31,6 @@ object FontRepository {
     fun addFonts(items: List<FontItem>) {
         val existingIds = fonts.map { it.id }.toSet()
         val newFonts = items.filter { it.id !in existingIds }
-        // Reapply any saved overrides for these fonts immediately
         newFonts.forEach { font ->
             overridesCache[font.id]?.let { font.metaOverrides = it }
         }
@@ -42,19 +44,26 @@ object FontRepository {
         save(context)
     }
 
+    /** Call this every time the user picks a folder so it's remembered across restarts */
+    fun saveFolderUri(uri: Uri, context: Context) {
+        savedFolderUris.add(uri.toString())
+        save(context)
+    }
+
+    /** Returns all previously picked folder URIs */
+    fun getSavedFolderUris(): List<Uri> =
+        savedFolderUris.map { Uri.parse(it) }
+
     fun saveMetaOverrides(fontId: String, overrides: Map<String, String>, context: Context) {
-        // Update in-memory font
         fonts.find { it.id == fontId }?.let { it.metaOverrides = overrides }
-        // Update in-memory cache
         overridesCache[fontId] = overrides
-        // Persist to SharedPreferences
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        val allOverrides = prefs.getString(KEY_META_OVERRIDES, "{}") ?: "{}"
+        val allOverrides = prefs.getString(KEY_OVERRIDES, "{}") ?: "{}"
         val type = object : TypeToken<MutableMap<String, Map<String, String>>>() {}.type
         val map: MutableMap<String, Map<String, String>> =
             gson.fromJson(allOverrides, type) ?: mutableMapOf()
         map[fontId] = overrides
-        prefs.edit().putString(KEY_META_OVERRIDES, gson.toJson(map)).apply()
+        prefs.edit().putString(KEY_OVERRIDES, gson.toJson(map)).apply()
     }
 
     fun getMetaOverrides(fontId: String): Map<String, String> =
@@ -75,29 +84,35 @@ object FontRepository {
             try {
                 val type = object : TypeToken<Set<String>>() {}.type
                 val loaded: Set<String> = gson.fromJson(it, type) ?: emptySet()
-                favorites.clear()
-                favorites.addAll(loaded)
+                favorites.clear(); favorites.addAll(loaded)
             } catch (_: Exception) {}
         }
 
-        // Load overrides into cache — applied to fonts in addFonts() when they load
-        prefs.getString(KEY_META_OVERRIDES, "{}")?.let {
+        // Meta overrides
+        prefs.getString(KEY_OVERRIDES, "{}")?.let {
             try {
                 val type = object : TypeToken<Map<String, Map<String, String>>>() {}.type
                 val map: Map<String, Map<String, String>> = gson.fromJson(it, type) ?: emptyMap()
-                overridesCache.clear()
-                overridesCache.putAll(map)
-                // Also reapply to any already-loaded fonts (e.g. after settings change)
+                overridesCache.clear(); overridesCache.putAll(map)
                 fonts.forEach { f -> overridesCache[f.id]?.let { ov -> f.metaOverrides = ov } }
+            } catch (_: Exception) {}
+        }
+
+        // Saved folder URIs
+        prefs.getString(KEY_FOLDERS, "[]")?.let {
+            try {
+                val type = object : TypeToken<Set<String>>() {}.type
+                val loaded: Set<String> = gson.fromJson(it, type) ?: emptySet()
+                savedFolderUris.clear(); savedFolderUris.addAll(loaded)
             } catch (_: Exception) {}
         }
     }
 
     private fun save(context: Context) {
-        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        prefs.edit()
-            .putString(KEY_SETTINGS, gson.toJson(settings))
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .putString(KEY_SETTINGS,  gson.toJson(settings))
             .putString(KEY_FAVORITES, gson.toJson(favorites))
+            .putString(KEY_FOLDERS,   gson.toJson(savedFolderUris))
             .apply()
     }
 
@@ -105,7 +120,7 @@ object FontRepository {
         val s = settings
         val userText = s.langSamples[s.defaultLang] ?: ""
         val metaText = font.effectiveMeta.sampleText
-        val default = "The quick brown fox jumps over the lazy dog 0123456789"
+        val default  = "The quick brown fox jumps over the lazy dog 0123456789"
         return when (s.samplePriority) {
             SamplePriority.ALWAYS_USER    -> userText.ifEmpty { default }
             SamplePriority.ALWAYS_META    -> metaText.ifEmpty { default }
