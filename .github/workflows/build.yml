@@ -23,8 +23,10 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Generate Gradle wrapper
-        run: gradle wrapper --gradle-version 8.4
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.7
 
       - name: Grant execute permission to gradlew
         run: chmod +x gradlew
@@ -55,8 +57,10 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Generate Gradle wrapper
-        run: gradle wrapper --gradle-version 8.4
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.7
 
       - name: Grant execute permission to gradlew
         run: chmod +x gradlew
