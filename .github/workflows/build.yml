@@ -1,4 +1,4 @@
-namename: Build FontLens APK
+name: Build FontLens APK
 
 on:
   push:
