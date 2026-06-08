@@ -1,4 +1,4 @@
-package com.fontforge.data
+package com.fontlens.data
 
 import android.content.Context
 import com.google.gson.Gson
@@ -14,7 +14,7 @@ object FontRepository {
     private val overridesCache = mutableMapOf<String, Map<String, String>>()
 
     private val gson = Gson()
-    private const val PREFS = "fontforge_prefs"
+    private const val PREFS = "fontlens_prefs"
     private const val KEY_SETTINGS = "settings"
     private const val KEY_FAVORITES = "favorites"
     private const val KEY_META_OVERRIDES = "meta_overrides"

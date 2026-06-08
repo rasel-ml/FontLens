@@ -1,10 +1,10 @@
-package com.fontforge.ui.glyph
+package com.fontlens.ui.glyph
 
 import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.fontforge.databinding.ItemGlyphCellBinding
+import com.fontlens.databinding.ItemGlyphCellBinding
 
 class GlyphAdapter(
     private val typeface: Typeface?,

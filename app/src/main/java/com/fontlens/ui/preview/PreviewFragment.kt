@@ -1,4 +1,4 @@
-package com.fontforge.ui.preview
+package com.fontlens.ui.preview
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,10 +8,10 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.fontforge.R
-import com.fontforge.data.FontRepository
-import com.fontforge.databinding.FragmentPreviewBinding
-import com.fontforge.utils.FontLoader
+import com.fontlens.R
+import com.fontlens.data.FontRepository
+import com.fontlens.databinding.FragmentPreviewBinding
+import com.fontlens.utils.FontLoader
 
 class PreviewFragment : Fragment() {
 

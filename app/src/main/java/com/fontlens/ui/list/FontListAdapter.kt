@@ -1,4 +1,4 @@
-package com.fontforge.ui.list
+package com.fontlens.ui.list
 
 import android.graphics.Typeface
 import android.view.LayoutInflater
@@ -6,9 +6,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.fontforge.data.FontItem
-import com.fontforge.databinding.ItemFontCardBinding
-import com.fontforge.utils.FontLoader
+import com.fontlens.data.FontItem
+import com.fontlens.databinding.ItemFontCardBinding
+import com.fontlens.utils.FontLoader
 
 class FontListAdapter(
     private val onFontClick: (FontItem) -> Unit,
@@ -46,9 +46,9 @@ class FontListAdapter(
         b.btnFavorite.text = if (isFavorite(font.id)) "★" else "☆"
         b.btnFavorite.setTextColor(
             if (isFavorite(font.id))
-                holder.itemView.context.getColor(com.fontforge.R.color.accent)
+                holder.itemView.context.getColor(com.fontlens.R.color.accent)
             else
-                holder.itemView.context.getColor(com.fontforge.R.color.text_muted)
+                holder.itemView.context.getColor(com.fontlens.R.color.text_muted)
         )
 
         b.root.setOnClickListener { onFontClick(font) }

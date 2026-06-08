@@ -1,4 +1,4 @@
-package com.fontforge.ui.glyph
+package com.fontlens.ui.glyph
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,9 +9,9 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
-import com.fontforge.data.FontRepository
-import com.fontforge.databinding.FragmentGlyphBinding
-import com.fontforge.utils.FontLoader
+import com.fontlens.data.FontRepository
+import com.fontlens.databinding.FragmentGlyphBinding
+import com.fontlens.utils.FontLoader
 
 class GlyphFragment : Fragment() {
 
@@ -79,7 +79,7 @@ class GlyphFragment : Fragment() {
 
         val totalPages = maxOf(1, (filteredChars.size + PAGE_SIZE - 1) / PAGE_SIZE)
         binding.tvPage.text = "${currentPage + 1} / $totalPages"
-        binding.tvGlyphCount.text = getString(com.fontforge.R.string.glyph_count, filteredChars.size)
+        binding.tvGlyphCount.text = getString(com.fontlens.R.string.glyph_count, filteredChars.size)
 
         binding.btnPrev.alpha = if (currentPage > 0) 1f else 0.3f
         binding.btnNext.alpha = if (currentPage < totalPages - 1) 1f else 0.3f

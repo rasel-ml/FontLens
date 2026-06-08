@@ -1,9 +1,9 @@
-package com.fontforge.ui.meta
+package com.fontlens.ui.meta
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.fontforge.databinding.ItemMetaRowBinding
+import com.fontlens.databinding.ItemMetaRowBinding
 
 class MetaAdapter(private val items: List<Pair<String, String>>) :
     RecyclerView.Adapter<MetaAdapter.VH>() {

@@ -1,10 +1,10 @@
-package com.fontforge.utils
+package com.fontlens.utils
 
 import android.content.Context
 import android.graphics.Typeface
 import android.net.Uri
-import com.fontforge.data.FontItem
-import com.fontforge.data.FontRepository
+import com.fontlens.data.FontItem
+import com.fontlens.data.FontRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

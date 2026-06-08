@@ -1,4 +1,4 @@
-package com.fontforge.ui.list
+package com.fontlens.ui.list
 
 import android.app.Activity
 import android.content.Intent
@@ -12,10 +12,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.fontforge.R
-import com.fontforge.data.FontRepository
-import com.fontforge.databinding.FragmentFontListBinding
-import com.fontforge.utils.FontLoader
+import com.fontlens.R
+import com.fontlens.data.FontRepository
+import com.fontlens.databinding.FragmentFontListBinding
+import com.fontlens.utils.FontLoader
 import kotlinx.coroutines.launch
 
 class FontListFragment : Fragment() {

@@ -1,4 +1,4 @@
-name: Build FontForge APK
+name: Build FontLens APK
 
 on:
   push:
@@ -37,40 +37,40 @@ jobs:
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: FontForge-debug
+          name: FontLens-debug
           path: app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
 
-  release:
-    name: Build Release APK (unsigned)
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+  # release:
+    # name: Build Release APK (unsigned)
+    # runs-on: ubuntu-latest
+    # if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    # steps:
+      # - name: Checkout code
+        # uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
+      # - name: Set up JDK 17
+        # uses: actions/setup-java@v4
+        # with:
+          # java-version: '17'
+          # distribution: 'temurin'
 
-      - name: Download gradle-wrapper.jar
-        run: |
-          mkdir -p gradle/wrapper
-          curl -Lo gradle/wrapper/gradle-wrapper.jar \
-            https://github.com/gradle/gradle/raw/v8.7.0/gradle/wrapper/gradle-wrapper.jar
+      # - name: Download gradle-wrapper.jar
+        # run: |
+          # mkdir -p gradle/wrapper
+          # curl -Lo gradle/wrapper/gradle-wrapper.jar \
+            # https://github.com/gradle/gradle/raw/v8.7.0/gradle/wrapper/gradle-wrapper.jar
 
-      - name: Grant execute permission to gradlew
-        run: chmod +x gradlew
+      # - name: Grant execute permission to gradlew
+        # run: chmod +x gradlew
 
-      - name: Build release APK
-        run: ./gradlew assembleRelease --stacktrace
+      # - name: Build release APK
+        # run: ./gradlew assembleRelease --stacktrace
 
-      - name: Upload release APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: FontForge-release-unsigned
-          path: app/build/outputs/apk/release/app-release-unsigned.apk
-          retention-days: 30
+      # - name: Upload release APK
+        # uses: actions/upload-artifact@v4
+        # with:
+          # name: FontLens-release-unsigned
+          # path: app/build/outputs/apk/release/app-release-unsigned.apk
+          # retention-days: 30

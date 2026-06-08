@@ -1,4 +1,4 @@
-package com.fontforge.ui.meta
+package com.fontlens.ui.meta
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,8 +8,8 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.fontforge.data.FontRepository
-import com.fontforge.databinding.FragmentMetadataBinding
+import com.fontlens.data.FontRepository
+import com.fontlens.databinding.FragmentMetadataBinding
 
 class MetaFragment : Fragment() {
 

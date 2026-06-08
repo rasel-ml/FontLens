@@ -1,1 +1,1 @@
--keep class com.fontforge.data.** { *; }
+-keep class com.fontlens.data.** { *; }

@@ -1,6 +1,6 @@
-package com.fontforge.utils
+package com.fontlens.utils
 
-import com.fontforge.data.FontMeta
+import com.fontlens.data.FontMeta
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder

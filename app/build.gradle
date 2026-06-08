@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace 'com.fontforge'
+    namespace 'com.fontlens'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.fontforge"
+        applicationId "com.fontlens"
         minSdk 26
         targetSdk 34
         versionCode 1

@@ -1,11 +1,11 @@
-package com.fontforge
+package com.fontlens
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
-import com.fontforge.data.FontRepository
-import com.fontforge.databinding.ActivityMainBinding
+import com.fontlens.data.FontRepository
+import com.fontlens.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 

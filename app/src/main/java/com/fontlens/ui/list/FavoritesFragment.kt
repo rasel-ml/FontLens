@@ -1,4 +1,4 @@
-package com.fontforge.ui.list
+package com.fontlens.ui.list
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.fontforge.R
-import com.fontforge.data.FontRepository
-import com.fontforge.databinding.FragmentFontListBinding
+import com.fontlens.R
+import com.fontlens.data.FontRepository
+import com.fontlens.databinding.FragmentFontListBinding
 
 class FavoritesFragment : Fragment() {
 

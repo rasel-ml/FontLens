@@ -1,4 +1,4 @@
-package com.fontforge.ui.settings
+package com.fontlens.ui.settings
 
 import android.app.AlertDialog
 import android.os.Bundle
@@ -7,12 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
-import com.fontforge.R
-import com.fontforge.data.AppSettings
-import com.fontforge.data.FontRepository
-import com.fontforge.data.SamplePriority
-import com.fontforge.databinding.FragmentSettingsBinding
-import com.fontforge.databinding.ItemLangSettingBinding
+import com.fontlens.R
+import com.fontlens.data.AppSettings
+import com.fontlens.data.FontRepository
+import com.fontlens.data.SamplePriority
+import com.fontlens.databinding.FragmentSettingsBinding
+import com.fontlens.databinding.ItemLangSettingBinding
 import com.google.android.material.textfield.TextInputEditText
 
 class SettingsFragment : Fragment() {

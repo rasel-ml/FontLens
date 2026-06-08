@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/fontListFragment"
-        android:name="com.fontforge.ui.list.FontListFragment"
+        android:name="com.fontlens.ui.list.FontListFragment"
         android:label="@string/library">
         <action
             android:id="@+id/action_list_to_preview"
@@ -17,7 +17,7 @@
 
     <fragment
         android:id="@+id/favoritesFragment"
-        android:name="com.fontforge.ui.list.FavoritesFragment"
+        android:name="com.fontlens.ui.list.FavoritesFragment"
         android:label="@string/favorites">
         <action
             android:id="@+id/action_fav_to_preview"
@@ -28,12 +28,12 @@
 
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.fontforge.ui.settings.SettingsFragment"
+        android:name="com.fontlens.ui.settings.SettingsFragment"
         android:label="@string/settings" />
 
     <fragment
         android:id="@+id/previewFragment"
-        android:name="com.fontforge.ui.preview.PreviewFragment"
+        android:name="com.fontlens.ui.preview.PreviewFragment"
         android:label="@string/preview">
         <argument android:name="fontId" app:argType="string" />
         <action android:id="@+id/action_preview_to_glyph" app:destination="@id/glyphFragment" />
@@ -43,14 +43,14 @@
 
     <fragment
         android:id="@+id/glyphFragment"
-        android:name="com.fontforge.ui.glyph.GlyphFragment"
+        android:name="com.fontlens.ui.glyph.GlyphFragment"
         android:label="@string/glyph_map">
         <argument android:name="fontId" app:argType="string" />
     </fragment>
 
     <fragment
         android:id="@+id/metaFragment"
-        android:name="com.fontforge.ui.meta.MetaFragment"
+        android:name="com.fontlens.ui.meta.MetaFragment"
         android:label="@string/metadata">
         <argument android:name="fontId" app:argType="string" />
         <action android:id="@+id/action_meta_to_edit" app:destination="@id/metaEditFragment" />
@@ -58,14 +58,14 @@
 
     <fragment
         android:id="@+id/metaEditFragment"
-        android:name="com.fontforge.ui.meta.MetaEditFragment"
+        android:name="com.fontlens.ui.meta.MetaEditFragment"
         android:label="@string/edit_metadata">
         <argument android:name="fontId" app:argType="string" />
     </fragment>
 
     <fragment
         android:id="@+id/fontInfoFragment"
-        android:name="com.fontforge.ui.info.FontInfoFragment"
+        android:name="com.fontlens.ui.info.FontInfoFragment"
         android:label="@string/font_info">
         <argument android:name="fontId" app:argType="string" />
     </fragment>

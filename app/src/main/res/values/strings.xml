@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">FontForge</string>
+    <string name="app_name">FontLens</string>
     <string name="library">Library</string>
     <string name="favorites">Favorites</string>
     <string name="settings">Settings</string>

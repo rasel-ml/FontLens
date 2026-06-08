@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.FontForge" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.FontLens" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/accent</item>
         <item name="colorPrimaryVariant">@color/accent_dim</item>
         <item name="colorOnPrimary">@color/bg_primary</item>
@@ -24,7 +24,7 @@
         <item name="strokeWidth">1dp</item>
     </style>
 
-    <style name="Theme.FontForge.BottomSheet" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
+    <style name="Theme.FontLens.BottomSheet" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
         <item name="android:colorBackground">@color/bg_elevated</item>
     </style>
 
