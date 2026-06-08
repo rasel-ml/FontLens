@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_primary">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/bg_sidebar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_back"
+        app:navigationIconTint="@color/text_secondary"
+        app:title="@string/font_info"
+        app:titleTextColor="@color/text_primary" />
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="24dp">
+
+            <!-- Style Support section header -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/style_support"
+                android:textColor="@color/accent"
+                android:textSize="11sp"
+                android:letterSpacing="0.12"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="6dp" />
+
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider" android:layout_marginStart="16dp" />
+
+            <!-- Bold Support -->
+            <include layout="@layout/item_info_row" android:id="@+id/row_bold" />
+            <include layout="@layout/item_info_row" android:id="@+id/row_italic" />
+            <include layout="@layout/item_info_row" android:id="@+id/row_condensed" />
+            <include layout="@layout/item_info_row" android:id="@+id/row_extended" />
+            <include layout="@layout/item_info_row" android:id="@+id/row_mono" />
+
+            <!-- Technical section header -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/technical"
+                android:textColor="@color/accent"
+                android:textSize="11sp"
+                android:letterSpacing="0.12"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="6dp" />
+
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider" android:layout_marginStart="16dp" />
+
+            <include layout="@layout/item_info_row" android:id="@+id/row_glyphs" />
+            <include layout="@layout/item_info_row" android:id="@+id/row_weight" />
+            <include layout="@layout/item_info_row" android:id="@+id/row_upm" />
+            <include layout="@layout/item_info_row" android:id="@+id/row_italic_angle" />
+            <include layout="@layout/item_info_row" android:id="@+id/row_chars" />
+            <include layout="@layout/item_info_row" android:id="@+id/row_tables" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

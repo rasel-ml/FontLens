@@ -1,0 +1,21 @@
+# Gradle
+.gradle/
+build/
+**/build/
+local.properties
+*.iml
+
+# Android Studio
+.idea/
+*.DS_Store
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Keystore (never commit signing keys)
+*.jks
+*.keystore
+
+# Generated
+app/src/main/res/raw/
+

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/glyph_cell_size"
+    android:layout_height="@dimen/glyph_cell_size"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="4dp"
+    android:background="@drawable/bg_glyph_cell"
+    android:clickable="true"
+    android:focusable="true">
+
+    <TextView
+        android:id="@+id/tv_glyph"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:textSize="24sp"
+        android:textColor="@color/text_primary"
+        android:maxLines="1" />
+
+    <TextView
+        android:id="@+id/tv_codepoint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="8sp"
+        android:textColor="@color/text_muted"
+        android:fontFamily="monospace"
+        android:maxLines="1" />
+
+</LinearLayout>

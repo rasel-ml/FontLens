@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="sidebar_width">72dp</dimen>
+    <dimen name="card_padding">16dp</dimen>
+    <dimen name="card_radius">8dp</dimen>
+    <dimen name="card_spacing">10dp</dimen>
+    <dimen name="toolbar_height">56dp</dimen>
+    <dimen name="glyph_cell_size">72dp</dimen>
+    <dimen name="icon_size">24dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="preview_padding">24dp</dimen>
+    <dimen name="section_padding">16dp</dimen>
+    <dimen name="meta_key_width">140dp</dimen>
+</resources>
