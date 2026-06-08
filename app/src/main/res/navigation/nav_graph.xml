@@ -8,14 +8,22 @@
         android:id="@+id/fontListFragment"
         android:name="com.fontforge.ui.list.FontListFragment"
         android:label="@string/library">
-        <action android:id="@+id/action_list_to_preview" app:destination="@id/previewFragment" />
+        <action
+            android:id="@+id/action_list_to_preview"
+            app:destination="@id/previewFragment"
+            app:popUpTo="@id/fontListFragment"
+            app:popUpToInclusive="false" />
     </fragment>
 
     <fragment
         android:id="@+id/favoritesFragment"
         android:name="com.fontforge.ui.list.FavoritesFragment"
         android:label="@string/favorites">
-        <action android:id="@+id/action_fav_to_preview" app:destination="@id/previewFragment" />
+        <action
+            android:id="@+id/action_fav_to_preview"
+            app:destination="@id/previewFragment"
+            app:popUpTo="@id/favoritesFragment"
+            app:popUpToInclusive="false" />
     </fragment>
 
     <fragment
@@ -29,8 +37,8 @@
         android:label="@string/preview">
         <argument android:name="fontId" app:argType="string" />
         <action android:id="@+id/action_preview_to_glyph" app:destination="@id/glyphFragment" />
-        <action android:id="@+id/action_preview_to_meta" app:destination="@id/metaFragment" />
-        <action android:id="@+id/action_preview_to_info" app:destination="@id/fontInfoFragment" />
+        <action android:id="@+id/action_preview_to_meta"  app:destination="@id/metaFragment" />
+        <action android:id="@+id/action_preview_to_info"  app:destination="@id/fontInfoFragment" />
     </fragment>
 
     <fragment

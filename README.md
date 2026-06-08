@@ -1,4 +1,4 @@
-# FontForge 🔤
+# FontLens
 
 A fully offline Android font viewer and inspector.
 
@@ -15,7 +15,7 @@ A fully offline Android font viewer and inspector.
 ## Building
 
 ### In Android Studio
-1. Open the `FontForge/` folder
+1. Open the `FontLens/` folder
 2. Wait for Gradle sync
 3. Run ▶ on a device or emulator (min SDK 26)
 
@@ -33,7 +33,7 @@ This generates the `gradlew` binary and `.jar` needed by CI.
 ## Project Structure
 ```
 app/src/main/
-├── java/com/fontforge/
+├── java/com/fontlens/
 │   ├── MainActivity.kt
 │   ├── data/          FontData.kt, FontRepository.kt
 │   ├── utils/         FontParser.kt, FontLoader.kt
@@ -51,15 +51,3 @@ app/src/main/
     ├── menu/          bottom_nav_menu.xml
     └── values/        strings, colors, themes, dimens
 ```
-
-## Launcher Icons needed
-Place your icons in the mipmap folders:
-| Folder            | Size     |
-|-------------------|----------|
-| mipmap-mdpi       | 48×48    |
-| mipmap-hdpi       | 72×72    |
-| mipmap-xhdpi      | 96×96    |
-| mipmap-xxhdpi     | 144×144  |
-| mipmap-xxxhdpi    | 192×192  |
-
-In Android Studio: right-click `res` → New → Image Asset (easiest way).
