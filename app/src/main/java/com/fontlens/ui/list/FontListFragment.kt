@@ -17,6 +17,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fontlens.data.FontRepository
 import com.fontlens.databinding.FragmentFontListBinding
+import com.fontlens.ui.LoadingDialog
 import com.fontlens.utils.FontLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,11 +34,9 @@ class FontListFragment : Fragment() {
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val uri = result.data?.data ?: return@registerForActivityResult
-            // Persist permission across reboots
             requireContext().contentResolver.takePersistableUriPermission(
                 uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
             )
-            // Save URI so it reloads on next launch
             FontRepository.saveFolderUri(uri, requireContext())
             loadFontsFromFolder(uri, showToast = true)
         }
@@ -69,7 +68,6 @@ class FontListFragment : Fragment() {
         binding.fabAdd.setOnClickListener { openFolderPicker() }
         binding.etSearch.addTextChangedListener { refresh(it?.toString() ?: "") }
 
-        // Reload fonts from all previously picked folders on every launch
         reloadSavedFolders()
     }
 
@@ -78,34 +76,56 @@ class FontListFragment : Fragment() {
         if (savedUris.isEmpty()) { refresh(); return }
         lifecycleScope.launch {
             for (uri in savedUris) {
-                try {
-                    loadFontsFromFolder(uri, showToast = false)
-                } catch (_: Exception) {
-                    // URI permission may have expired — ignore silently
-                }
+                try { loadFontsFromFolder(uri, showToast = false) }
+                catch (_: Exception) {}
             }
         }
     }
 
     private fun openFolderPicker() {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-        pickFolder.launch(intent)
+        pickFolder.launch(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE))
     }
 
     private fun loadFontsFromFolder(folderUri: Uri, showToast: Boolean) {
         val recursive = FontRepository.settings.folderRecursive
+
+        // Show loading dialog
+        val loadingDialog = LoadingDialog()
+        loadingDialog.show(parentFragmentManager, LoadingDialog.TAG)
+
         lifecycleScope.launch {
             val fontUris = withContext(Dispatchers.IO) {
                 collectFontUris(folderUri, recursive)
             }
+
             if (fontUris.isEmpty()) {
+                loadingDialog.dismissAllowingStateLoss()
                 if (showToast) Toast.makeText(requireContext(), "No font files found", Toast.LENGTH_SHORT).show()
                 return@launch
             }
-            val items = FontLoader.loadFontsFromUris(requireContext(), fontUris)
+
+            // Update dialog with total count
+            loadingDialog.updateMessage("Loading fonts…")
+
+            val items = FontLoader.loadFontsFromUris(
+                context = requireContext(),
+                uris = fontUris,
+                onProgress = { loaded, total ->
+                    // Switch to main thread to update UI
+                    lifecycleScope.launch {
+                        loadingDialog.updateProgress(loaded, total)
+                        loadingDialog.updateMessage("Loading fonts…")
+                    }
+                }
+            )
+
             FontRepository.addFonts(items)
             refresh()
-            if (showToast) Toast.makeText(requireContext(), "${items.size} font(s) loaded", Toast.LENGTH_SHORT).show()
+            loadingDialog.dismissAllowingStateLoss()
+
+            if (showToast) Toast.makeText(
+                requireContext(), "${items.size} font(s) loaded", Toast.LENGTH_SHORT
+            ).show()
         }
     }
 

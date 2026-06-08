@@ -1,4 +1,4 @@
-name: Build FontLens APK
+namename: Build FontLens APK
 
 on:
   push:
@@ -7,12 +7,14 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     name: Build APK
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -22,6 +24,20 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+
+      - name: Cache Gradle distribution (bin.zip)
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/wrapper/dists
+          key: gradle-dist-8.7
+          restore-keys: gradle-dist-8.7
+
+      - name: Cache Gradle build cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: gradle-cache-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: gradle-cache-
 
       - name: Download gradle-wrapper.jar
         run: |
@@ -34,11 +50,13 @@ jobs:
 
       - name: Build debug APK
         run: ./gradlew assembleDebug --stacktrace
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
-      - name: Upload debug APK
+      - name: Upload APK
         uses: actions/upload-artifact@v5
         with:
-          name: FontLens-debug
+          name: FontLens
           path: app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
 
