@@ -175,6 +175,73 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                app:cardBackgroundColor="@color/bg_surface"
+                app:strokeColor="@color/divider"
+                app:strokeWidth="1dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp">
+            
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+            
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="FOLDER SCANNING"
+                        android:textColor="@color/accent"
+                        android:textSize="11sp"
+                        android:letterSpacing="0.1"
+                        android:textAllCaps="true"
+                        android:layout_marginBottom="8dp" />
+            
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+            
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+            
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Scan Subfolders Recursively"
+                                android:textColor="@color/text_primary"
+                                android:textSize="14sp" />
+            
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="When on, fonts inside subfolders are also loaded"
+                                android:textColor="@color/text_muted"
+                                android:textSize="12sp"
+                                android:layout_marginTop="2dp" />
+            
+                        </LinearLayout>
+            
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/switch_recursive"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:thumbTint="@color/accent"
+                            android:trackTint="@color/switch_track_color" />
+            
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- Glyph Keyboard Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"

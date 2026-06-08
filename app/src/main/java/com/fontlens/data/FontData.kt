@@ -42,20 +42,20 @@ data class FontItem(
     var metaOverrides: Map<String, String> = emptyMap()
 ) {
     val effectiveMeta: FontMeta get() = meta.copy(
-        family      = metaOverrides["family"]      ?: meta.family,
-        subfamily   = metaOverrides["subfamily"]   ?: meta.subfamily,
-        fullName    = metaOverrides["fullName"]     ?: meta.fullName,
-        version     = metaOverrides["version"]     ?: meta.version,
-        postscript  = metaOverrides["postscript"]  ?: meta.postscript,
-        manufacturer= metaOverrides["manufacturer"]?: meta.manufacturer,
-        designer    = metaOverrides["designer"]    ?: meta.designer,
-        description = metaOverrides["description"] ?: meta.description,
-        trademark   = metaOverrides["trademark"]   ?: meta.trademark,
-        license     = metaOverrides["license"]     ?: meta.license,
-        licenseURL  = metaOverrides["licenseURL"]  ?: meta.licenseURL,
-        vendorURL   = metaOverrides["vendorURL"]   ?: meta.vendorURL,
-        designerURL = metaOverrides["designerURL"] ?: meta.designerURL,
-        sampleText  = metaOverrides["sampleText"]  ?: meta.sampleText
+        family       = metaOverrides["family"]       ?: meta.family,
+        subfamily    = metaOverrides["subfamily"]    ?: meta.subfamily,
+        fullName     = metaOverrides["fullName"]     ?: meta.fullName,
+        version      = metaOverrides["version"]      ?: meta.version,
+        postscript   = metaOverrides["postscript"]   ?: meta.postscript,
+        manufacturer = metaOverrides["manufacturer"] ?: meta.manufacturer,
+        designer     = metaOverrides["designer"]     ?: meta.designer,
+        description  = metaOverrides["description"]  ?: meta.description,
+        trademark    = metaOverrides["trademark"]    ?: meta.trademark,
+        license      = metaOverrides["license"]      ?: meta.license,
+        licenseURL   = metaOverrides["licenseURL"]   ?: meta.licenseURL,
+        vendorURL    = metaOverrides["vendorURL"]    ?: meta.vendorURL,
+        designerURL  = metaOverrides["designerURL"]  ?: meta.designerURL,
+        sampleText   = metaOverrides["sampleText"]   ?: meta.sampleText
     )
 }
 
@@ -66,7 +66,8 @@ data class AppSettings(
     ),
     val samplePriority: SamplePriority = SamplePriority.METADATA_FIRST,
     val glyphShowAll: Boolean = false,
-    val defaultLang: String = "English"
+    val defaultLang: String = "English",
+    val folderRecursive: Boolean = true   // scan subfolders by default
 )
 
 enum class SamplePriority { METADATA_FIRST, USER_FIRST, ALWAYS_USER, ALWAYS_META }

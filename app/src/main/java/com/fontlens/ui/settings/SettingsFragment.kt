@@ -34,6 +34,7 @@ class SettingsFragment : Fragment() {
         val s = FontRepository.settings
         renderPriority(s)
         renderGlyphSwitch(s)
+        renderRecursiveSwitch(s)
         renderLangList(s)
         renderLangSpinner(s)
     }
@@ -48,11 +49,11 @@ class SettingsFragment : Fragment() {
         rb.isChecked = true
         binding.rgPriority.setOnCheckedChangeListener { _, checkedId ->
             val priority = when (checkedId) {
-                R.id.rb_meta_first   -> SamplePriority.METADATA_FIRST
-                R.id.rb_user_first   -> SamplePriority.USER_FIRST
-                R.id.rb_always_user  -> SamplePriority.ALWAYS_USER
-                R.id.rb_always_meta  -> SamplePriority.ALWAYS_META
-                else                 -> SamplePriority.METADATA_FIRST
+                R.id.rb_meta_first  -> SamplePriority.METADATA_FIRST
+                R.id.rb_user_first  -> SamplePriority.USER_FIRST
+                R.id.rb_always_user -> SamplePriority.ALWAYS_USER
+                R.id.rb_always_meta -> SamplePriority.ALWAYS_META
+                else                -> SamplePriority.METADATA_FIRST
             }
             FontRepository.settings = FontRepository.settings.copy(samplePriority = priority)
             FontRepository.saveSettings(requireContext())
@@ -63,6 +64,14 @@ class SettingsFragment : Fragment() {
         binding.switchGlyphAll.isChecked = s.glyphShowAll
         binding.switchGlyphAll.setOnCheckedChangeListener { _, checked ->
             FontRepository.settings = FontRepository.settings.copy(glyphShowAll = checked)
+            FontRepository.saveSettings(requireContext())
+        }
+    }
+
+    private fun renderRecursiveSwitch(s: AppSettings) {
+        binding.switchRecursive.isChecked = s.folderRecursive
+        binding.switchRecursive.setOnCheckedChangeListener { _, checked ->
+            FontRepository.settings = FontRepository.settings.copy(folderRecursive = checked)
             FontRepository.saveSettings(requireContext())
         }
     }
@@ -116,7 +125,6 @@ class SettingsFragment : Fragment() {
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_lang, null)
         val etName = dialogView.findViewById<TextInputEditText>(R.id.et_lang_name)
         val etText = dialogView.findViewById<TextInputEditText>(R.id.et_lang_sample)
-
         AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.add_language))
             .setView(dialogView)

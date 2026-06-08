@@ -8,17 +8,19 @@ import android.provider.DocumentsContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.fontlens.R
 import com.fontlens.data.FontRepository
 import com.fontlens.databinding.FragmentFontListBinding
 import com.fontlens.utils.FontLoader
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class FontListFragment : Fragment() {
 
@@ -56,7 +58,7 @@ class FontListFragment : Fragment() {
                 adapter.notifyDataSetChanged()
             },
             isFavorite = { FontRepository.isFavorite(it) },
-            getSample = { FontRepository.getSampleText(it) }
+            getSample  = { FontRepository.getSampleText(it) }
         )
 
         binding.rvFonts.layoutManager = LinearLayoutManager(requireContext())
@@ -72,54 +74,62 @@ class FontListFragment : Fragment() {
     }
 
     private fun loadFontsFromFolder(folderUri: Uri) {
+        val recursive = FontRepository.settings.folderRecursive
+        lifecycleScope.launch {
+            val fontUris = withContext(Dispatchers.IO) {
+                collectFontUris(folderUri, recursive)
+            }
+
+            if (fontUris.isEmpty()) {
+                Toast.makeText(requireContext(), "No font files found", Toast.LENGTH_SHORT).show()
+                return@launch
+            }
+
+            val items = FontLoader.loadFontsFromUris(requireContext(), fontUris)
+            FontRepository.addFonts(items)
+            refresh()
+            Toast.makeText(requireContext(), "${items.size} font(s) loaded", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun collectFontUris(folderUri: Uri, recursive: Boolean): List<Uri> {
         val cr = requireContext().contentResolver
-        val docId = DocumentsContract.getTreeDocumentId(folderUri)
-        val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(folderUri, docId)
-
-        val fontUris = mutableListOf<Uri>()
         val fontExtensions = setOf("ttf", "otf", "woff", "woff2", "ttc")
+        val result = mutableListOf<Uri>()
 
-        cr.query(
-            childrenUri,
-            arrayOf(
-                DocumentsContract.Document.COLUMN_DOCUMENT_ID,
-                DocumentsContract.Document.COLUMN_DISPLAY_NAME,
-                DocumentsContract.Document.COLUMN_MIME_TYPE
-            ),
-            null, null, null
-        )?.use { cursor ->
-            val idCol   = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID)
-            val nameCol = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
-            while (cursor.moveToNext()) {
-                val name = cursor.getString(nameCol) ?: continue
-                val ext  = name.substringAfterLast(".").lowercase()
-                if (ext in fontExtensions) {
-                    val childDocId = cursor.getString(idCol)
-                    val fileUri = DocumentsContract.buildDocumentUriUsingTree(folderUri, childDocId)
-                    fontUris.add(fileUri)
+        fun scanFolder(treeUri: Uri, docId: String) {
+            val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(treeUri, docId)
+            cr.query(
+                childrenUri,
+                arrayOf(
+                    DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                    DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+                    DocumentsContract.Document.COLUMN_MIME_TYPE
+                ),
+                null, null, null
+            )?.use { cursor ->
+                val idCol   = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID)
+                val nameCol = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
+                val mimeCol = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_MIME_TYPE)
+                while (cursor.moveToNext()) {
+                    val childId  = cursor.getString(idCol)   ?: continue
+                    val name     = cursor.getString(nameCol) ?: continue
+                    val mime     = cursor.getString(mimeCol) ?: ""
+                    val ext      = name.substringAfterLast(".").lowercase()
+
+                    if (ext in fontExtensions) {
+                        result.add(DocumentsContract.buildDocumentUriUsingTree(treeUri, childId))
+                    } else if (recursive && mime == DocumentsContract.Document.MIME_TYPE_DIR) {
+                        // Recurse into subfolder
+                        scanFolder(treeUri, childId)
+                    }
                 }
             }
         }
 
-        if (fontUris.isEmpty()) {
-            android.widget.Toast.makeText(
-                requireContext(),
-                "No font files found in this folder",
-                android.widget.Toast.LENGTH_SHORT
-            ).show()
-            return
-        }
-
-        lifecycleScope.launch {
-            val items = FontLoader.loadFontsFromUris(requireContext(), fontUris)
-            FontRepository.addFonts(items)
-            refresh()
-            android.widget.Toast.makeText(
-                requireContext(),
-                "${items.size} font(s) loaded",
-                android.widget.Toast.LENGTH_SHORT
-            ).show()
-        }
+        val rootDocId = DocumentsContract.getTreeDocumentId(folderUri)
+        scanFolder(folderUri, rootDocId)
+        return result
     }
 
     fun refresh(query: String = binding.etSearch.text?.toString() ?: "") {
