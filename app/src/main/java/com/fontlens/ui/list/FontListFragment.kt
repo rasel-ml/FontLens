@@ -99,16 +99,23 @@ class FontListFragment : Fragment() {
 
         if (!initialLoadDone) {
             initialLoadDone = true
-            // Skip library reload if app was opened by tapping a font file
             val fromIntent = (activity as? MainActivity)?.launchedFromIntent == true
             if (!fromIntent) {
                 reloadSavedFolders()
             } else {
-                refresh()
+                refresh() // show empty library instantly, reload triggered when user comes back
             }
         } else {
             refresh()
         }
+    }
+
+    /** Called by MainActivity when user navigates back from a temp font preview */
+    fun triggerReload() {
+        FontRepository.getSavedFolderUris().forEach {
+            FontRepository.unmarkFolderLoaded(it)
+        }
+        reloadSavedFolders()
     }
 
     private fun reloadSavedFolders() {

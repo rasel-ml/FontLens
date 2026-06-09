@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
     private var backPressedOnce = false
     private val backToastHandler = android.os.Handler(android.os.Looper.getMainLooper())
 
-    // True when launched by tapping a font file — suppresses library auto-reload
+    // True when cold-launched by tapping a font file
     var launchedFromIntent = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,6 +61,12 @@ class MainActivity : AppCompatActivity() {
                 R.id.favoritesFragment -> binding.bottomNav.menu.findItem(R.id.nav_favorites)?.isChecked = true
                 R.id.settingsFragment  -> binding.bottomNav.menu.findItem(R.id.nav_settings)?.isChecked  = true
             }
+
+            // When navigating back to library after a temp preview, trigger folder reload
+            if (destination.id == R.id.fontListFragment && launchedFromIntent) {
+                launchedFromIntent = false  // reset flag
+                getLibraryFragment()?.triggerReload()
+            }
         }
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -88,7 +94,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        // Handle font file opened from file manager
         if (intent.action == Intent.ACTION_VIEW && intent.data != null) {
             launchedFromIntent = true
             handleIncomingIntent(intent)
@@ -97,7 +102,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        // App already running — no need to suppress library reload
         handleIncomingIntent(intent)
     }
 
@@ -105,8 +109,8 @@ class MainActivity : AppCompatActivity() {
         if (intent.action != Intent.ACTION_VIEW) return
         val uri = intent.data ?: return
 
-        val name = getFileNameFromUri(uri)
-        val ext  = name.substringAfterLast(".").lowercase()
+        val name     = getFileNameFromUri(uri)
+        val ext      = name.substringAfterLast(".").lowercase()
         val fontExts = setOf("ttf", "otf", "woff", "woff2", "ttc")
         val mimeType = intent.type ?: contentResolver.getType(uri) ?: ""
         val isFontMime = mimeType.startsWith("font/") || mimeType.contains("font") ||
@@ -178,7 +182,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun getLibraryFragment(): com.fontlens.ui.list.FontListFragment? =
+    fun getLibraryFragment(): com.fontlens.ui.list.FontListFragment? =
         supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
             ?.childFragmentManager?.fragments?.firstOrNull()
             as? com.fontlens.ui.list.FontListFragment
