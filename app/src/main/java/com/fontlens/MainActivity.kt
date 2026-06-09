@@ -23,6 +23,9 @@ class MainActivity : AppCompatActivity() {
     private var backPressedOnce = false
     private val backToastHandler = android.os.Handler(android.os.Looper.getMainLooper())
 
+    // True when launched by tapping a font file — suppresses library auto-reload
+    var launchedFromIntent = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -76,18 +79,25 @@ class MainActivity : AppCompatActivity() {
                     binding.bottomNav.menu.findItem(R.id.nav_library)?.isChecked = true
                     return
                 }
-                if (backPressedOnce) { backToastHandler.removeCallbacksAndMessages(null); finish(); return }
+                if (backPressedOnce) {
+                    backToastHandler.removeCallbacksAndMessages(null); finish(); return
+                }
                 backPressedOnce = true
                 Toast.makeText(this@MainActivity, "Press back again to exit", Toast.LENGTH_SHORT).show()
                 backToastHandler.postDelayed({ backPressedOnce = false }, 2000)
             }
         })
 
-        handleIncomingIntent(intent)
+        // Handle font file opened from file manager
+        if (intent.action == Intent.ACTION_VIEW && intent.data != null) {
+            launchedFromIntent = true
+            handleIncomingIntent(intent)
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        // App already running — no need to suppress library reload
         handleIncomingIntent(intent)
     }
 
@@ -113,14 +123,11 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this@MainActivity, "Could not load font", Toast.LENGTH_SHORT).show()
                 return@launch
             }
-
             val font = items.first()
-            // Store temporarily — NOT in the main library yet
             FontRepository.addTempFont(font)
 
             val navHost = supportFragmentManager
                 .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-            // Navigate to preview with tempMode = true so it shows the Add button
             navHost.navController.navigate(
                 R.id.previewFragment,
                 Bundle().apply {

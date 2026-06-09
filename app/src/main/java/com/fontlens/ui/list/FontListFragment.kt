@@ -93,18 +93,19 @@ class FontListFragment : Fragment() {
 
         binding.rvFonts.layoutManager = LinearLayoutManager(requireContext())
         binding.rvFonts.adapter = adapter
-
-        // Hamburger icon opens drawer
-        binding.btnHamburger.setOnClickListener {
-            (activity as? MainActivity)?.openDrawer()
-        }
-
+        binding.btnHamburger.setOnClickListener { (activity as? MainActivity)?.openDrawer() }
         binding.fabAdd.setOnClickListener { openFolderPicker() }
         binding.etSearch.addTextChangedListener { refresh(it?.toString() ?: "") }
 
         if (!initialLoadDone) {
             initialLoadDone = true
-            reloadSavedFolders()
+            // Skip library reload if app was opened by tapping a font file
+            val fromIntent = (activity as? MainActivity)?.launchedFromIntent == true
+            if (!fromIntent) {
+                reloadSavedFolders()
+            } else {
+                refresh()
+            }
         } else {
             refresh()
         }
@@ -122,7 +123,6 @@ class FontListFragment : Fragment() {
         }
     }
 
-    /** Called from MainActivity drawer reload button */
     fun reloadFolder(uri: Uri) {
         loadFontsFromFolder(uri, showToast = true)
     }
@@ -138,13 +138,11 @@ class FontListFragment : Fragment() {
 
         lifecycleScope.launch {
             val fontUris = withContext(Dispatchers.IO) { collectFontUris(folderUri, recursive) }
-
             if (fontUris.isEmpty()) {
                 loadingDialog.dismissAllowingStateLoss()
                 if (showToast) Toast.makeText(requireContext(), "No font files found", Toast.LENGTH_SHORT).show()
                 return@launch
             }
-
             val items = FontLoader.loadFontsFromUris(
                 context = requireContext(),
                 uris = fontUris,
