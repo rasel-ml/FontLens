@@ -4,67 +4,58 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/fontListFragment">
 
-    <fragment
-        android:id="@+id/fontListFragment"
+    <fragment android:id="@+id/fontListFragment"
         android:name="com.fontlens.ui.list.FontListFragment"
         android:label="@string/library">
-        <action
-            android:id="@+id/action_list_to_preview"
+        <action android:id="@+id/action_list_to_preview"
             app:destination="@id/previewFragment"
             app:popUpTo="@id/fontListFragment"
             app:popUpToInclusive="false" />
     </fragment>
 
-    <fragment
-        android:id="@+id/favoritesFragment"
+    <fragment android:id="@+id/favoritesFragment"
         android:name="com.fontlens.ui.list.FavoritesFragment"
         android:label="@string/favorites">
-        <action
-            android:id="@+id/action_fav_to_preview"
+        <action android:id="@+id/action_fav_to_preview"
             app:destination="@id/previewFragment"
             app:popUpTo="@id/favoritesFragment"
             app:popUpToInclusive="false" />
     </fragment>
 
-    <fragment
-        android:id="@+id/settingsFragment"
+    <fragment android:id="@+id/settingsFragment"
         android:name="com.fontlens.ui.settings.SettingsFragment"
         android:label="@string/settings" />
 
-    <fragment
-        android:id="@+id/previewFragment"
+    <fragment android:id="@+id/previewFragment"
         android:name="com.fontlens.ui.preview.PreviewFragment"
         android:label="@string/preview">
-        <argument android:name="fontId" app:argType="string" />
+        <argument android:name="fontId"   app:argType="string" />
+        <argument android:name="tempMode" app:argType="boolean" android:defaultValue="false" />
         <action android:id="@+id/action_preview_to_glyph" app:destination="@id/glyphFragment" />
         <action android:id="@+id/action_preview_to_meta"  app:destination="@id/metaFragment" />
         <action android:id="@+id/action_preview_to_info"  app:destination="@id/fontInfoFragment" />
     </fragment>
 
-    <fragment
-        android:id="@+id/glyphFragment"
+    <fragment android:id="@+id/glyphFragment"
         android:name="com.fontlens.ui.glyph.GlyphFragment"
         android:label="@string/glyph_map">
         <argument android:name="fontId" app:argType="string" />
     </fragment>
 
-    <fragment
-        android:id="@+id/metaFragment"
+    <fragment android:id="@+id/metaFragment"
         android:name="com.fontlens.ui.meta.MetaFragment"
         android:label="@string/metadata">
         <argument android:name="fontId" app:argType="string" />
         <action android:id="@+id/action_meta_to_edit" app:destination="@id/metaEditFragment" />
     </fragment>
 
-    <fragment
-        android:id="@+id/metaEditFragment"
+    <fragment android:id="@+id/metaEditFragment"
         android:name="com.fontlens.ui.meta.MetaEditFragment"
         android:label="@string/edit_metadata">
         <argument android:name="fontId" app:argType="string" />
     </fragment>
 
-    <fragment
-        android:id="@+id/fontInfoFragment"
+    <fragment android:id="@+id/fontInfoFragment"
         android:name="com.fontlens.ui.info.FontInfoFragment"
         android:label="@string/font_info">
         <argument android:name="fontId" app:argType="string" />

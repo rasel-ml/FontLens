@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="@color/bg_primary">
 
-    <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
@@ -37,7 +36,24 @@
                 android:ellipsize="end"
                 android:letterSpacing="0.04" />
 
-            <!-- Info button -->
+            <!-- Add to Library button (temp mode only) -->
+            <TextView
+                android:id="@+id/btn_add_to_library"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+ Add"
+                android:textSize="13sp"
+                android:textColor="@color/bg_primary"
+                android:background="@drawable/bg_accent_btn"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:layout_marginEnd="4dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="gone" />
+
             <TextView
                 android:id="@+id/btn_info"
                 android:layout_width="40dp"
@@ -50,7 +66,6 @@
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
-            <!-- Metadata button -->
             <TextView
                 android:id="@+id/btn_meta"
                 android:layout_width="40dp"
@@ -63,7 +78,6 @@
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
-            <!-- Glyph keyboard button -->
             <TextView
                 android:id="@+id/btn_glyph"
                 android:layout_width="40dp"
@@ -76,7 +90,6 @@
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
-            <!-- Favorite star -->
             <TextView
                 android:id="@+id/btn_favorite"
                 android:layout_width="40dp"
@@ -92,7 +105,6 @@
         </LinearLayout>
     </androidx.appcompat.widget.Toolbar>
 
-    <!-- Controls bar: size + bold/italic -->
     <LinearLayout
         android:id="@+id/controls_bar"
         android:layout_width="0dp"
@@ -155,7 +167,6 @@
 
     </LinearLayout>
 
-    <!-- Divider -->
     <View
         android:id="@+id/divider"
         android:layout_width="0dp"
@@ -165,7 +176,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/controls_bar" />
 
-    <!-- Scrollable preview canvas -->
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"

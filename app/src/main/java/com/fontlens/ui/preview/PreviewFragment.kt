@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -19,7 +20,7 @@ class PreviewFragment : Fragment() {
     private val binding get() = _binding!!
     private val args: PreviewFragmentArgs by navArgs()
 
-    private var isBold = false
+    private var isBold   = false
     private var isItalic = false
     private var fontSize = 32
 
@@ -31,17 +32,33 @@ class PreviewFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val font = FontRepository.getById(args.fontId) ?: run {
-            findNavController().popBackStack(); return
-        }
-        val m = font.effectiveMeta
+        val font = FontRepository.getById(args.fontId)
+            ?: run { findNavController().popBackStack(); return }
         val tf = FontLoader.getTypeface(font.id)
+        val tempMode = args.tempMode
 
-        // Toolbar
-        binding.tvFontName.text = m.family.ifEmpty { font.displayName }
+        binding.tvFontName.text = font.effectiveMeta.family.ifEmpty { font.displayName }
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
-        // Favorite
+        // ── Add to Library button (only visible in temp mode) ─────────────────
+        if (tempMode && !FontRepository.isInLibrary(font.id)) {
+            binding.btnAddToLibrary.visibility = View.VISIBLE
+            binding.btnAddToLibrary.setOnClickListener {
+                FontRepository.promoteToLibrary(font.id, requireContext())
+                binding.btnAddToLibrary.visibility = View.GONE
+                Toast.makeText(requireContext(), "Added to library", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            binding.btnAddToLibrary.visibility = View.GONE
+        }
+
+        // ── Favorite ──────────────────────────────────────────────────────────
+        // Hide fav/remove buttons in temp mode since font isn't in library yet
+        binding.btnFavorite.visibility = if (tempMode) View.GONE else View.VISIBLE
+        binding.btnInfo.visibility     = View.VISIBLE
+        binding.btnMeta.visibility     = View.VISIBLE
+        binding.btnGlyph.visibility    = View.VISIBLE
+
         fun updateFav() {
             val fav = FontRepository.isFavorite(font.id)
             binding.btnFavorite.text = if (fav) "★" else "☆"
@@ -54,12 +71,11 @@ class PreviewFragment : Fragment() {
             FontRepository.toggleFavorite(font.id, requireContext()); updateFav()
         }
 
-        // Preview text + typeface
-        val sampleText = FontRepository.getSampleText(font)
-        binding.etPreview.setText(sampleText)
+        // ── Preview text ──────────────────────────────────────────────────────
+        binding.etPreview.setText(FontRepository.getSampleText(font))
         if (tf != null) binding.etPreview.typeface = tf
 
-        // Size seekbar (range 8..160, stored as offset from 8)
+        // ── Size seekbar ──────────────────────────────────────────────────────
         fontSize = 32
         binding.seekbarSize.max = 152
         binding.seekbarSize.progress = fontSize - 8
@@ -76,7 +92,7 @@ class PreviewFragment : Fragment() {
             override fun onStopTrackingTouch(sb: android.widget.SeekBar?) {}
         })
 
-        // Bold / italic toggles
+        // ── Bold / Italic ─────────────────────────────────────────────────────
         fun updateStyle() {
             val style = when {
                 isBold && isItalic -> android.graphics.Typeface.BOLD_ITALIC
@@ -85,17 +101,17 @@ class PreviewFragment : Fragment() {
                 else               -> android.graphics.Typeface.NORMAL
             }
             binding.etPreview.setTypeface(tf, style)
-            val accentColor = ContextCompat.getColor(requireContext(), R.color.accent)
-            val mutedColor  = ContextCompat.getColor(requireContext(), R.color.text_muted)
-            binding.btnBold.setTextColor(if (isBold) accentColor else mutedColor)
-            binding.btnItalic.setTextColor(if (isItalic) accentColor else mutedColor)
+            val accent = ContextCompat.getColor(requireContext(), R.color.accent)
+            val muted  = ContextCompat.getColor(requireContext(), R.color.text_muted)
+            binding.btnBold.setTextColor(if (isBold) accent else muted)
+            binding.btnItalic.setTextColor(if (isItalic) accent else muted)
             binding.btnBold.setBackgroundResource(if (isBold) R.drawable.bg_style_btn_active else R.drawable.bg_style_btn)
             binding.btnItalic.setBackgroundResource(if (isItalic) R.drawable.bg_style_btn_active else R.drawable.bg_style_btn)
         }
         binding.btnBold.setOnClickListener   { isBold   = !isBold;   updateStyle() }
         binding.btnItalic.setOnClickListener { isItalic = !isItalic; updateStyle() }
 
-        // Navigation to sub-screens
+        // ── Sub-screen navigation ─────────────────────────────────────────────
         binding.btnGlyph.setOnClickListener {
             findNavController().navigate(PreviewFragmentDirections.actionPreviewToGlyph(font.id))
         }

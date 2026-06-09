@@ -7,13 +7,14 @@ import com.google.gson.reflect.TypeToken
 
 object FontRepository {
 
-    private val fonts = mutableListOf<FontItem>()
+    private val fonts     = mutableListOf<FontItem>()
+    private val tempFonts = mutableMapOf<String, FontItem>() // opened from file manager, not in library
     private val favorites = mutableSetOf<String>()
     var settings = AppSettings()
 
-    private val overridesCache = mutableMapOf<String, Map<String, String>>()
-    private val savedFolderUris = mutableSetOf<String>()
-    private val loadedFolderUris = mutableSetOf<String>()
+    private val overridesCache    = mutableMapOf<String, Map<String, String>>()
+    private val savedFolderUris   = mutableSetOf<String>()
+    private val loadedFolderUris  = mutableSetOf<String>()
 
     private val gson = Gson()
     private const val PREFS         = "fontlens_prefs"
@@ -22,9 +23,10 @@ object FontRepository {
     private const val KEY_OVERRIDES = "meta_overrides"
     private const val KEY_FOLDERS   = "folder_uris"
 
+    // ── Library ───────────────────────────────────────────────────────────────
     fun getAll(): List<FontItem> = fonts.toList()
     fun getFavorites(): List<FontItem> = fonts.filter { favorites.contains(it.id) }
-    fun getById(id: String): FontItem? = fonts.find { it.id == id }
+    fun getById(id: String): FontItem? = fonts.find { it.id == id } ?: tempFonts[id]
 
     fun addFonts(items: List<FontItem>) {
         val existingIds = fonts.map { it.id }.toSet()
@@ -57,6 +59,20 @@ object FontRepository {
         }
     }
 
+    fun isInLibrary(id: String) = fonts.any { it.id == id }
+
+    // ── Temp fonts (opened from file manager, not yet in library) ─────────────
+    fun addTempFont(font: FontItem) { tempFonts[font.id] = font }
+
+    /** Move a temp font into the permanent library */
+    fun promoteToLibrary(id: String, context: Context): Boolean {
+        val font = tempFonts.remove(id) ?: return false
+        if (fonts.none { it.id == id }) fonts.add(font)
+        save(context)
+        return true
+    }
+
+    // ── Favorites ─────────────────────────────────────────────────────────────
     fun isFavorite(id: String) = favorites.contains(id)
 
     fun toggleFavorite(id: String, context: Context) {
@@ -64,9 +80,9 @@ object FontRepository {
         save(context)
     }
 
+    // ── Folders ───────────────────────────────────────────────────────────────
     fun saveFolderUri(uri: Uri, context: Context) {
-        savedFolderUris.add(uri.toString())
-        save(context)
+        savedFolderUris.add(uri.toString()); save(context)
     }
 
     fun removeSavedFolder(uri: Uri, context: Context) {
@@ -76,11 +92,11 @@ object FontRepository {
     }
 
     fun getSavedFolderUris(): List<Uri> = savedFolderUris.map { Uri.parse(it) }
-
-    fun isFolderLoaded(uri: Uri) = loadedFolderUris.contains(uri.toString())
-    fun markFolderLoaded(uri: Uri) { loadedFolderUris.add(uri.toString()) }
+    fun isFolderLoaded(uri: Uri)  = loadedFolderUris.contains(uri.toString())
+    fun markFolderLoaded(uri: Uri)   { loadedFolderUris.add(uri.toString()) }
     fun unmarkFolderLoaded(uri: Uri) { loadedFolderUris.remove(uri.toString()) }
 
+    // ── Meta overrides ────────────────────────────────────────────────────────
     fun saveMetaOverrides(fontId: String, overrides: Map<String, String>, context: Context) {
         fonts.find { it.id == fontId }?.let { it.metaOverrides = overrides }
         overridesCache[fontId] = overrides
@@ -96,6 +112,7 @@ object FontRepository {
     fun getMetaOverrides(fontId: String): Map<String, String> =
         overridesCache[fontId] ?: emptyMap()
 
+    // ── Settings ──────────────────────────────────────────────────────────────
     fun saveSettings(context: Context) = save(context)
 
     fun load(context: Context) {
