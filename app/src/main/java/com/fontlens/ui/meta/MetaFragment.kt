@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.LinearLayoutManager
+import com.fontlens.R
 import com.fontlens.data.FontRepository
 import com.fontlens.databinding.FragmentMetadataBinding
 
@@ -17,6 +17,9 @@ class MetaFragment : Fragment() {
     private val binding get() = _binding!!
     private val args: MetaFragmentArgs by navArgs()
 
+    private val isStandalone get() =
+        findNavController().graph.id == R.id.nav_preview
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentMetadataBinding.inflate(inflater, container, false)
         return binding.root
@@ -25,12 +28,19 @@ class MetaFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val font = FontRepository.getById(args.fontId) ?: run { findNavController().popBackStack(); return }
+        val font = FontRepository.getById(args.fontId)
+            ?: run { findNavController().popBackStack(); return }
         val m = font.effectiveMeta
 
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+
         binding.btnEdit.setOnClickListener {
-            findNavController().navigate(MetaFragmentDirections.actionMetaToEdit(font.id))
+            // Use raw ID — works in both nav graphs
+            findNavController().navigate(
+                if (isStandalone) R.id.action_standalone_meta_to_edit
+                else R.id.action_meta_to_edit,
+                Bundle().apply { putString("fontId", font.id) }
+            )
         }
 
         val fields = listOf(
@@ -56,7 +66,7 @@ class MetaFragment : Fragment() {
         } else {
             binding.tvEmpty.visibility = View.GONE
             binding.rvMeta.visibility  = View.VISIBLE
-            binding.rvMeta.layoutManager = LinearLayoutManager(requireContext())
+            binding.rvMeta.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(requireContext())
             binding.rvMeta.adapter = MetaAdapter(fields)
         }
     }
