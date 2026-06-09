@@ -99,12 +99,7 @@ class FontListFragment : Fragment() {
 
         if (!initialLoadDone) {
             initialLoadDone = true
-            val fromIntent = (activity as? MainActivity)?.launchedFromIntent == true
-            if (!fromIntent) {
-                reloadSavedFolders()
-            } else {
-                refresh() // show empty library instantly, reload triggered when user comes back
-            }
+            reloadSavedFolders()
         } else {
             refresh()
         }
