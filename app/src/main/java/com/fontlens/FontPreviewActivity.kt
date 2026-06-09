@@ -18,7 +18,6 @@ class FontPreviewActivity : AppCompatActivity() {
         binding = ActivityFontPreviewBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Load settings/favorites independently of MainActivity
         FontRepository.load(this)
 
         val uri = intent.data
@@ -28,7 +27,8 @@ class FontPreviewActivity : AppCompatActivity() {
         val ext      = name.substringAfterLast(".").lowercase()
         val fontExts = setOf("ttf", "otf", "woff", "woff2", "ttc")
         val mimeType = intent.type ?: contentResolver.getType(uri) ?: ""
-        val isFontMime = mimeType.startsWith("font/") || mimeType.contains("font") ||
+        val isFontMime = mimeType.startsWith("font/") ||
+                mimeType.contains("font") ||
                 (mimeType == "application/octet-stream" && ext in fontExts)
 
         if (!isFontMime && ext !in fontExts) {
@@ -45,16 +45,15 @@ class FontPreviewActivity : AppCompatActivity() {
             val font = items.first()
             FontRepository.addTempFont(font)
 
-            // Hand off to the preview fragment via its own nav host
-            val navHost = supportFragmentManager
-                .findFragmentById(R.id.preview_nav_host) as androidx.navigation.fragment.NavHostFragment
-            navHost.navController.navigate(
-                R.id.standalonePreviewFragment,
-                Bundle().apply {
+            // Load fragment directly with args bundle
+            val fragment = com.fontlens.ui.preview.StandalonePreviewFragment().apply {
+                arguments = Bundle().apply {
                     putString("fontId", font.id)
-                    putBoolean("tempMode", true)
                 }
-            )
+            }
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.preview_container, fragment)
+                .commit()
         }
     }
 

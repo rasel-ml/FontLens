@@ -17,9 +17,6 @@ class MetaFragment : Fragment() {
     private val binding get() = _binding!!
     private val args: MetaFragmentArgs by navArgs()
 
-    private val isStandalone get() =
-        findNavController().graph.id == R.id.nav_preview
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentMetadataBinding.inflate(inflater, container, false)
         return binding.root
@@ -35,10 +32,8 @@ class MetaFragment : Fragment() {
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
         binding.btnEdit.setOnClickListener {
-            // Use raw ID — works in both nav graphs
             findNavController().navigate(
-                if (isStandalone) R.id.action_standalone_meta_to_edit
-                else R.id.action_meta_to_edit,
+                R.id.action_meta_to_edit,
                 Bundle().apply { putString("fontId", font.id) }
             )
         }
@@ -66,7 +61,8 @@ class MetaFragment : Fragment() {
         } else {
             binding.tvEmpty.visibility = View.GONE
             binding.rvMeta.visibility  = View.VISIBLE
-            binding.rvMeta.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(requireContext())
+            binding.rvMeta.layoutManager =
+                androidx.recyclerview.widget.LinearLayoutManager(requireContext())
             binding.rvMeta.adapter = MetaAdapter(fields)
         }
     }
