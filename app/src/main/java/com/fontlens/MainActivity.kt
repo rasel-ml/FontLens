@@ -1,6 +1,5 @@
 package com.fontlens
 
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,22 +8,16 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import com.fontlens.data.FontRepository
 import com.fontlens.databinding.ActivityMainBinding
 import com.fontlens.databinding.ItemDrawerFolderBinding
-import com.fontlens.utils.FontLoader
-import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private var backPressedOnce = false
     private val backToastHandler = android.os.Handler(android.os.Looper.getMainLooper())
-
-    // True when cold-launched by tapping a font file
-    var launchedFromIntent = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,12 +54,6 @@ class MainActivity : AppCompatActivity() {
                 R.id.favoritesFragment -> binding.bottomNav.menu.findItem(R.id.nav_favorites)?.isChecked = true
                 R.id.settingsFragment  -> binding.bottomNav.menu.findItem(R.id.nav_settings)?.isChecked  = true
             }
-
-            // When navigating back to library after a temp preview, trigger folder reload
-            if (destination.id == R.id.fontListFragment && launchedFromIntent) {
-                launchedFromIntent = false  // reset flag
-                getLibraryFragment()?.triggerReload()
-            }
         }
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -93,62 +80,6 @@ class MainActivity : AppCompatActivity() {
                 backToastHandler.postDelayed({ backPressedOnce = false }, 2000)
             }
         })
-
-        if (intent.action == Intent.ACTION_VIEW && intent.data != null) {
-            launchedFromIntent = true
-            handleIncomingIntent(intent)
-        }
-    }
-
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        handleIncomingIntent(intent)
-    }
-
-    private fun handleIncomingIntent(intent: Intent) {
-        if (intent.action != Intent.ACTION_VIEW) return
-        val uri = intent.data ?: return
-
-        val name     = getFileNameFromUri(uri)
-        val ext      = name.substringAfterLast(".").lowercase()
-        val fontExts = setOf("ttf", "otf", "woff", "woff2", "ttc")
-        val mimeType = intent.type ?: contentResolver.getType(uri) ?: ""
-        val isFontMime = mimeType.startsWith("font/") || mimeType.contains("font") ||
-                (mimeType == "application/octet-stream" && ext in fontExts)
-
-        if (!isFontMime && ext !in fontExts) {
-            Toast.makeText(this, "Not a supported font file", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        lifecycleScope.launch {
-            val items = FontLoader.loadFontsFromUris(this@MainActivity, listOf(uri))
-            if (items.isEmpty()) {
-                Toast.makeText(this@MainActivity, "Could not load font", Toast.LENGTH_SHORT).show()
-                return@launch
-            }
-            val font = items.first()
-            FontRepository.addTempFont(font)
-
-            val navHost = supportFragmentManager
-                .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-            navHost.navController.navigate(
-                R.id.previewFragment,
-                Bundle().apply {
-                    putString("fontId", font.id)
-                    putBoolean("tempMode", true)
-                }
-            )
-        }
-    }
-
-    private fun getFileNameFromUri(uri: Uri): String {
-        var name = ""
-        contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-            val idx = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
-            if (cursor.moveToFirst() && idx >= 0) name = cursor.getString(idx) ?: ""
-        }
-        return name.ifEmpty { uri.lastPathSegment ?: "" }
     }
 
     fun openDrawer()  { refreshDrawer(); binding.drawerLayout.openDrawer(GravityCompat.START) }

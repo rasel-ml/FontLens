@@ -1,5 +1,6 @@
 package com.fontlens.ui.preview
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +25,10 @@ class PreviewFragment : Fragment() {
     private var isItalic = false
     private var fontSize = 32
 
+    // True when this fragment lives inside FontPreviewActivity (standalone)
+    private val isStandalone get() =
+        findNavController().graph.id == R.id.nav_preview
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentPreviewBinding.inflate(inflater, container, false)
         return binding.root
@@ -34,30 +39,39 @@ class PreviewFragment : Fragment() {
 
         val font = FontRepository.getById(args.fontId)
             ?: run { findNavController().popBackStack(); return }
-        val tf = FontLoader.getTypeface(font.id)
+        val tf       = FontLoader.getTypeface(font.id)
         val tempMode = args.tempMode
 
         binding.tvFontName.text = font.effectiveMeta.family.ifEmpty { font.displayName }
-        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
-        // ── Add to Library button (only visible in temp mode) ─────────────────
+        // Back — if standalone, finish the activity; otherwise pop back stack
+        binding.toolbar.setNavigationOnClickListener {
+            if (isStandalone) requireActivity().finish()
+            else findNavController().popBackStack()
+        }
+
+        // Add to Library button
         if (tempMode && !FontRepository.isInLibrary(font.id)) {
             binding.btnAddToLibrary.visibility = View.VISIBLE
             binding.btnAddToLibrary.setOnClickListener {
                 FontRepository.promoteToLibrary(font.id, requireContext())
                 binding.btnAddToLibrary.visibility = View.GONE
-                Toast.makeText(requireContext(), "Added to library", Toast.LENGTH_SHORT).show()
+                // If standalone, offer to open in main app
+                if (isStandalone) {
+                    Toast.makeText(requireContext(), "Added to library", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(requireContext(), com.fontlens.MainActivity::class.java)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    startActivity(intent)
+                } else {
+                    Toast.makeText(requireContext(), "Added to library", Toast.LENGTH_SHORT).show()
+                }
             }
         } else {
             binding.btnAddToLibrary.visibility = View.GONE
         }
 
-        // ── Favorite ──────────────────────────────────────────────────────────
-        // Hide fav/remove buttons in temp mode since font isn't in library yet
+        // Hide fav in temp mode
         binding.btnFavorite.visibility = if (tempMode) View.GONE else View.VISIBLE
-        binding.btnInfo.visibility     = View.VISIBLE
-        binding.btnMeta.visibility     = View.VISIBLE
-        binding.btnGlyph.visibility    = View.VISIBLE
 
         fun updateFav() {
             val fav = FontRepository.isFavorite(font.id)
@@ -71,17 +85,16 @@ class PreviewFragment : Fragment() {
             FontRepository.toggleFavorite(font.id, requireContext()); updateFav()
         }
 
-        // ── Preview text ──────────────────────────────────────────────────────
+        // Preview text
         binding.etPreview.setText(FontRepository.getSampleText(font))
         if (tf != null) binding.etPreview.typeface = tf
 
-        // ── Size seekbar ──────────────────────────────────────────────────────
+        // Size seekbar
         fontSize = 32
         binding.seekbarSize.max = 152
         binding.seekbarSize.progress = fontSize - 8
         binding.tvSizeLabel.text = "${fontSize}px"
         binding.etPreview.textSize = fontSize.toFloat()
-
         binding.seekbarSize.setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(sb: android.widget.SeekBar?, p: Int, fromUser: Boolean) {
                 fontSize = p + 8
@@ -92,7 +105,7 @@ class PreviewFragment : Fragment() {
             override fun onStopTrackingTouch(sb: android.widget.SeekBar?) {}
         })
 
-        // ── Bold / Italic ─────────────────────────────────────────────────────
+        // Bold / Italic
         fun updateStyle() {
             val style = when {
                 isBold && isItalic -> android.graphics.Typeface.BOLD_ITALIC
@@ -111,15 +124,27 @@ class PreviewFragment : Fragment() {
         binding.btnBold.setOnClickListener   { isBold   = !isBold;   updateStyle() }
         binding.btnItalic.setOnClickListener { isItalic = !isItalic; updateStyle() }
 
-        // ── Sub-screen navigation ─────────────────────────────────────────────
+        // Sub-screen navigation — use correct action IDs based on which graph we're in
         binding.btnGlyph.setOnClickListener {
-            findNavController().navigate(PreviewFragmentDirections.actionPreviewToGlyph(font.id))
+            if (isStandalone)
+                findNavController().navigate(R.id.action_standalone_to_glyph,
+                    Bundle().apply { putString("fontId", font.id) })
+            else
+                findNavController().navigate(PreviewFragmentDirections.actionPreviewToGlyph(font.id))
         }
         binding.btnMeta.setOnClickListener {
-            findNavController().navigate(PreviewFragmentDirections.actionPreviewToMeta(font.id))
+            if (isStandalone)
+                findNavController().navigate(R.id.action_standalone_to_meta,
+                    Bundle().apply { putString("fontId", font.id) })
+            else
+                findNavController().navigate(PreviewFragmentDirections.actionPreviewToMeta(font.id))
         }
         binding.btnInfo.setOnClickListener {
-            findNavController().navigate(PreviewFragmentDirections.actionPreviewToInfo(font.id))
+            if (isStandalone)
+                findNavController().navigate(R.id.action_standalone_to_info,
+                    Bundle().apply { putString("fontId", font.id) })
+            else
+                findNavController().navigate(PreviewFragmentDirections.actionPreviewToInfo(font.id))
         }
     }
 

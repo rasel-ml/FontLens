@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_preview"
+    app:startDestination="@id/standalonePreviewFragment">
+
+    <fragment
+        android:id="@+id/standalonePreviewFragment"
+        android:name="com.fontlens.ui.preview.PreviewFragment"
+        android:label="@string/preview">
+        <argument android:name="fontId"   app:argType="string" />
+        <argument android:name="tempMode" app:argType="boolean" android:defaultValue="true" />
+        <action android:id="@+id/action_standalone_to_glyph" app:destination="@id/standaloneGlyphFragment" />
+        <action android:id="@+id/action_standalone_to_meta"  app:destination="@id/standaloneMetaFragment" />
+        <action android:id="@+id/action_standalone_to_info"  app:destination="@id/standaloneFontInfoFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/standaloneGlyphFragment"
+        android:name="com.fontlens.ui.glyph.GlyphFragment"
+        android:label="@string/glyph_map">
+        <argument android:name="fontId" app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/standaloneMetaFragment"
+        android:name="com.fontlens.ui.meta.MetaFragment"
+        android:label="@string/metadata">
+        <argument android:name="fontId" app:argType="string" />
+        <action android:id="@+id/action_standalone_meta_to_edit" app:destination="@id/standaloneMetaEditFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/standaloneMetaEditFragment"
+        android:name="com.fontlens.ui.meta.MetaEditFragment"
+        android:label="@string/edit_metadata">
+        <argument android:name="fontId" app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/standaloneFontInfoFragment"
+        android:name="com.fontlens.ui.info.FontInfoFragment"
+        android:label="@string/font_info">
+        <argument android:name="fontId" app:argType="string" />
+    </fragment>
+
+</navigation>
