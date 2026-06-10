@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import com.fontlens.R
 import com.fontlens.data.FontRepository
 import com.fontlens.databinding.FragmentPreviewBinding
+import com.fontlens.ui.DeleteFontDialog
 import com.fontlens.utils.FontLoader
 
 class StandalonePreviewFragment : Fragment() {
@@ -37,24 +38,29 @@ class StandalonePreviewFragment : Fragment() {
         binding.tvFontName.text = font.effectiveMeta.family.ifEmpty { font.displayName }
         binding.toolbar.setNavigationOnClickListener { requireActivity().finish() }
 
-        // ── Add to Library button ─────────────────────────────────────────────
-        fun refreshAddBtn() {
-            binding.btnAddToLibrary.visibility =
-                if (!FontRepository.isInLibrary(font.id)) View.VISIBLE else View.GONE
+        // ── Add to Library ────────────────────────────────────────────────────
+        fun refreshButtons() {
+            val inLibrary = FontRepository.isInLibrary(font.id)
+            binding.btnAddToLibrary.visibility = if (!inLibrary) View.VISIBLE else View.GONE
+            binding.btnDelete.visibility       = if (inLibrary) View.VISIBLE else View.GONE
+            binding.btnFavorite.visibility     = if (inLibrary) View.VISIBLE else View.GONE
         }
-        refreshAddBtn()
+        refreshButtons()
+
         binding.btnAddToLibrary.setOnClickListener {
             FontRepository.promoteToLibrary(font.id, requireContext())
-            refreshAddBtn()
-            binding.btnFavorite.visibility = View.VISIBLE
+            refreshButtons()
             Toast.makeText(requireContext(), "Added to library", Toast.LENGTH_SHORT).show()
         }
 
-        // ── Favorite button ───────────────────────────────────────────────────
-        // Show fav only if already in library
-        binding.btnFavorite.visibility =
-            if (FontRepository.isInLibrary(font.id)) View.VISIBLE else View.GONE
+        // ── Delete (only when in library) ─────────────────────────────────────
+        binding.btnDelete.setOnClickListener {
+            DeleteFontDialog.show(requireContext(), font) {
+                requireActivity().finish()
+            }
+        }
 
+        // ── Favorite ──────────────────────────────────────────────────────────
         fun updateFav() {
             val fav = FontRepository.isFavorite(font.id)
             binding.btnFavorite.text = if (fav) "★" else "☆"
@@ -65,13 +71,7 @@ class StandalonePreviewFragment : Fragment() {
         }
         updateFav()
         binding.btnFavorite.setOnClickListener {
-            // If not in library yet, add to library first then favorite
-            if (!FontRepository.isInLibrary(font.id)) {
-                FontRepository.promoteToLibrary(font.id, requireContext())
-                refreshAddBtn()
-            }
-            FontRepository.toggleFavorite(font.id, requireContext())
-            updateFav()
+            FontRepository.toggleFavorite(font.id, requireContext()); updateFav()
         }
 
         // ── Preview text ──────────────────────────────────────────────────────
@@ -115,7 +115,7 @@ class StandalonePreviewFragment : Fragment() {
         binding.btnBold.setOnClickListener   { isBold   = !isBold;   updateStyle() }
         binding.btnItalic.setOnClickListener { isItalic = !isItalic; updateStyle() }
 
-        // ── Sub-screens via fragment transactions ─────────────────────────────
+        // ── Sub-screens ───────────────────────────────────────────────────────
         binding.btnGlyph.setOnClickListener {
             openSubFragment(StandaloneGlyphFragment().apply {
                 arguments = Bundle().apply { putString("fontId", font.id) }
@@ -135,7 +135,7 @@ class StandalonePreviewFragment : Fragment() {
 
     private fun openSubFragment(fragment: Fragment) {
         requireActivity().supportFragmentManager.beginTransaction()
-            .replace(com.fontlens.R.id.preview_container, fragment)
+            .replace(R.id.preview_container, fragment)
             .addToBackStack(null)
             .commit()
     }

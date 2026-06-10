@@ -1,7 +1,6 @@
 package com.fontlens.ui.list
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -19,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.fontlens.MainActivity
 import com.fontlens.data.FontRepository
 import com.fontlens.databinding.FragmentFontListBinding
+import com.fontlens.ui.DeleteFontDialog
 import com.fontlens.ui.LoadingDialog
 import com.fontlens.utils.FontLoader
 import kotlinx.coroutines.Dispatchers
@@ -63,29 +63,7 @@ class FontListFragment : Fragment() {
                 adapter.notifyDataSetChanged()
             },
             onRemoveClick = { font ->
-                AlertDialog.Builder(requireContext())
-                    .setTitle("Remove from Library")
-                    .setMessage("Remove \"${font.effectiveMeta.family.ifEmpty { font.displayName }}\" from the library?\n\nThe file will NOT be deleted from storage.")
-                    .setPositiveButton("Remove") { _, _ ->
-                        FontRepository.removeFont(font.id, requireContext())
-                        refresh()
-                        Toast.makeText(requireContext(), "Removed from library", Toast.LENGTH_SHORT).show()
-                    }
-                    .setNegativeButton("Cancel", null).show()
-            },
-            onRemoveLongClick = { font ->
-                AlertDialog.Builder(requireContext())
-                    .setTitle("⚠ Delete from Storage")
-                    .setMessage("Permanently delete \"${font.effectiveMeta.family.ifEmpty { font.displayName }}\" from your device?\n\nThis cannot be undone.")
-                    .setPositiveButton("Delete") { _, _ ->
-                        val deleted = FontRepository.removeFontFromStorage(font.id, requireContext())
-                        refresh()
-                        Toast.makeText(requireContext(),
-                            if (deleted) "File deleted from storage"
-                            else "Removed from library (file could not be deleted)",
-                            Toast.LENGTH_SHORT).show()
-                    }
-                    .setNegativeButton("Cancel", null).show()
+                DeleteFontDialog.show(requireContext(), font) { refresh() }
             },
             isFavorite = { FontRepository.isFavorite(it) },
             getSample  = { FontRepository.getSampleText(it) }
@@ -105,14 +83,6 @@ class FontListFragment : Fragment() {
         }
     }
 
-    /** Called by MainActivity when user navigates back from a temp font preview */
-    fun triggerReload() {
-        FontRepository.getSavedFolderUris().forEach {
-            FontRepository.unmarkFolderLoaded(it)
-        }
-        reloadSavedFolders()
-    }
-
     private fun reloadSavedFolders() {
         val newUris = FontRepository.getSavedFolderUris()
             .filter { !FontRepository.isFolderLoaded(it) }
@@ -125,9 +95,7 @@ class FontListFragment : Fragment() {
         }
     }
 
-    fun reloadFolder(uri: Uri) {
-        loadFontsFromFolder(uri, showToast = true)
-    }
+    fun reloadFolder(uri: Uri) { loadFontsFromFolder(uri, showToast = true) }
 
     private fun openFolderPicker() {
         pickFolder.launch(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE))
@@ -137,7 +105,6 @@ class FontListFragment : Fragment() {
         val recursive = FontRepository.settings.folderRecursive
         val loadingDialog = LoadingDialog()
         loadingDialog.show(parentFragmentManager, LoadingDialog.TAG)
-
         lifecycleScope.launch {
             val fontUris = withContext(Dispatchers.IO) { collectFontUris(folderUri, recursive) }
             if (fontUris.isEmpty()) {
@@ -146,8 +113,7 @@ class FontListFragment : Fragment() {
                 return@launch
             }
             val items = FontLoader.loadFontsFromUris(
-                context = requireContext(),
-                uris = fontUris,
+                context = requireContext(), uris = fontUris,
                 onProgress = { loaded, total ->
                     lifecycleScope.launch { loadingDialog.updateProgress(loaded, total) }
                 }

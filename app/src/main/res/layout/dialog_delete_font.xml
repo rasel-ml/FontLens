@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_loading_dialog"
+    android:paddingTop="24dp"
+    android:paddingBottom="16dp"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp">
+
+    <!-- Font name -->
+    <TextView
+        android:id="@+id/tv_delete_font_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/accent"
+        android:textSize="16sp"
+        android:fontFamily="serif"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:layout_marginBottom="6dp" />
+
+    <!-- Message -->
+    <TextView
+        android:id="@+id/tv_delete_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_muted"
+        android:textSize="13sp"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Two action buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:weightSum="2">
+
+        <!-- Delete permanently — red -->
+        <TextView
+            android:id="@+id/btn_delete_permanently"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:gravity="center"
+            android:text="🗑 Delete Permanently"
+            android:textColor="#FF5252"
+            android:textSize="13sp"
+            android:background="@drawable/bg_delete_btn"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- Remove from library -->
+        <TextView
+            android:id="@+id/btn_remove_library"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            android:gravity="center"
+            android:text="Remove from Library"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp"
+            android:background="@drawable/bg_style_btn"
+            android:clickable="true"
+            android:focusable="true" />
+
+    </LinearLayout>
+
+</LinearLayout>

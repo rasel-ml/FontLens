@@ -15,7 +15,6 @@ class FontListAdapter(
     private val onFontClick: (FontItem) -> Unit,
     private val onFavoriteClick: (FontItem) -> Unit,
     private val onRemoveClick: (FontItem) -> Unit,
-    private val onRemoveLongClick: (FontItem) -> Unit,
     private val isFavorite: (String) -> Boolean,
     private val getSample: (FontItem) -> String
 ) : ListAdapter<FontItem, FontListAdapter.VH>(DIFF) {
@@ -46,7 +45,6 @@ class FontListAdapter(
         b.tvPreviewSmall.text = sample
         b.tvPreviewSmall.typeface = tf
 
-        // Favorite
         b.btnFavorite.text = if (isFavorite(font.id)) "★" else "☆"
         b.btnFavorite.setTextColor(
             holder.itemView.context.getColor(
@@ -55,9 +53,9 @@ class FontListAdapter(
         )
         b.btnFavorite.setOnClickListener { onFavoriteClick(font) }
 
-        // Remove — single press = remove from library, long press = remove from storage
+        // Single tap only — opens bottom sheet style dialog
         b.btnRemove.setOnClickListener { onRemoveClick(font) }
-        b.btnRemove.setOnLongClickListener { onRemoveLongClick(font); true }
+        b.btnRemove.setOnLongClickListener(null)
 
         b.root.setOnClickListener { onFontClick(font) }
     }

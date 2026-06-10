@@ -12,6 +12,7 @@ import androidx.navigation.fragment.navArgs
 import com.fontlens.R
 import com.fontlens.data.FontRepository
 import com.fontlens.databinding.FragmentPreviewBinding
+import com.fontlens.ui.DeleteFontDialog
 import com.fontlens.utils.FontLoader
 
 class PreviewFragment : Fragment() {
@@ -40,25 +41,39 @@ class PreviewFragment : Fragment() {
         binding.tvFontName.text = font.effectiveMeta.family.ifEmpty { font.displayName }
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
-        // Add to Library button
+        // Add to Library (temp mode)
         if (tempMode && !FontRepository.isInLibrary(font.id)) {
             binding.btnAddToLibrary.visibility = View.VISIBLE
             binding.btnAddToLibrary.setOnClickListener {
                 FontRepository.promoteToLibrary(font.id, requireContext())
                 binding.btnAddToLibrary.visibility = View.GONE
+                binding.btnDelete.visibility = View.VISIBLE
+                binding.btnFavorite.visibility = View.VISIBLE
                 Toast.makeText(requireContext(), "Added to library", Toast.LENGTH_SHORT).show()
             }
         } else {
             binding.btnAddToLibrary.visibility = View.GONE
         }
 
-        binding.btnFavorite.visibility = if (tempMode) View.GONE else View.VISIBLE
+        // Delete button — visible only when in library
+        binding.btnDelete.visibility =
+            if (!tempMode || FontRepository.isInLibrary(font.id)) View.VISIBLE else View.GONE
+        binding.btnDelete.setOnClickListener {
+            DeleteFontDialog.show(requireContext(), font) {
+                findNavController().popBackStack()
+            }
+        }
+
+        // Favorite
+        binding.btnFavorite.visibility =
+            if (!tempMode || FontRepository.isInLibrary(font.id)) View.VISIBLE else View.GONE
 
         fun updateFav() {
             val fav = FontRepository.isFavorite(font.id)
             binding.btnFavorite.text = if (fav) "★" else "☆"
             binding.btnFavorite.setTextColor(
-                ContextCompat.getColor(requireContext(), if (fav) R.color.accent else R.color.text_muted)
+                ContextCompat.getColor(requireContext(),
+                    if (fav) R.color.accent else R.color.text_muted)
             )
         }
         updateFav()
@@ -105,22 +120,16 @@ class PreviewFragment : Fragment() {
         binding.btnItalic.setOnClickListener { isItalic = !isItalic; updateStyle() }
 
         binding.btnGlyph.setOnClickListener {
-            findNavController().navigate(
-                R.id.action_preview_to_glyph,
-                Bundle().apply { putString("fontId", font.id) }
-            )
+            findNavController().navigate(R.id.action_preview_to_glyph,
+                Bundle().apply { putString("fontId", font.id) })
         }
         binding.btnMeta.setOnClickListener {
-            findNavController().navigate(
-                R.id.action_preview_to_meta,
-                Bundle().apply { putString("fontId", font.id) }
-            )
+            findNavController().navigate(R.id.action_preview_to_meta,
+                Bundle().apply { putString("fontId", font.id) })
         }
         binding.btnInfo.setOnClickListener {
-            findNavController().navigate(
-                R.id.action_preview_to_info,
-                Bundle().apply { putString("fontId", font.id) }
-            )
+            findNavController().navigate(R.id.action_preview_to_info,
+                Bundle().apply { putString("fontId", font.id) })
         }
     }
 
