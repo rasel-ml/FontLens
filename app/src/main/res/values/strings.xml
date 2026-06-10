@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">FontLens</string>
-    <string name="library">FontLens</string>
+    <string name="library">Library</string>
     <string name="favorites">Favorites</string>
     <string name="settings">Settings</string>
     <string name="preview">Preview</string>
