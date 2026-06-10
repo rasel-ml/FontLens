@@ -22,11 +22,12 @@ class MainActivity : AppCompatActivity() {
     private val backToastHandler = android.os.Handler(android.os.Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Apply saved theme BEFORE setContentView
+        super.onCreate(savedInstanceState) // super MUST be first
+
+        // Load settings then apply theme
         FontRepository.load(this)
         applyTheme(FontRepository.settings.theme)
 
-        super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

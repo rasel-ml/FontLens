@@ -3,7 +3,9 @@ package com.fontlens
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.lifecycleScope
+import com.fontlens.data.AppTheme
 import com.fontlens.data.FontRepository
 import com.fontlens.databinding.ActivityFontPreviewBinding
 import com.fontlens.utils.FontLoader
@@ -15,10 +17,17 @@ class FontPreviewActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Apply saved theme before showing UI
+        FontRepository.load(this)
+        AppCompatDelegate.setDefaultNightMode(when (FontRepository.settings.theme) {
+            AppTheme.SYSTEM -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            AppTheme.DAY    -> AppCompatDelegate.MODE_NIGHT_NO
+            AppTheme.NIGHT  -> AppCompatDelegate.MODE_NIGHT_YES
+        })
+
         binding = ActivityFontPreviewBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        FontRepository.load(this)
 
         val uri = intent.data
         if (uri == null) { finish(); return }
@@ -53,7 +62,6 @@ class FontPreviewActivity : AppCompatActivity() {
         }
     }
 
-    // Sub-fragments push to back stack, so back press pops them
     override fun onBackPressed() {
         if (supportFragmentManager.backStackEntryCount > 0) {
             supportFragmentManager.popBackStack()
