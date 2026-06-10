@@ -54,7 +54,7 @@
             android:layout_weight="1"
             android:layout_marginEnd="6dp"
             android:gravity="center"
-            android:text="🗑 Delete Permanently"
+            android:text="Delete Permanently"
             android:textColor="#FF5252"
             android:textSize="13sp"
             android:background="@drawable/bg_delete_btn"
