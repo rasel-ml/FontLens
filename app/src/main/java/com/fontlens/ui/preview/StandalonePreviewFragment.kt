@@ -31,59 +31,54 @@ class StandalonePreviewFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val fontId = arguments?.getString("fontId") ?: run { requireActivity().finish(); return }
-        val font   = FontRepository.getById(fontId) ?: run { requireActivity().finish(); return }
+        val font   = FontRepository.getById(fontId)  ?: run { requireActivity().finish(); return }
         val tf     = FontLoader.getTypeface(font.id)
 
         binding.tvFontName.text = font.effectiveMeta.family.ifEmpty { font.displayName }
-
-        // Back closes the activity
         binding.toolbar.setNavigationOnClickListener { requireActivity().finish() }
 
-        // Add to Library button
-        if (!FontRepository.isInLibrary(font.id)) {
-            binding.btnAddToLibrary.visibility = View.VISIBLE
-            binding.btnAddToLibrary.setOnClickListener {
+        // ── Add to Library button ─────────────────────────────────────────────
+        fun refreshAddBtn() {
+            binding.btnAddToLibrary.visibility =
+                if (!FontRepository.isInLibrary(font.id)) View.VISIBLE else View.GONE
+        }
+        refreshAddBtn()
+        binding.btnAddToLibrary.setOnClickListener {
+            FontRepository.promoteToLibrary(font.id, requireContext())
+            refreshAddBtn()
+            binding.btnFavorite.visibility = View.VISIBLE
+            Toast.makeText(requireContext(), "Added to library", Toast.LENGTH_SHORT).show()
+        }
+
+        // ── Favorite button ───────────────────────────────────────────────────
+        // Show fav only if already in library
+        binding.btnFavorite.visibility =
+            if (FontRepository.isInLibrary(font.id)) View.VISIBLE else View.GONE
+
+        fun updateFav() {
+            val fav = FontRepository.isFavorite(font.id)
+            binding.btnFavorite.text = if (fav) "★" else "☆"
+            binding.btnFavorite.setTextColor(
+                ContextCompat.getColor(requireContext(),
+                    if (fav) R.color.accent else R.color.text_muted)
+            )
+        }
+        updateFav()
+        binding.btnFavorite.setOnClickListener {
+            // If not in library yet, add to library first then favorite
+            if (!FontRepository.isInLibrary(font.id)) {
                 FontRepository.promoteToLibrary(font.id, requireContext())
-                binding.btnAddToLibrary.visibility = View.GONE
-                Toast.makeText(requireContext(), "Added to library", Toast.LENGTH_SHORT).show()
-                // Open main app so user can see it in library
-                startActivity(
-                    Intent(requireContext(), com.fontlens.MainActivity::class.java)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                )
+                refreshAddBtn()
             }
-        } else {
-            binding.btnAddToLibrary.visibility = View.GONE
+            FontRepository.toggleFavorite(font.id, requireContext())
+            updateFav()
         }
 
-        // Hide fav/meta/glyph/info — no nav controller here, open full app instead
-        binding.btnFavorite.visibility = View.GONE
-
-        // Keep info/meta/glyph buttons but open main app for them
-        binding.btnGlyph.setOnClickListener {
-            FontRepository.promoteToLibrary(font.id, requireContext())
-            startActivity(Intent(requireContext(), com.fontlens.MainActivity::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-            Toast.makeText(requireContext(), "Opening in FontLens…", Toast.LENGTH_SHORT).show()
-        }
-        binding.btnMeta.setOnClickListener {
-            FontRepository.promoteToLibrary(font.id, requireContext())
-            startActivity(Intent(requireContext(), com.fontlens.MainActivity::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-            Toast.makeText(requireContext(), "Opening in FontLens…", Toast.LENGTH_SHORT).show()
-        }
-        binding.btnInfo.setOnClickListener {
-            FontRepository.promoteToLibrary(font.id, requireContext())
-            startActivity(Intent(requireContext(), com.fontlens.MainActivity::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-            Toast.makeText(requireContext(), "Opening in FontLens…", Toast.LENGTH_SHORT).show()
-        }
-
-        // Preview text
+        // ── Preview text ──────────────────────────────────────────────────────
         binding.etPreview.setText(FontRepository.getSampleText(font))
         if (tf != null) binding.etPreview.typeface = tf
 
-        // Size seekbar
+        // ── Size seekbar ──────────────────────────────────────────────────────
         fontSize = 32
         binding.seekbarSize.max = 152
         binding.seekbarSize.progress = fontSize - 8
@@ -99,7 +94,7 @@ class StandalonePreviewFragment : Fragment() {
             override fun onStopTrackingTouch(sb: android.widget.SeekBar?) {}
         })
 
-        // Bold / Italic
+        // ── Bold / Italic ─────────────────────────────────────────────────────
         fun updateStyle() {
             val style = when {
                 isBold && isItalic -> android.graphics.Typeface.BOLD_ITALIC
@@ -119,6 +114,30 @@ class StandalonePreviewFragment : Fragment() {
         }
         binding.btnBold.setOnClickListener   { isBold   = !isBold;   updateStyle() }
         binding.btnItalic.setOnClickListener { isItalic = !isItalic; updateStyle() }
+
+        // ── Sub-screens via fragment transactions ─────────────────────────────
+        binding.btnGlyph.setOnClickListener {
+            openSubFragment(StandaloneGlyphFragment().apply {
+                arguments = Bundle().apply { putString("fontId", font.id) }
+            })
+        }
+        binding.btnMeta.setOnClickListener {
+            openSubFragment(StandaloneMetaFragment().apply {
+                arguments = Bundle().apply { putString("fontId", font.id) }
+            })
+        }
+        binding.btnInfo.setOnClickListener {
+            openSubFragment(StandaloneInfoFragment().apply {
+                arguments = Bundle().apply { putString("fontId", font.id) }
+            })
+        }
+    }
+
+    private fun openSubFragment(fragment: Fragment) {
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(com.fontlens.R.id.preview_container, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     override fun onDestroyView() { super.onDestroyView(); _binding = null }

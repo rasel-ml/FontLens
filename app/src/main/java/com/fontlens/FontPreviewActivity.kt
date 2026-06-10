@@ -27,8 +27,7 @@ class FontPreviewActivity : AppCompatActivity() {
         val ext      = name.substringAfterLast(".").lowercase()
         val fontExts = setOf("ttf", "otf", "woff", "woff2", "ttc")
         val mimeType = intent.type ?: contentResolver.getType(uri) ?: ""
-        val isFontMime = mimeType.startsWith("font/") ||
-                mimeType.contains("font") ||
+        val isFontMime = mimeType.startsWith("font/") || mimeType.contains("font") ||
                 (mimeType == "application/octet-stream" && ext in fontExts)
 
         if (!isFontMime && ext !in fontExts) {
@@ -45,15 +44,21 @@ class FontPreviewActivity : AppCompatActivity() {
             val font = items.first()
             FontRepository.addTempFont(font)
 
-            // Load fragment directly with args bundle
-            val fragment = com.fontlens.ui.preview.StandalonePreviewFragment().apply {
-                arguments = Bundle().apply {
-                    putString("fontId", font.id)
-                }
-            }
             supportFragmentManager.beginTransaction()
-                .replace(R.id.preview_container, fragment)
+                .replace(R.id.preview_container,
+                    com.fontlens.ui.preview.StandalonePreviewFragment().apply {
+                        arguments = Bundle().apply { putString("fontId", font.id) }
+                    })
                 .commit()
+        }
+    }
+
+    // Sub-fragments push to back stack, so back press pops them
+    override fun onBackPressed() {
+        if (supportFragmentManager.backStackEntryCount > 0) {
+            supportFragmentManager.popBackStack()
+        } else {
+            super.onBackPressed()
         }
     }
 
