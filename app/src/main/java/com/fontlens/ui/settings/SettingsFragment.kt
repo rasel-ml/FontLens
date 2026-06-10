@@ -6,9 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.fontlens.R
 import com.fontlens.data.AppSettings
+import com.fontlens.data.AppTheme
 import com.fontlens.data.FontRepository
 import com.fontlens.data.SamplePriority
 import com.fontlens.databinding.FragmentSettingsBinding
@@ -32,11 +34,36 @@ class SettingsFragment : Fragment() {
 
     private fun renderAll() {
         val s = FontRepository.settings
+        renderTheme(s)
         renderPriority(s)
         renderGlyphSwitch(s)
         renderRecursiveSwitch(s)
         renderLangList(s)
         renderLangSpinner(s)
+    }
+
+    private fun renderTheme(s: AppSettings) {
+        val rb = when (s.theme) {
+            AppTheme.SYSTEM -> binding.rbThemeSystem
+            AppTheme.DAY    -> binding.rbThemeDay
+            AppTheme.NIGHT  -> binding.rbThemeNight
+        }
+        rb.isChecked = true
+        binding.rgTheme.setOnCheckedChangeListener { _, id ->
+            val theme = when (id) {
+                R.id.rb_theme_system -> AppTheme.SYSTEM
+                R.id.rb_theme_day    -> AppTheme.DAY
+                R.id.rb_theme_night  -> AppTheme.NIGHT
+                else                 -> AppTheme.SYSTEM
+            }
+            FontRepository.settings = FontRepository.settings.copy(theme = theme)
+            FontRepository.saveSettings(requireContext())
+            AppCompatDelegate.setDefaultNightMode(when (theme) {
+                AppTheme.SYSTEM -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                AppTheme.DAY    -> AppCompatDelegate.MODE_NIGHT_NO
+                AppTheme.NIGHT  -> AppCompatDelegate.MODE_NIGHT_YES
+            })
+        }
     }
 
     private fun renderPriority(s: AppSettings) {
@@ -85,9 +112,8 @@ class SettingsFragment : Fragment() {
             lb.etLangText.setText(text)
             lb.etLangText.setOnFocusChangeListener { _, hasFocus ->
                 if (!hasFocus) {
-                    val newText = lb.etLangText.text?.toString() ?: ""
                     val updated = FontRepository.settings.langSamples.toMutableMap()
-                    updated[lang] = newText
+                    updated[lang] = lb.etLangText.text?.toString() ?: ""
                     FontRepository.settings = FontRepository.settings.copy(langSamples = updated)
                     FontRepository.saveSettings(requireContext())
                 }

@@ -7,8 +7,10 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.GravityCompat
 import androidx.navigation.fragment.NavHostFragment
+import com.fontlens.data.AppTheme
 import com.fontlens.data.FontRepository
 import com.fontlens.databinding.ActivityMainBinding
 import com.fontlens.databinding.ItemDrawerFolderBinding
@@ -20,11 +22,13 @@ class MainActivity : AppCompatActivity() {
     private val backToastHandler = android.os.Handler(android.os.Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Apply saved theme BEFORE setContentView
+        FontRepository.load(this)
+        applyTheme(FontRepository.settings.theme)
+
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        FontRepository.load(this)
 
         val navHost = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -72,13 +76,19 @@ class MainActivity : AppCompatActivity() {
                     binding.bottomNav.menu.findItem(R.id.nav_library)?.isChecked = true
                     return
                 }
-                if (backPressedOnce) {
-                    backToastHandler.removeCallbacksAndMessages(null); finish(); return
-                }
+                if (backPressedOnce) { backToastHandler.removeCallbacksAndMessages(null); finish(); return }
                 backPressedOnce = true
                 Toast.makeText(this@MainActivity, "Press back again to exit", Toast.LENGTH_SHORT).show()
                 backToastHandler.postDelayed({ backPressedOnce = false }, 2000)
             }
+        })
+    }
+
+    private fun applyTheme(theme: AppTheme) {
+        AppCompatDelegate.setDefaultNightMode(when (theme) {
+            AppTheme.SYSTEM -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            AppTheme.DAY    -> AppCompatDelegate.MODE_NIGHT_NO
+            AppTheme.NIGHT  -> AppCompatDelegate.MODE_NIGHT_YES
         })
     }
 

@@ -39,7 +39,9 @@ data class FontItem(
     val displayName: String,
     val uri: Uri,
     val meta: FontMeta,
-    var metaOverrides: Map<String, String> = emptyMap()
+    var metaOverrides: Map<String, String> = emptyMap(),
+    val addedAt: Long = System.currentTimeMillis(), // for date sort
+    val folderPath: String = ""                     // for folder grouping
 ) {
     val effectiveMeta: FontMeta get() = meta.copy(
         family       = metaOverrides["family"]       ?: meta.family,
@@ -67,7 +69,20 @@ data class AppSettings(
     val samplePriority: SamplePriority = SamplePriority.METADATA_FIRST,
     val glyphShowAll: Boolean = false,
     val defaultLang: String = "English",
-    val folderRecursive: Boolean = true   // scan subfolders by default
+    val folderRecursive: Boolean = true,
+    val theme: AppTheme = AppTheme.SYSTEM
 )
 
 enum class SamplePriority { METADATA_FIRST, USER_FIRST, ALWAYS_USER, ALWAYS_META }
+enum class AppTheme { SYSTEM, DAY, NIGHT }
+enum class SortOrder {
+    NAME_ASC, NAME_DESC,
+    DATE_ASC, DATE_DESC,
+    FOLDER
+}
+
+// List item — either a font or a folder separator
+sealed class FontListItem {
+    data class Font(val font: FontItem) : FontListItem()
+    data class FolderHeader(val path: String) : FontListItem()
+}

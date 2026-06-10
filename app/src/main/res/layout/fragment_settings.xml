@@ -34,6 +34,72 @@
             android:paddingTop="12dp"
             android:paddingBottom="24dp">
 
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                app:cardBackgroundColor="@color/bg_surface"
+                app:strokeColor="@color/divider"
+                app:strokeWidth="1dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp">
+            
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+            
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="THEME"
+                        android:textColor="@color/accent"
+                        android:textSize="11sp"
+                        android:letterSpacing="0.1"
+                        android:textAllCaps="true"
+                        android:layout_marginBottom="10dp" />
+            
+                    <RadioGroup
+                        android:id="@+id/rg_theme"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+            
+                        <RadioButton
+                            android:id="@+id/rb_theme_system"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Follow System"
+                            android:textColor="@color/text_primary"
+                            android:buttonTint="@color/accent"
+                            android:paddingStart="8dp"
+                            android:layout_marginBottom="4dp" />
+            
+                        <RadioButton
+                            android:id="@+id/rb_theme_day"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="☀ Day"
+                            android:textColor="@color/text_primary"
+                            android:buttonTint="@color/accent"
+                            android:paddingStart="8dp"
+                            android:layout_marginBottom="4dp" />
+            
+                        <RadioButton
+                            android:id="@+id/rb_theme_night"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="🌙 Night"
+                            android:textColor="@color/text_primary"
+                            android:buttonTint="@color/accent"
+                            android:paddingStart="8dp" />
+            
+                    </RadioGroup>
+            
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            
+
             <!-- Default Language Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"

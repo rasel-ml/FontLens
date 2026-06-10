@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/bg_primary">
 
-    <!-- Toolbar -->
+    <!-- Normal toolbar -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
@@ -24,7 +24,6 @@
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <!-- Hamburger -->
             <TextView
                 android:id="@+id/btn_hamburger"
                 android:layout_width="44dp"
@@ -62,8 +61,115 @@
                 android:textSize="12sp"
                 android:text="0" />
 
+            <!-- Sort button -->
+            <TextView
+                android:id="@+id/btn_sort"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="4dp"
+                android:gravity="center"
+                android:text="⇅"
+                android:textSize="18sp"
+                android:textColor="@color/text_secondary"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <!-- Theme toggle -->
+            <TextView
+                android:id="@+id/btn_theme"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="☀"
+                android:textSize="18sp"
+                android:textColor="@color/text_secondary"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
         </LinearLayout>
     </androidx.appcompat.widget.Toolbar>
+
+    <!-- Selection toolbar (replaces normal toolbar when selecting) -->
+    <LinearLayout
+        android:id="@+id/toolbar_selection"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/accent_dim"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Cancel selection -->
+        <TextView
+            android:id="@+id/btn_cancel_selection"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:text="✕"
+            android:textSize="16sp"
+            android:textColor="@color/accent"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <!-- Selected count -->
+        <TextView
+            android:id="@+id/tv_selected_count"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:text="0 selected" />
+
+        <!-- Select all -->
+        <TextView
+            android:id="@+id/btn_select_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="All"
+            android:textColor="@color/accent"
+            android:textSize="13sp"
+            android:padding="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <!-- Favorite selected -->
+        <TextView
+            android:id="@+id/btn_sel_favorite"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:text="★"
+            android:textSize="18sp"
+            android:textColor="@color/text_secondary"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <!-- Delete selected -->
+        <TextView
+            android:id="@+id/btn_sel_delete"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:text="🗑"
+            android:textSize="16sp"
+            android:textColor="#FF5252"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+    </LinearLayout>
 
     <!-- Search bar -->
     <com.google.android.material.textfield.TextInputLayout
@@ -96,7 +202,6 @@
             android:textSize="14sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Empty state -->
     <LinearLayout
         android:id="@+id/layout_empty"
         android:layout_width="wrap_content"
@@ -126,7 +231,6 @@
             android:textSize="15sp" />
     </LinearLayout>
 
-    <!-- Font list -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_fonts"
         android:layout_width="0dp"
@@ -141,7 +245,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/search_layout" />
 
-    <!-- FAB -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add"
         android:layout_width="wrap_content"

@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Typeface
 import android.net.Uri
 import com.fontlens.data.FontItem
-import com.fontlens.data.FontRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -15,6 +14,7 @@ object FontLoader {
     suspend fun loadFontsFromUris(
         context: Context,
         uris: List<Uri>,
+        folderPath: String = "",
         onProgress: ((loaded: Int, total: Int) -> Unit)? = null
     ): List<FontItem> = withContext(Dispatchers.IO) {
         val result = mutableListOf<FontItem>()
@@ -26,7 +26,14 @@ object FontLoader {
                 val id = "${name}_${uri.hashCode()}"
                 val meta = cr.openInputStream(uri)?.use { FontParser.parse(it) } ?: return@forEachIndexed
                 val displayName = meta.family.ifEmpty { name.substringBeforeLast(".") }
-                val item = FontItem(id = id, displayName = displayName, uri = uri, meta = meta)
+                val item = FontItem(
+                    id = id,
+                    displayName = displayName,
+                    uri = uri,
+                    meta = meta,
+                    addedAt = System.currentTimeMillis(),
+                    folderPath = folderPath
+                )
                 result.add(item)
                 cr.openFileDescriptor(uri, "r")?.use { pfd ->
                     val tf = Typeface.Builder(pfd.fileDescriptor).build()
