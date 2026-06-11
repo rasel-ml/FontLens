@@ -1,5 +1,5 @@
-![AppBanner](.github/raw/banner.jpeg)
-<img align="center" src=".github/raw/icon.png" alt="App Icon" height="80" width="80">
+<img src=".github/raw/banner.jpeg" alt="App Banner" width="100%"></img>
+<p align="center"><img src=".github/raw/icon.png" alt="App Icon" height="80" width="80"></p>
 <h1 align="center"><b>FontLens</b></h1>
 <p align="center">A fully offline Android font viewer and inspector</p>
 
@@ -11,6 +11,14 @@
 - Metadata viewer and editor
 - Favorites system
 - Multiple sample texts suppor with configurable priority
+
+##Screenshots
+<div><img src=".github/raw/ss_1.png" alt="Library" width="32%"></img>
+<img src=".github/raw/ss_2.png" alt="Favorite" width="32%"></img>
+<img src=".github/raw/ss_3.png" alt="Preview" width="32%"></img></div>
+<div><img src=".github/raw/ss_4.png" alt="Font Info" width="32%"></img>
+<img src=".github/raw/ss_5.png" alt="Font Metadata" width="32%"></img>
+<img src=".github/raw/ss_6.png" alt="Glyph Map" width="32%"></img></div>
 
 ## Building
 
@@ -134,18 +142,15 @@ This app is made by/with help of
 - Claude AI [For coding help]
 - Termux (Androied) [For git push]
 - Github-Action [To build]
+
 No Laptop/Computer is used.
 
 ## Copyright
 ```
-Copyright (C) 2026 Rasel Molla
+Copyright (C) 2026 Md. Rasel Molla
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or any later version.
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 ```
