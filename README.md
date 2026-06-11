@@ -1,5 +1,5 @@
 ![AppBanner](.github/raw/banner.jpeg)
-
+<img align="center" src=".github/raw/icon.png" alt="App Icon" height="80" width="80">
 <h1 align="center"><b>FontLens</b></h1>
 <p align="center">A fully offline Android font viewer and inspector</p>
 
@@ -129,6 +129,12 @@ app/src/main/
     └── values-night
          └── themes.xml
 ```
+## Disclaimer
+This app is made by/with help of
+- Claude AI [For coding help]
+- Termux (Androied) [For git push]
+- Github-Action [To build]
+No Laptop/Computer is used.
 
 ## Copyright
 ```
