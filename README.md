@@ -1,17 +1,16 @@
 ![AppBanner](.github/raw/banner.jpeg)
 
-<h1 align="center">FontLens</h1>
+<h1 align="center"><b>FontLens</b></h1>
 <p align="center">A fully offline Android font viewer and inspector</p>
 
 ## Features
+- Completely offline. No permission required.
 - Browse & preview local font files (.ttf, .otf, .woff, .woff2)
-- Live editable preview with font size, bold, italic controls
-- Glyph keyboard showing all characters in the font
-- Metadata viewer + local non-destructive metadata editor
-- Font info panel (bold/italic/condensed support, weight class, etc.)
+- Live editable font preview with size, bold, italic controls
+- Glyph keyboard for showing all characters in the font
+- Metadata viewer and editor
 - Favorites system
-- Language-based sample texts with configurable priority
-- Settings for glyph display (font-supported only vs full Unicode)
+- Multiple sample texts suppor with configurable priority
 
 ## Building
 
@@ -131,7 +130,7 @@ app/src/main/
          └── themes.xml
 ```
 
-## License
+## Copyright
 ```
 Copyright (C) 2026 Rasel Molla
 
