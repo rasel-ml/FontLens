@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fontlens.R
-import com.fontlens.data.FontItem
 import com.fontlens.data.FontListItem
 import com.fontlens.data.FontRepository
 import com.fontlens.databinding.FragmentFontListBinding
@@ -32,11 +31,10 @@ class FavoritesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.tvTitle.text = getString(R.string.favorites)
-        binding.fabAdd.visibility    = View.GONE
+        binding.fabAdd.visibility       = View.GONE
         binding.btnHamburger.visibility = View.GONE
-        binding.btnSort.visibility   = View.GONE
-        binding.btnTheme.visibility  = View.GONE
-        binding.searchLayout.visibility = View.VISIBLE
+        binding.btnSort.visibility      = View.GONE
+        binding.btnTheme.visibility     = View.GONE
 
         adapter = FontListAdapter(
             onFontClick = { font ->
@@ -60,21 +58,14 @@ class FavoritesFragment : Fragment() {
         binding.rvFonts.adapter = adapter
         binding.etSearch.addTextChangedListener { refresh(it?.toString() ?: "") }
 
-        // Selection toolbar actions
-        binding.btnCancelSelection.setOnClickListener {
-            adapter.exitSelectionMode(); showNormalToolbar()
-        }
+        binding.btnCancelSelection.setOnClickListener { adapter.exitSelectionMode(); showNormalToolbar() }
         binding.btnSelectAll.setOnClickListener {
             adapter.selectAll(FontRepository.getFavorites())
             updateSelectionToolbar(adapter.getSelectedIds())
         }
         binding.btnSelFavorite.setOnClickListener {
-            // In favorites, this removes from favorites
             val ids = adapter.getSelectedIds()
-            ids.forEach { id ->
-                if (FontRepository.isFavorite(id))
-                    FontRepository.toggleFavorite(id, requireContext())
-            }
+            ids.forEach { id -> if (FontRepository.isFavorite(id)) FontRepository.toggleFavorite(id, requireContext()) }
             Toast.makeText(requireContext(), "${ids.size} removed from favorites", Toast.LENGTH_SHORT).show()
             adapter.exitSelectionMode(); showNormalToolbar(); refresh()
         }
@@ -107,14 +98,16 @@ class FavoritesFragment : Fragment() {
     }
 
     private fun showNormalToolbar() {
-        binding.toolbar.visibility          = View.VISIBLE
+        binding.toolbarNormal.visibility    = View.VISIBLE
         binding.toolbarSelection.visibility = View.GONE
+        binding.searchLayout.visibility     = View.VISIBLE
     }
 
     private fun updateSelectionToolbar(ids: Set<String>) {
         val total = FontRepository.getFavorites().size
-        binding.toolbar.visibility          = View.GONE
+        binding.toolbarNormal.visibility    = View.GONE
         binding.toolbarSelection.visibility = View.VISIBLE
+        binding.searchLayout.visibility     = View.GONE
         binding.tvSelectedCount.text        = "${ids.size} / $total selected"
     }
 

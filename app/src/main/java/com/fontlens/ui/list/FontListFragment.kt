@@ -64,11 +64,11 @@ class FontListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         adapter = FontListAdapter(
-            onFontClick    = { font -> findNavController().navigate(FontListFragmentDirections.actionListToPreview(font.id)) },
+            onFontClick     = { font -> findNavController().navigate(FontListFragmentDirections.actionListToPreview(font.id)) },
             onFavoriteClick = { font -> FontRepository.toggleFavorite(font.id, requireContext()); adapter.notifyDataSetChanged() },
-            onRemoveClick  = { font -> DeleteFontDialog.show(requireContext(), font) { refresh() } },
-            isFavorite     = { FontRepository.isFavorite(it) },
-            getSample      = { FontRepository.getSampleText(it) },
+            onRemoveClick   = { font -> DeleteFontDialog.show(requireContext(), font) { refresh() } },
+            isFavorite      = { FontRepository.isFavorite(it) },
+            getSample       = { FontRepository.getSampleText(it) },
             onSelectionChanged = { ids -> updateSelectionToolbar(ids) }
         )
 
@@ -78,21 +78,14 @@ class FontListFragment : Fragment() {
         binding.btnHamburger.setOnClickListener { (activity as? MainActivity)?.openDrawer() }
         binding.fabAdd.setOnClickListener { openFolderPicker() }
         binding.etSearch.addTextChangedListener { refresh(it?.toString() ?: "") }
-
-        // Sort button
         binding.btnSort.setOnClickListener { showSortSheet() }
-
-        // Theme toggle
         binding.btnTheme.setOnClickListener {
             isNightMode = !isNightMode
             AppCompatDelegate.setDefaultNightMode(
-                if (isNightMode) AppCompatDelegate.MODE_NIGHT_YES
-                else AppCompatDelegate.MODE_NIGHT_NO
-            )
+                if (isNightMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO)
             binding.btnTheme.text = if (isNightMode) "🌙" else "☀"
         }
 
-        // Selection toolbar actions
         binding.btnCancelSelection.setOnClickListener { adapter.exitSelectionMode(); showNormalToolbar() }
         binding.btnSelectAll.setOnClickListener {
             adapter.selectAll(FontRepository.getAll())
@@ -100,9 +93,7 @@ class FontListFragment : Fragment() {
         }
         binding.btnSelFavorite.setOnClickListener {
             val ids = adapter.getSelectedIds()
-            ids.forEach { id ->
-                if (!FontRepository.isFavorite(id)) FontRepository.toggleFavorite(id, requireContext())
-            }
+            ids.forEach { id -> if (!FontRepository.isFavorite(id)) FontRepository.toggleFavorite(id, requireContext()) }
             Toast.makeText(requireContext(), "${ids.size} added to favorites", Toast.LENGTH_SHORT).show()
             adapter.exitSelectionMode(); showNormalToolbar(); refresh()
         }
@@ -134,20 +125,31 @@ class FontListFragment : Fragment() {
         if (!initialLoadDone) { initialLoadDone = true; reloadSavedFolders() } else refresh()
     }
 
+    private fun showNormalToolbar() {
+        binding.toolbarNormal.visibility    = View.VISIBLE
+        binding.toolbarSelection.visibility = View.GONE
+        binding.searchLayout.visibility     = View.VISIBLE
+    }
+
+    private fun updateSelectionToolbar(ids: Set<String>) {
+        val total = FontRepository.getAll().size
+        binding.toolbarNormal.visibility    = View.GONE
+        binding.toolbarSelection.visibility = View.VISIBLE
+        binding.searchLayout.visibility     = View.GONE
+        binding.tvSelectedCount.text        = "${ids.size} / $total selected"
+    }
+
     private fun showSortSheet() {
         val dialog = BottomSheetDialog(requireContext(), R.style.Theme_FontLens_BottomSheet)
         val sheetBinding = BottomSheetSortBinding.inflate(LayoutInflater.from(requireContext()))
         dialog.setContentView(sheetBinding.root)
-
-        val rb = when (currentSort) {
+        when (currentSort) {
             SortOrder.NAME_ASC  -> sheetBinding.rbNameAsc
             SortOrder.NAME_DESC -> sheetBinding.rbNameDesc
             SortOrder.DATE_ASC  -> sheetBinding.rbDateAsc
             SortOrder.DATE_DESC -> sheetBinding.rbDateDesc
             SortOrder.FOLDER    -> sheetBinding.rbFolder
-        }
-        rb.isChecked = true
-
+        }.isChecked = true
         sheetBinding.rgSort.setOnCheckedChangeListener { _, id ->
             currentSort = when (id) {
                 R.id.rb_name_asc  -> SortOrder.NAME_ASC
@@ -157,22 +159,9 @@ class FontListFragment : Fragment() {
                 R.id.rb_folder    -> SortOrder.FOLDER
                 else              -> SortOrder.NAME_ASC
             }
-            dialog.dismiss()
-            refresh()
+            dialog.dismiss(); refresh()
         }
         dialog.show()
-    }
-
-    private fun showNormalToolbar() {
-        binding.toolbar.visibility          = View.VISIBLE
-        binding.toolbarSelection.visibility = View.GONE
-    }
-
-    private fun updateSelectionToolbar(ids: Set<String>) {
-        val total = FontRepository.getAll().size
-        binding.toolbar.visibility          = View.GONE
-        binding.toolbarSelection.visibility = View.VISIBLE
-        binding.tvSelectedCount.text        = "${ids.size} / $total selected"
     }
 
     private fun reloadSavedFolders() {
@@ -261,16 +250,11 @@ class FontListFragment : Fragment() {
             SortOrder.FOLDER    -> fonts.sortedBy { it.folderPath }
         }
         if (currentSort != SortOrder.FOLDER) return sorted.map { FontListItem.Font(it) }
-
-        // Group by folder with headers
         val result = mutableListOf<FontListItem>()
         var lastFolder = ""
         sorted.forEach { font ->
             val folder = font.folderPath.ifEmpty { "/ (root)" }
-            if (folder != lastFolder) {
-                result.add(FontListItem.FolderHeader(folder))
-                lastFolder = folder
-            }
+            if (folder != lastFolder) { result.add(FontListItem.FolderHeader(folder)); lastFolder = folder }
             result.add(FontListItem.Font(font))
         }
         return result

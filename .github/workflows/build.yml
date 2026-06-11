@@ -54,7 +54,7 @@ jobs:
           GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
       - name: Upload APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: FontLens
           path: app/build/outputs/apk/debug/app-debug.apk
