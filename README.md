@@ -1,6 +1,6 @@
 <img src=".github/raw/banner.jpeg" alt="App Banner" width="100%"></img>
 <p align="center"></p>
-<h1 align="center"><b>FontLens</b> <img src=".github/raw/icon.png" alt="App Icon" height="40" width="40"></h1>
+<h1 align="center"><img src=".github/raw/icon.png" alt="App Icon" height="30" width="30">  <b>FontLens</b></h1>
 
 <p align="center">A fully offline Android font viewer and inspector</p>
 
