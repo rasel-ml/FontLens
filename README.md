@@ -1,6 +1,8 @@
 <img src=".github/raw/banner.jpeg" alt="App Banner" width="100%"></img>
-<p align="center"><img src=".github/raw/icon.png" alt="App Icon" height="80" width="80"></p>
-<h1 align="center"><b>FontLens</b></h1>
+<p align="center"><img src=".github/raw/icon.png" alt="App Icon" height="80" width="80">
+<h1><b>FontLens</b></h1>
+</p>
+
 <p align="center">A fully offline Android font viewer and inspector</p>
 
 ## Features
@@ -12,13 +14,14 @@
 - Favorites system
 - Multiple sample texts suppor with configurable priority
 
-##Screenshots
-<div><img src=".github/raw/ss_1.png" alt="Library" width="32%"></img>
-<img src=".github/raw/ss_2.png" alt="Favorite" width="32%"></img>
-<img src=".github/raw/ss_3.png" alt="Preview" width="32%"></img></div>
-<div><img src=".github/raw/ss_4.png" alt="Font Info" width="32%"></img>
-<img src=".github/raw/ss_5.png" alt="Font Metadata" width="32%"></img>
-<img src=".github/raw/ss_6.png" alt="Glyph Map" width="32%"></img></div>
+## Screenshots
+
+<div><img src=".github/raw/ss_1.png" alt="Library" width="33%"></img>
+<img src=".github/raw/ss_2.png" alt="Favorite" width="33%"></img>
+<img src=".github/raw/ss_3.png" alt="Preview" width="33%"></img></div>
+<div><img src=".github/raw/ss_4.png" alt="Font Info" width="33%"></img>
+<img src=".github/raw/ss_5.png" alt="Font Metadata" width="33%"></img>
+<img src=".github/raw/ss_6.png" alt="Glyph Map" width="33%"></img></div>
 
 ## Building
 
