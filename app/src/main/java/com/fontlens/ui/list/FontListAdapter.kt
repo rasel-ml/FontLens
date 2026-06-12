@@ -12,7 +12,7 @@ import com.fontlens.data.FontItem
 import com.fontlens.data.FontListItem
 import com.fontlens.databinding.ItemFontCardBinding
 import com.fontlens.databinding.ItemFolderHeaderBinding
-import com.fontlens.utils.FontLoader
+import com.fontlens.utils.TypefaceLoader
 
 class FontListAdapter(
     private val onFontClick: (FontItem) -> Unit,
@@ -43,6 +43,14 @@ class FontListAdapter(
     }
 
     fun getSelectedIds() = selected.toSet()
+
+    /** Call when a typeface finishes loading to refresh that specific card */
+    fun notifyTypefaceReady(fontId: String) {
+        val index = currentList.indexOfFirst {
+            it is FontListItem.Font && it.font.id == fontId
+        }
+        if (index >= 0) notifyItemChanged(index)
+    }
 
     companion object {
         const val TYPE_FONT   = 0
@@ -90,7 +98,7 @@ class FontListAdapter(
                 }
                 b.tvFontSub.visibility = if (b.tvFontSub.text.isBlank()) View.GONE else View.VISIBLE
 
-                val tf = FontLoader.getTypeface(font.id) ?: Typeface.DEFAULT
+                val tf = TypefaceLoader.getTypeface(font.id) ?: Typeface.DEFAULT
                 val sample = getSample(font).replace("\n", "  ").replace("\r", "")
                 b.tvPreviewLarge.text     = sample
                 b.tvPreviewLarge.typeface = tf
@@ -98,6 +106,8 @@ class FontListAdapter(
 
                 // Selection highlight
                 val isSelected = selected.contains(font.id)
+                b.root.alpha = if (TypefaceLoader.isLoaded(font.id)) 1f else 0.7f
+
                 b.root.strokeColor = if (isSelected)
                     ctx.getColor(R.color.accent) else ctx.getColor(R.color.divider)
                 b.root.strokeWidth = if (isSelected) 2 else 1
