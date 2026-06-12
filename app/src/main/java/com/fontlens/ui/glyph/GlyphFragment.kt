@@ -11,7 +11,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import com.fontlens.data.FontRepository
 import com.fontlens.databinding.FragmentGlyphBinding
-import com.fontlens.utils.FontLoader
+import com.fontlens.utils.TypefaceLoader
 
 class GlyphFragment : Fragment() {
 
@@ -34,7 +34,7 @@ class GlyphFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val font = FontRepository.getById(args.fontId) ?: run { findNavController().popBackStack(); return }
-        val tf = FontLoader.getTypeface(font.id)
+        val tf = TypefaceLoader.getTypeface(font.id)
         val showAll = FontRepository.settings.glyphShowAll
 
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }

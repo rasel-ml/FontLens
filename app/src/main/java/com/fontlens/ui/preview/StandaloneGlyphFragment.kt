@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.fontlens.data.FontRepository
 import com.fontlens.databinding.FragmentGlyphBinding
 import com.fontlens.ui.glyph.GlyphAdapter
-import com.fontlens.utils.FontLoader
+import com.fontlens.utils.TypefaceLoader
 
 class StandaloneGlyphFragment : Fragment() {
 
@@ -33,7 +33,7 @@ class StandaloneGlyphFragment : Fragment() {
 
         val fontId = arguments?.getString("fontId") ?: return
         val font   = FontRepository.getById(fontId) ?: return
-        val tf     = FontLoader.getTypeface(font.id)
+        val tf     = TypefaceLoader.getTypeface(font.id)
         val showAll = FontRepository.settings.glyphShowAll
 
         binding.toolbar.setNavigationOnClickListener {

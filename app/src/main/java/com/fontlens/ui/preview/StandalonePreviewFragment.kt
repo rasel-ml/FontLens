@@ -12,7 +12,9 @@ import com.fontlens.R
 import com.fontlens.data.FontRepository
 import com.fontlens.databinding.FragmentPreviewBinding
 import com.fontlens.ui.DeleteFontDialog
-import com.fontlens.utils.FontLoader
+import com.fontlens.utils.TypefaceLoader
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class StandalonePreviewFragment : Fragment() {
 
@@ -33,7 +35,7 @@ class StandalonePreviewFragment : Fragment() {
 
         val fontId = arguments?.getString("fontId") ?: run { requireActivity().finish(); return }
         val font   = FontRepository.getById(fontId)  ?: run { requireActivity().finish(); return }
-        val tf     = FontLoader.getTypeface(font.id)
+        val tf = TypefaceLoader.getTypeface(font.id)
 
         binding.tvFontName.text = font.effectiveMeta.family.ifEmpty { font.displayName }
         binding.toolbar.setNavigationOnClickListener { requireActivity().finish() }
