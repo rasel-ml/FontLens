@@ -41,7 +41,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_font_name" />
 
-        <!-- Remove button -->
         <TextView
             android:id="@+id/btn_remove"
             android:layout_width="36dp"
@@ -55,7 +54,6 @@
             app:layout_constraintEnd_toStartOf="@id/btn_favorite"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Favorite star -->
         <TextView
             android:id="@+id/btn_favorite"
             android:layout_width="36dp"
@@ -70,6 +68,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- Single preview TextView, 2 lines, same size and color -->
         <TextView
             android:id="@+id/tv_preview_large"
             android:layout_width="match_parent"
@@ -77,22 +76,19 @@
             android:layout_marginTop="12dp"
             android:textColor="@color/text_secondary"
             android:textSize="26sp"
-            android:maxLines="1"
+            android:maxLines="2"
             android:ellipsize="end"
             android:lineSpacingMultiplier="1.2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_font_sub" />
 
+        <!-- Hidden — kept so binding doesn't crash, zero size -->
         <TextView
             android:id="@+id/tv_preview_small"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textColor="@color/text_muted"
-            android:textSize="14sp"
-            android:maxLines="1"
-            android:ellipsize="end"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_preview_large" />
