@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.FontLens" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">#FFFFFF</item>
+        <item name="colorPrimary">@color/accent</item>
         <item name="colorPrimaryVariant">@color/accent_dim</item>
         <item name="colorOnPrimary">@color/bg_primary</item>
         <item name="colorSecondary">@color/accent</item>
@@ -11,7 +11,7 @@
         <item name="android:windowBackground">@color/bg_primary</item>
         <item name="android:statusBarColor">@color/bg_sidebar</item>
         <item name="android:navigationBarColor">@color/bg_sidebar</item>
-        <item name="android:textColorPrimary">#000000</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:textColorSecondary">@color/text_secondary</item>
         <item name="materialCardViewStyle">@style/CardStyle</item>
     </style>
@@ -39,4 +39,15 @@
         <item name="strokeColor">@color/border</item>
         <item name="android:textColor">@color/text_secondary</item>
     </style>
+
+    <style name="Theme.FontLens.Dialog" parent="Theme.MaterialComponents.DayNight.Dialog.Alert">
+        <item name="colorPrimary">@color/accent</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="android:colorBackground">@color/bg_elevated</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="buttonBarPositiveButtonStyle">@style/AccentButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/OutlineButton</item>
+    </style>
 </resources>
+

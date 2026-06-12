@@ -22,12 +22,11 @@ class MainActivity : AppCompatActivity() {
     private val backToastHandler = android.os.Handler(android.os.Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState) // super MUST be first
-
-        // Load settings then apply theme
+        // Apply saved theme BEFORE setContentView
         FontRepository.load(this)
         applyTheme(FontRepository.settings.theme)
 
+        super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -112,13 +111,17 @@ class MainActivity : AppCompatActivity() {
                 getLibraryFragment()?.reloadFolder(uri)
             }
             fb.btnRemoveFolder.setOnClickListener {
-                androidx.appcompat.app.AlertDialog.Builder(this)
+                val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_FontLens_Dialog)
                     .setTitle("Remove Folder")
-                    .setMessage("Remove this folder from FontLens?\n\nFonts already loaded will remain until the app restarts.")
+                    .setMessage("Remove "" + getFolderDisplayName(uri) + "" and all its fonts from the library?")
                     .setPositiveButton("Remove") { _, _ ->
-                        FontRepository.removeSavedFolder(uri, this); refreshDrawer()
+                        FontRepository.removeSavedFolder(uri, this)
+                        refreshDrawer()
+                        getLibraryFragment()?.refresh()
                     }
-                    .setNegativeButton("Cancel", null).show()
+                    .setNegativeButton("Cancel", null)
+                    .create()
+                dialog.show()
             }
             container.addView(fb.root)
         }
@@ -133,3 +136,4 @@ class MainActivity : AppCompatActivity() {
         try { "/" + (uri.lastPathSegment ?: uri.toString()).substringAfter(":") }
         catch (_: Exception) { uri.toString() }
 }
+
