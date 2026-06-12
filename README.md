@@ -11,7 +11,7 @@
 - Glyph keyboard for showing all characters in the font
 - Metadata viewer and editor
 - Favorites system
-- Multiple sample texts suppor with configurable priority
+- Multiple sample texts support with configurable priority
 
 ## Screenshots
 

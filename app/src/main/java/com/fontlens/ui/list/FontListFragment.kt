@@ -28,6 +28,7 @@ import com.fontlens.databinding.FragmentFontListBinding
 import com.fontlens.ui.DeleteFontDialog
 import com.fontlens.ui.LoadingDialog
 import com.fontlens.utils.FontLoader
+import com.fontlens.utils.TypefaceLoader
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,6 +42,7 @@ class FontListFragment : Fragment() {
     private var initialLoadDone = false
     private var currentSort = SortOrder.NAME_ASC
     private var isNightMode = false
+    private var typefaceJobRunning = false
 
     private val pickFolder = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -102,7 +104,6 @@ class FontListFragment : Fragment() {
             if (ids.isEmpty()) return@setOnClickListener
             AlertDialog.Builder(requireContext())
                 .setTitle("Delete ${ids.size} font(s)?")
-                .setMessage("Choose how to remove the selected fonts.")
                 .setPositiveButton("🗑 Delete from Storage") { _, _ ->
                     AlertDialog.Builder(requireContext())
                         .setTitle("⚠ Permanently delete ${ids.size} font(s)?")
@@ -110,19 +111,147 @@ class FontListFragment : Fragment() {
                         .setPositiveButton("Delete") { _, _ ->
                             ids.forEach { FontRepository.removeFontFromStorage(it, requireContext()) }
                             adapter.exitSelectionMode(); showNormalToolbar(); refresh()
-                            Toast.makeText(requireContext(), "${ids.size} file(s) deleted", Toast.LENGTH_SHORT).show()
                         }
                         .setNegativeButton("Cancel", null).show()
                 }
                 .setNeutralButton("Remove from Library") { _, _ ->
                     ids.forEach { FontRepository.removeFont(it, requireContext()) }
                     adapter.exitSelectionMode(); showNormalToolbar(); refresh()
-                    Toast.makeText(requireContext(), "${ids.size} removed", Toast.LENGTH_SHORT).show()
                 }
                 .setNegativeButton("Cancel", null).show()
         }
 
-        if (!initialLoadDone) { initialLoadDone = true; reloadSavedFolders() } else refresh()
+        if (!initialLoadDone) {
+            initialLoadDone = true
+            val cached = FontRepository.getAll()
+            if (cached.isNotEmpty()) {
+                // Instant list from cache — no loading popup
+                refresh()
+                startBackgroundTypefaceLoading(cached)
+                // Still scan folders for new fonts in background (silently)
+                scanFoldersForNewFonts()
+            } else {
+                // First ever launch — scan folders with loading popup
+                scanFoldersWithPopup()
+            }
+        } else {
+            refresh()
+        }
+    }
+
+    /**
+     * First launch or explicit reload — show loading popup, scan folders
+     */
+    private fun scanFoldersWithPopup() {
+        val newUris = FontRepository.getSavedFolderUris().filter { !FontRepository.isFolderLoaded(it) }
+        if (newUris.isEmpty()) { refresh(); return }
+        lifecycleScope.launch {
+            for (uri in newUris) try { loadFontsFromFolder(uri, showToast = false) } catch (_: Exception) {}
+        }
+    }
+
+    /**
+     * Subsequent launches — silently check for new fonts without blocking UI
+     */
+    private fun scanFoldersForNewFonts() {
+        val uris = FontRepository.getSavedFolderUris()
+        if (uris.isEmpty()) return
+        lifecycleScope.launch {
+            val recursive = FontRepository.settings.folderRecursive
+            for (folderUri in uris) {
+                try {
+                    val folderLabel = "/" + (folderUri.lastPathSegment ?: "").substringAfter(":")
+                    val fontUris = withContext(Dispatchers.IO) { collectFontUris(folderUri, recursive) }
+                    val items = FontLoader.loadFontsFromUris(
+                        context = requireContext(), uris = fontUris, folderPath = folderLabel)
+                    val before = FontRepository.getAll().size
+                    FontRepository.addFontsAndSave(items, requireContext())
+                    val after = FontRepository.getAll().size
+                    if (after > before) {
+                        // New fonts found — refresh list and start loading their typefaces
+                        refresh()
+                        startBackgroundTypefaceLoading(FontRepository.getAll())
+                    }
+                } catch (_: Exception) {}
+            }
+        }
+    }
+
+    /**
+     * Load typefaces one by one in background. Each completion updates that card.
+     */
+    private fun startBackgroundTypefaceLoading(fonts: List<FontItem>) {
+        if (typefaceJobRunning) return
+        typefaceJobRunning = true
+        lifecycleScope.launch {
+            val toLoad = fonts.filter { !TypefaceLoader.isLoaded(it.id) }
+                .map { it.id to it.uri }
+            TypefaceLoader.loadSequentially(requireContext(), toLoad) { fontId ->
+                // Called on main thread after each font's typeface is ready
+                if (_binding != null) adapter.notifyTypefaceReady(fontId)
+            }
+            typefaceJobRunning = false
+        }
+    }
+
+    fun reloadFolder(uri: Uri) { loadFontsFromFolder(uri, showToast = true) }
+
+    private fun openFolderPicker() { pickFolder.launch(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)) }
+
+    private fun loadFontsFromFolder(folderUri: Uri, showToast: Boolean) {
+        val recursive   = FontRepository.settings.folderRecursive
+        val folderLabel = "/" + (folderUri.lastPathSegment ?: "").substringAfter(":")
+        val loadingDialog = LoadingDialog()
+        loadingDialog.show(parentFragmentManager, LoadingDialog.TAG)
+        lifecycleScope.launch {
+            val fontUris = withContext(Dispatchers.IO) { collectFontUris(folderUri, recursive) }
+            if (fontUris.isEmpty()) {
+                loadingDialog.dismissAllowingStateLoss()
+                if (showToast) Toast.makeText(requireContext(), "No font files found", Toast.LENGTH_SHORT).show()
+                return@launch
+            }
+            val items = FontLoader.loadFontsFromUris(
+                context = requireContext(), uris = fontUris, folderPath = folderLabel,
+                onProgress = { loaded, total -> lifecycleScope.launch { loadingDialog.updateProgress(loaded, total) } }
+            )
+            FontRepository.addFontsAndSave(items, requireContext())
+            FontRepository.markFolderLoaded(folderUri)
+            refresh()
+            loadingDialog.dismissAllowingStateLoss()
+            if (showToast) Toast.makeText(requireContext(), "${items.size} font(s) loaded", Toast.LENGTH_SHORT).show()
+            // Start loading typefaces for new fonts
+            startBackgroundTypefaceLoading(FontRepository.getAll())
+        }
+    }
+
+    private fun collectFontUris(folderUri: Uri, recursive: Boolean): List<Uri> {
+        val cr = requireContext().contentResolver
+        val fontExtensions = setOf("ttf", "otf", "woff", "woff2", "ttc")
+        val result = mutableListOf<Uri>()
+        fun scanFolder(treeUri: Uri, docId: String) {
+            val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(treeUri, docId)
+            cr.query(childrenUri, arrayOf(
+                DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+                DocumentsContract.Document.COLUMN_MIME_TYPE
+            ), null, null, null)?.use { cursor ->
+                val idCol   = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID)
+                val nameCol = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
+                val mimeCol = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_MIME_TYPE)
+                while (cursor.moveToNext()) {
+                    val childId = cursor.getString(idCol) ?: continue
+                    val name    = cursor.getString(nameCol) ?: continue
+                    val mime    = cursor.getString(mimeCol) ?: ""
+                    val ext     = name.substringAfterLast(".").lowercase()
+                    when {
+                        ext in fontExtensions -> result.add(DocumentsContract.buildDocumentUriUsingTree(treeUri, childId))
+                        recursive && mime == DocumentsContract.Document.MIME_TYPE_DIR -> scanFolder(treeUri, childId)
+                    }
+                }
+            }
+        }
+        scanFolder(folderUri, DocumentsContract.getTreeDocumentId(folderUri))
+        return result
     }
 
     private fun showNormalToolbar() {
@@ -162,72 +291,6 @@ class FontListFragment : Fragment() {
             dialog.dismiss(); refresh()
         }
         dialog.show()
-    }
-
-    private fun reloadSavedFolders() {
-        val newUris = FontRepository.getSavedFolderUris().filter { !FontRepository.isFolderLoaded(it) }
-        if (newUris.isEmpty()) { refresh(); return }
-        lifecycleScope.launch {
-            for (uri in newUris) try { loadFontsFromFolder(uri, showToast = false) } catch (_: Exception) {}
-        }
-    }
-
-    fun reloadFolder(uri: Uri) { loadFontsFromFolder(uri, showToast = true) }
-
-    private fun openFolderPicker() { pickFolder.launch(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)) }
-
-    private fun loadFontsFromFolder(folderUri: Uri, showToast: Boolean) {
-        val recursive   = FontRepository.settings.folderRecursive
-        val folderLabel = "/" + (folderUri.lastPathSegment ?: "").substringAfter(":")
-        val loadingDialog = LoadingDialog()
-        loadingDialog.show(parentFragmentManager, LoadingDialog.TAG)
-        lifecycleScope.launch {
-            val fontUris = withContext(Dispatchers.IO) { collectFontUris(folderUri, recursive) }
-            if (fontUris.isEmpty()) {
-                loadingDialog.dismissAllowingStateLoss()
-                if (showToast) Toast.makeText(requireContext(), "No font files found", Toast.LENGTH_SHORT).show()
-                return@launch
-            }
-            val items = FontLoader.loadFontsFromUris(
-                context = requireContext(), uris = fontUris, folderPath = folderLabel,
-                onProgress = { loaded, total -> lifecycleScope.launch { loadingDialog.updateProgress(loaded, total) } }
-            )
-            FontRepository.addFonts(items)
-            FontRepository.markFolderLoaded(folderUri)
-            refresh()
-            loadingDialog.dismissAllowingStateLoss()
-            if (showToast) Toast.makeText(requireContext(), "${items.size} font(s) loaded", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun collectFontUris(folderUri: Uri, recursive: Boolean): List<Uri> {
-        val cr = requireContext().contentResolver
-        val fontExtensions = setOf("ttf", "otf", "woff", "woff2", "ttc")
-        val result = mutableListOf<Uri>()
-        fun scanFolder(treeUri: Uri, docId: String) {
-            val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(treeUri, docId)
-            cr.query(childrenUri, arrayOf(
-                DocumentsContract.Document.COLUMN_DOCUMENT_ID,
-                DocumentsContract.Document.COLUMN_DISPLAY_NAME,
-                DocumentsContract.Document.COLUMN_MIME_TYPE
-            ), null, null, null)?.use { cursor ->
-                val idCol   = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_DOCUMENT_ID)
-                val nameCol = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
-                val mimeCol = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_MIME_TYPE)
-                while (cursor.moveToNext()) {
-                    val childId = cursor.getString(idCol)   ?: continue
-                    val name    = cursor.getString(nameCol) ?: continue
-                    val mime    = cursor.getString(mimeCol) ?: ""
-                    val ext     = name.substringAfterLast(".").lowercase()
-                    when {
-                        ext in fontExtensions -> result.add(DocumentsContract.buildDocumentUriUsingTree(treeUri, childId))
-                        recursive && mime == DocumentsContract.Document.MIME_TYPE_DIR -> scanFolder(treeUri, childId)
-                    }
-                }
-            }
-        }
-        scanFolder(folderUri, DocumentsContract.getTreeDocumentId(folderUri))
-        return result
     }
 
     fun refresh(query: String = binding.etSearch.text?.toString() ?: "") {

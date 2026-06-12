@@ -10,9 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.fontlens.R
 import com.fontlens.data.FontItem
 import com.fontlens.data.FontListItem
-import com.fontlens.databinding.ItemFontCardBinding
-import com.fontlens.databinding.ItemFolderHeaderBinding
-import com.fontlens.utils.FontLoader
+import com.fontlens.utils.TypefaceLoader
 
 class FontListAdapter(
     private val onFontClick: (FontItem) -> Unit,
@@ -44,12 +42,20 @@ class FontListAdapter(
 
     fun getSelectedIds() = selected.toSet()
 
+    /** Call this when a typeface finishes loading to refresh that specific card */
+    fun notifyTypefaceReady(fontId: String) {
+        val index = currentList.indexOfFirst {
+            it is FontListItem.Font && it.font.id == fontId
+        }
+        if (index >= 0) notifyItemChanged(index)
+    }
+
     companion object {
         const val TYPE_FONT   = 0
         const val TYPE_HEADER = 1
 
         val DIFF = object : DiffUtil.ItemCallback<FontListItem>() {
-            override fun areItemsTheSame(a: FontListItem, b: FontListItem): Boolean = when {
+            override fun areItemsTheSame(a: FontListItem, b: FontListItem) = when {
                 a is FontListItem.Font && b is FontListItem.Font -> a.font.id == b.font.id
                 a is FontListItem.FolderHeader && b is FontListItem.FolderHeader -> a.path == b.path
                 else -> false
@@ -63,14 +69,18 @@ class FontListAdapter(
         is FontListItem.FolderHeader -> TYPE_HEADER
     }
 
-    inner class FontVH(val binding: ItemFontCardBinding) : RecyclerView.ViewHolder(binding.root)
-    inner class HeaderVH(val binding: ItemFolderHeaderBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class FontVH(val binding: com.fontlens.databinding.ItemFontCardBinding) :
+        RecyclerView.ViewHolder(binding.root)
+    inner class HeaderVH(val binding: com.fontlens.databinding.ItemFolderHeaderBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         if (viewType == TYPE_FONT)
-            FontVH(ItemFontCardBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+            FontVH(com.fontlens.databinding.ItemFontCardBinding
+                .inflate(LayoutInflater.from(parent.context), parent, false))
         else
-            HeaderVH(ItemFolderHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+            HeaderVH(com.fontlens.databinding.ItemFolderHeaderBinding
+                .inflate(LayoutInflater.from(parent.context), parent, false))
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = getItem(position)) {
@@ -79,9 +89,9 @@ class FontListAdapter(
             }
             is FontListItem.Font -> {
                 val font = item.font
-                val b = (holder as FontVH).binding
-                val m = font.effectiveMeta
-                val ctx = holder.itemView.context
+                val b    = (holder as FontVH).binding
+                val m    = font.effectiveMeta
+                val ctx  = holder.itemView.context
 
                 b.tvFontName.text = m.family.ifEmpty { font.displayName }
                 b.tvFontSub.text = buildString {
@@ -90,17 +100,21 @@ class FontListAdapter(
                 }
                 b.tvFontSub.visibility = if (b.tvFontSub.text.isBlank()) View.GONE else View.VISIBLE
 
-                val tf = FontLoader.getTypeface(font.id) ?: Typeface.DEFAULT
-                b.tvPreviewLarge.text = getSample(font); b.tvPreviewLarge.typeface = tf
-                b.tvPreviewSmall.text = getSample(font); b.tvPreviewSmall.typeface = tf
+                // Use loaded typeface or fall back to default — no blocking
+                val tf = TypefaceLoader.getTypeface(font.id) ?: Typeface.DEFAULT
+                val sample = getSample(font)
+                b.tvPreviewLarge.text    = sample
+                b.tvPreviewLarge.typeface = tf
+                b.tvPreviewSmall.text    = sample
+                b.tvPreviewSmall.typeface = tf
 
-                // Selection highlight
+                // Dim card slightly while typeface not loaded yet
+                b.root.alpha = if (TypefaceLoader.isLoaded(font.id)) 1f else 0.7f
+
                 val isSelected = selected.contains(font.id)
-                b.root.strokeColor = if (isSelected)
-                    ctx.getColor(R.color.accent) else ctx.getColor(R.color.divider)
+                b.root.strokeColor = if (isSelected) ctx.getColor(R.color.accent) else ctx.getColor(R.color.divider)
                 b.root.strokeWidth = if (isSelected) 2 else 1
 
-                // Favorite
                 b.btnFavorite.text = if (isFavorite(font.id)) "★" else "☆"
                 b.btnFavorite.setTextColor(ctx.getColor(
                     if (isFavorite(font.id)) R.color.accent else R.color.text_muted))
@@ -116,9 +130,7 @@ class FontListAdapter(
                         else selected.add(font.id)
                         onSelectionChanged(selected.toSet())
                         notifyItemChanged(position)
-                    } else {
-                        onFontClick(font)
-                    }
+                    } else onFontClick(font)
                 }
                 b.root.setOnLongClickListener {
                     if (!selectionMode) {

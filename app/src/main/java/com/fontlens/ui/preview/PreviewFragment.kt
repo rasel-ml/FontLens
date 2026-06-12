@@ -7,13 +7,15 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.fontlens.R
 import com.fontlens.data.FontRepository
 import com.fontlens.databinding.FragmentPreviewBinding
 import com.fontlens.ui.DeleteFontDialog
-import com.fontlens.utils.FontLoader
+import com.fontlens.utils.TypefaceLoader
+import kotlinx.coroutines.launch
 
 class PreviewFragment : Fragment() {
 
@@ -35,19 +37,18 @@ class PreviewFragment : Fragment() {
 
         val font = FontRepository.getById(args.fontId)
             ?: run { findNavController().popBackStack(); return }
-        val tf       = FontLoader.getTypeface(font.id)
         val tempMode = args.tempMode
 
         binding.tvFontName.text = font.effectiveMeta.family.ifEmpty { font.displayName }
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
-        // Add to Library (temp mode)
+        // Add to Library
         if (tempMode && !FontRepository.isInLibrary(font.id)) {
             binding.btnAddToLibrary.visibility = View.VISIBLE
             binding.btnAddToLibrary.setOnClickListener {
                 FontRepository.promoteToLibrary(font.id, requireContext())
                 binding.btnAddToLibrary.visibility = View.GONE
-                binding.btnDelete.visibility = View.VISIBLE
+                binding.btnDelete.visibility   = View.VISIBLE
                 binding.btnFavorite.visibility = View.VISIBLE
                 Toast.makeText(requireContext(), "Added to library", Toast.LENGTH_SHORT).show()
             }
@@ -55,26 +56,20 @@ class PreviewFragment : Fragment() {
             binding.btnAddToLibrary.visibility = View.GONE
         }
 
-        // Delete button — visible only when in library
         binding.btnDelete.visibility =
             if (!tempMode || FontRepository.isInLibrary(font.id)) View.VISIBLE else View.GONE
         binding.btnDelete.setOnClickListener {
-            DeleteFontDialog.show(requireContext(), font) {
-                findNavController().popBackStack()
-            }
+            DeleteFontDialog.show(requireContext(), font) { findNavController().popBackStack() }
         }
 
-        // Favorite
         binding.btnFavorite.visibility =
             if (!tempMode || FontRepository.isInLibrary(font.id)) View.VISIBLE else View.GONE
 
         fun updateFav() {
             val fav = FontRepository.isFavorite(font.id)
             binding.btnFavorite.text = if (fav) "★" else "☆"
-            binding.btnFavorite.setTextColor(
-                ContextCompat.getColor(requireContext(),
-                    if (fav) R.color.accent else R.color.text_muted)
-            )
+            binding.btnFavorite.setTextColor(ContextCompat.getColor(requireContext(),
+                if (fav) R.color.accent else R.color.text_muted))
         }
         updateFav()
         binding.btnFavorite.setOnClickListener {
@@ -82,7 +77,28 @@ class PreviewFragment : Fragment() {
         }
 
         binding.etPreview.setText(FontRepository.getSampleText(font))
-        if (tf != null) binding.etPreview.typeface = tf
+
+        // Apply typeface immediately if already loaded, otherwise load on demand
+        fun applyTypeface() {
+            val tf = TypefaceLoader.getTypeface(font.id) ?: return
+            val style = when {
+                isBold && isItalic -> android.graphics.Typeface.BOLD_ITALIC
+                isBold             -> android.graphics.Typeface.BOLD
+                isItalic           -> android.graphics.Typeface.ITALIC
+                else               -> android.graphics.Typeface.NORMAL
+            }
+            binding.etPreview.setTypeface(tf, style)
+        }
+
+        if (TypefaceLoader.isLoaded(font.id)) {
+            applyTypeface()
+        } else {
+            // Load this single font immediately — doesn't wait for background queue
+            lifecycleScope.launch {
+                TypefaceLoader.loadSingle(requireContext(), font.id, font.uri)
+                if (_binding != null) applyTypeface()
+            }
+        }
 
         fontSize = 32
         binding.seekbarSize.max = 152
@@ -100,6 +116,7 @@ class PreviewFragment : Fragment() {
         })
 
         fun updateStyle() {
+            val tf = TypefaceLoader.getTypeface(font.id) ?: return
             val style = when {
                 isBold && isItalic -> android.graphics.Typeface.BOLD_ITALIC
                 isBold             -> android.graphics.Typeface.BOLD
@@ -111,25 +128,20 @@ class PreviewFragment : Fragment() {
             val muted  = ContextCompat.getColor(requireContext(), R.color.text_muted)
             binding.btnBold.setTextColor(if (isBold) accent else muted)
             binding.btnItalic.setTextColor(if (isItalic) accent else muted)
-            binding.btnBold.setBackgroundResource(
-                if (isBold) R.drawable.bg_style_btn_active else R.drawable.bg_style_btn)
-            binding.btnItalic.setBackgroundResource(
-                if (isItalic) R.drawable.bg_style_btn_active else R.drawable.bg_style_btn)
+            binding.btnBold.setBackgroundResource(if (isBold) R.drawable.bg_style_btn_active else R.drawable.bg_style_btn)
+            binding.btnItalic.setBackgroundResource(if (isItalic) R.drawable.bg_style_btn_active else R.drawable.bg_style_btn)
         }
         binding.btnBold.setOnClickListener   { isBold   = !isBold;   updateStyle() }
         binding.btnItalic.setOnClickListener { isItalic = !isItalic; updateStyle() }
 
         binding.btnGlyph.setOnClickListener {
-            findNavController().navigate(R.id.action_preview_to_glyph,
-                Bundle().apply { putString("fontId", font.id) })
+            findNavController().navigate(R.id.action_preview_to_glyph, Bundle().apply { putString("fontId", font.id) })
         }
         binding.btnMeta.setOnClickListener {
-            findNavController().navigate(R.id.action_preview_to_meta,
-                Bundle().apply { putString("fontId", font.id) })
+            findNavController().navigate(R.id.action_preview_to_meta, Bundle().apply { putString("fontId", font.id) })
         }
         binding.btnInfo.setOnClickListener {
-            findNavController().navigate(R.id.action_preview_to_info,
-                Bundle().apply { putString("fontId", font.id) })
+            findNavController().navigate(R.id.action_preview_to_info, Bundle().apply { putString("fontId", font.id) })
         }
     }
 

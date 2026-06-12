@@ -1,15 +1,16 @@
 package com.fontlens.utils
 
 import android.content.Context
-import android.graphics.Typeface
 import android.net.Uri
 import com.fontlens.data.FontItem
+import com.fontlens.data.FontMeta
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+/**
+ * Parses font metadata only. Typeface loading is handled by TypefaceLoader separately.
+ */
 object FontLoader {
-
-    private val typefaceCache = mutableMapOf<String, Typeface>()
 
     suspend fun loadFontsFromUris(
         context: Context,
@@ -26,26 +27,15 @@ object FontLoader {
                 val id = "${name}_${uri.hashCode()}"
                 val meta = cr.openInputStream(uri)?.use { FontParser.parse(it) } ?: return@forEachIndexed
                 val displayName = meta.family.ifEmpty { name.substringBeforeLast(".") }
-                val item = FontItem(
-                    id = id,
-                    displayName = displayName,
-                    uri = uri,
-                    meta = meta,
-                    addedAt = System.currentTimeMillis(),
-                    folderPath = folderPath
-                )
-                result.add(item)
-                cr.openFileDescriptor(uri, "r")?.use { pfd ->
-                    val tf = Typeface.Builder(pfd.fileDescriptor).build()
-                    typefaceCache[id] = tf
-                }
+                result.add(FontItem(
+                    id = id, displayName = displayName, uri = uri, meta = meta,
+                    addedAt = System.currentTimeMillis(), folderPath = folderPath
+                ))
             } catch (_: Exception) {}
             onProgress?.invoke(index + 1, total)
         }
         result
     }
-
-    fun getTypeface(fontId: String): Typeface? = typefaceCache[fontId]
 
     private fun getFileName(context: Context, uri: Uri): String {
         var name = "Unknown"

@@ -8,13 +8,13 @@ import com.google.gson.reflect.TypeToken
 object FontRepository {
 
     private val fonts     = mutableListOf<FontItem>()
-    private val tempFonts = mutableMapOf<String, FontItem>() // opened from file manager, not in library
+    private val tempFonts = mutableMapOf<String, FontItem>()
     private val favorites = mutableSetOf<String>()
     var settings = AppSettings()
 
-    private val overridesCache    = mutableMapOf<String, Map<String, String>>()
-    private val savedFolderUris   = mutableSetOf<String>()
-    private val loadedFolderUris  = mutableSetOf<String>()
+    private val overridesCache   = mutableMapOf<String, Map<String, String>>()
+    private val savedFolderUris  = mutableSetOf<String>()
+    private val loadedFolderUris = mutableSetOf<String>()
 
     private val gson = Gson()
     private const val PREFS         = "fontlens_prefs"
@@ -33,6 +33,12 @@ object FontRepository {
         val newFonts = items.filter { it.id !in existingIds }
         newFonts.forEach { font -> overridesCache[font.id]?.let { font.metaOverrides = it } }
         fonts.addAll(newFonts)
+        // Persist cache after every add
+    }
+
+    fun addFontsAndSave(items: List<FontItem>, context: Context) {
+        addFonts(items)
+        FontCache.save(context, fonts)
     }
 
     fun removeFont(id: String, context: Context) {
@@ -42,11 +48,11 @@ object FontRepository {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val allOverrides = prefs.getString(KEY_OVERRIDES, "{}") ?: "{}"
         val type = object : TypeToken<MutableMap<String, Map<String, String>>>() {}.type
-        val map: MutableMap<String, Map<String, String>> =
-            gson.fromJson(allOverrides, type) ?: mutableMapOf()
+        val map: MutableMap<String, Map<String, String>> = gson.fromJson(allOverrides, type) ?: mutableMapOf()
         map.remove(id)
         prefs.edit().putString(KEY_OVERRIDES, gson.toJson(map)).apply()
         save(context)
+        FontCache.save(context, fonts)
     }
 
     fun removeFontFromStorage(id: String, context: Context): Boolean {
@@ -61,13 +67,13 @@ object FontRepository {
 
     fun isInLibrary(id: String) = fonts.any { it.id == id }
 
-    // ── Temp fonts (opened from file manager, not yet in library) ─────────────
+    // ── Temp fonts ────────────────────────────────────────────────────────────
     fun addTempFont(font: FontItem) { tempFonts[font.id] = font }
 
-    /** Move a temp font into the permanent library */
     fun promoteToLibrary(id: String, context: Context): Boolean {
         val font = tempFonts.remove(id) ?: return false
         if (fonts.none { it.id == id }) fonts.add(font)
+        FontCache.save(context, fonts)
         save(context)
         return true
     }
@@ -81,18 +87,12 @@ object FontRepository {
     }
 
     // ── Folders ───────────────────────────────────────────────────────────────
-    fun saveFolderUri(uri: Uri, context: Context) {
-        savedFolderUris.add(uri.toString()); save(context)
-    }
-
+    fun saveFolderUri(uri: Uri, context: Context) { savedFolderUris.add(uri.toString()); save(context) }
     fun removeSavedFolder(uri: Uri, context: Context) {
-        savedFolderUris.remove(uri.toString())
-        loadedFolderUris.remove(uri.toString())
-        save(context)
+        savedFolderUris.remove(uri.toString()); loadedFolderUris.remove(uri.toString()); save(context)
     }
-
     fun getSavedFolderUris(): List<Uri> = savedFolderUris.map { Uri.parse(it) }
-    fun isFolderLoaded(uri: Uri)  = loadedFolderUris.contains(uri.toString())
+    fun isFolderLoaded(uri: Uri)    = loadedFolderUris.contains(uri.toString())
     fun markFolderLoaded(uri: Uri)   { loadedFolderUris.add(uri.toString()) }
     fun unmarkFolderLoaded(uri: Uri) { loadedFolderUris.remove(uri.toString()) }
 
@@ -103,20 +103,20 @@ object FontRepository {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val allOverrides = prefs.getString(KEY_OVERRIDES, "{}") ?: "{}"
         val type = object : TypeToken<MutableMap<String, Map<String, String>>>() {}.type
-        val map: MutableMap<String, Map<String, String>> =
-            gson.fromJson(allOverrides, type) ?: mutableMapOf()
+        val map: MutableMap<String, Map<String, String>> = gson.fromJson(allOverrides, type) ?: mutableMapOf()
         map[fontId] = overrides
         prefs.edit().putString(KEY_OVERRIDES, gson.toJson(map)).apply()
+        FontCache.save(context, fonts)
     }
 
-    fun getMetaOverrides(fontId: String): Map<String, String> =
-        overridesCache[fontId] ?: emptyMap()
+    fun getMetaOverrides(fontId: String): Map<String, String> = overridesCache[fontId] ?: emptyMap()
 
     // ── Settings ──────────────────────────────────────────────────────────────
     fun saveSettings(context: Context) = save(context)
 
     fun load(context: Context) {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+
         prefs.getString(KEY_SETTINGS, null)?.let {
             try { settings = gson.fromJson(it, AppSettings::class.java) } catch (_: Exception) {}
         }
@@ -141,6 +141,15 @@ object FontRepository {
                 val loaded: Set<String> = gson.fromJson(it, type) ?: emptySet()
                 savedFolderUris.clear(); savedFolderUris.addAll(loaded)
             } catch (_: Exception) {}
+        }
+
+        // Load cached fonts instantly (no file I/O parsing)
+        if (fonts.isEmpty()) {
+            val cached = FontCache.load(context)
+            if (cached.isNotEmpty()) {
+                cached.forEach { font -> overridesCache[font.id]?.let { font.metaOverrides = it } }
+                fonts.addAll(cached)
+            }
         }
     }
 
