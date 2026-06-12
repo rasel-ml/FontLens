@@ -113,7 +113,7 @@ class MainActivity : AppCompatActivity() {
             fb.btnRemoveFolder.setOnClickListener {
                 val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_FontLens_Dialog)
                     .setTitle("Remove Folder")
-                    .setMessage("Remove "" + getFolderDisplayName(uri) + "" and all its fonts from the library?")
+                    .setMessage("Remove \"${getFolderDisplayName(uri)}\" and all its fonts from the library?")
                     .setPositiveButton("Remove") { _, _ ->
                         FontRepository.removeSavedFolder(uri, this)
                         refreshDrawer()
