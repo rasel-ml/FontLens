@@ -11,16 +11,20 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fontlens.R
+import com.fontlens.data.FontItem
 import com.fontlens.data.FontListItem
 import com.fontlens.data.FontRepository
 import com.fontlens.databinding.FragmentFontListBinding
 import com.fontlens.ui.DeleteFontDialog
+import com.fontlens.utils.StorageDeleteHelper
 
 class FavoritesFragment : Fragment() {
 
     private var _binding: FragmentFontListBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: FontListAdapter
+    private lateinit var storageDeleteHelper: StorageDeleteHelper
+    private var pendingDeleteFontId: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentFontListBinding.inflate(inflater, container, false)
@@ -31,10 +35,24 @@ class FavoritesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.tvTitle.text = getString(R.string.favorites)
-        binding.fabAdd.visibility       = View.GONE
+        binding.fabAdd.visibility    = View.GONE
         binding.btnHamburger.visibility = View.GONE
-        binding.btnSort.visibility      = View.GONE
-        binding.btnTheme.visibility     = View.GONE
+        binding.btnSort.visibility   = View.GONE
+        binding.btnTheme.visibility  = View.GONE
+        binding.searchLayout.visibility = View.VISIBLE
+
+        storageDeleteHelper = StorageDeleteHelper(this) { success ->
+            if (success) {
+                pendingDeleteFontId?.let { id ->
+                    FontRepository.removeFont(id, requireContext())
+                    refresh(binding.etSearch.text?.toString() ?: "")
+                    android.widget.Toast.makeText(requireContext(), "File deleted", android.widget.Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                android.widget.Toast.makeText(requireContext(), "Delete cancelled or failed", android.widget.Toast.LENGTH_SHORT).show()
+            }
+            pendingDeleteFontId = null
+        }
 
         adapter = FontListAdapter(
             onFontClick = { font ->
@@ -45,9 +63,15 @@ class FavoritesFragment : Fragment() {
                 refresh(binding.etSearch.text?.toString() ?: "")
             },
             onRemoveClick = { font ->
-                DeleteFontDialog.show(requireContext(), font) {
-                    refresh(binding.etSearch.text?.toString() ?: "")
-                }
+                DeleteFontDialog.show(
+                    context = requireContext(),
+                    font = font,
+                    onRemoveFromLibrary = { refresh(binding.etSearch.text?.toString() ?: "") },
+                    onDeletePermanently = {
+                        pendingDeleteFontId = font.id
+                        storageDeleteHelper.requestDelete(font.uri)
+                    }
+                )
             },
             isFavorite = { FontRepository.isFavorite(it) },
             getSample  = { FontRepository.getSampleText(it) },
@@ -58,14 +82,21 @@ class FavoritesFragment : Fragment() {
         binding.rvFonts.adapter = adapter
         binding.etSearch.addTextChangedListener { refresh(it?.toString() ?: "") }
 
-        binding.btnCancelSelection.setOnClickListener { adapter.exitSelectionMode(); showNormalToolbar() }
+        // Selection toolbar actions
+        binding.btnCancelSelection.setOnClickListener {
+            adapter.exitSelectionMode(); showNormalToolbar()
+        }
         binding.btnSelectAll.setOnClickListener {
             adapter.selectAll(FontRepository.getFavorites())
             updateSelectionToolbar(adapter.getSelectedIds())
         }
         binding.btnSelFavorite.setOnClickListener {
+            // In favorites, this removes from favorites
             val ids = adapter.getSelectedIds()
-            ids.forEach { id -> if (FontRepository.isFavorite(id)) FontRepository.toggleFavorite(id, requireContext()) }
+            ids.forEach { id ->
+                if (FontRepository.isFavorite(id))
+                    FontRepository.toggleFavorite(id, requireContext())
+            }
             Toast.makeText(requireContext(), "${ids.size} removed from favorites", Toast.LENGTH_SHORT).show()
             adapter.exitSelectionMode(); showNormalToolbar(); refresh()
         }
@@ -98,16 +129,14 @@ class FavoritesFragment : Fragment() {
     }
 
     private fun showNormalToolbar() {
-        binding.toolbarNormal.visibility    = View.VISIBLE
+        binding.toolbar.visibility          = View.VISIBLE
         binding.toolbarSelection.visibility = View.GONE
-        binding.searchLayout.visibility     = View.VISIBLE
     }
 
     private fun updateSelectionToolbar(ids: Set<String>) {
         val total = FontRepository.getFavorites().size
-        binding.toolbarNormal.visibility    = View.GONE
+        binding.toolbar.visibility          = View.GONE
         binding.toolbarSelection.visibility = View.VISIBLE
-        binding.searchLayout.visibility     = View.GONE
         binding.tvSelectedCount.text        = "${ids.size} / $total selected"
     }
 

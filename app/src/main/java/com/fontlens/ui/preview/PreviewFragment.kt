@@ -14,6 +14,7 @@ import com.fontlens.R
 import com.fontlens.data.FontRepository
 import com.fontlens.databinding.FragmentPreviewBinding
 import com.fontlens.ui.DeleteFontDialog
+import com.fontlens.utils.StorageDeleteHelper
 import com.fontlens.utils.TypefaceLoader
 import kotlinx.coroutines.launch
 
@@ -23,6 +24,8 @@ class PreviewFragment : Fragment() {
     private val binding get() = _binding!!
     private val args: PreviewFragmentArgs by navArgs()
 
+    private lateinit var storageDeleteHelper: StorageDeleteHelper
+    private var pendingDeleteFontId: String? = null
     private var isBold   = false
     private var isItalic = false
     private var fontSize = 32
@@ -34,6 +37,18 @@ class PreviewFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        storageDeleteHelper = StorageDeleteHelper(this) { success ->
+            if (success) {
+                pendingDeleteFontId?.let { id ->
+                    FontRepository.removeFont(id, requireContext())
+                    findNavController().popBackStack()
+                }
+            } else {
+                android.widget.Toast.makeText(requireContext(), "Delete cancelled or failed", android.widget.Toast.LENGTH_SHORT).show()
+            }
+            pendingDeleteFontId = null
+        }
 
         val font = FontRepository.getById(args.fontId)
             ?: run { findNavController().popBackStack(); return }
@@ -59,7 +74,15 @@ class PreviewFragment : Fragment() {
         binding.btnDelete.visibility =
             if (!tempMode || FontRepository.isInLibrary(font.id)) View.VISIBLE else View.GONE
         binding.btnDelete.setOnClickListener {
-            DeleteFontDialog.show(requireContext(), font) { findNavController().popBackStack() }
+            DeleteFontDialog.show(
+                context = requireContext(),
+                font = font,
+                onRemoveFromLibrary = { findNavController().popBackStack() },
+                onDeletePermanently = {
+                    pendingDeleteFontId = font.id
+                    storageDeleteHelper.requestDelete(font.uri)
+                }
+            )
         }
 
         binding.btnFavorite.visibility =
