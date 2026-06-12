@@ -51,7 +51,7 @@ class FontListFragment : Fragment() {
         if (result.resultCode == Activity.RESULT_OK) {
             val uri = result.data?.data ?: return@registerForActivityResult
             requireContext().contentResolver.takePersistableUriPermission(
-                uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
             FontRepository.saveFolderUri(uri, requireContext())
             (activity as? MainActivity)?.refreshDrawer()
             loadFontsFromFolder(uri, showToast = true)
@@ -202,7 +202,15 @@ class FontListFragment : Fragment() {
 
     fun reloadFolder(uri: Uri) { loadFontsFromFolder(uri, showToast = true) }
 
-    private fun openFolderPicker() { pickFolder.launch(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)) }
+    private fun openFolderPicker() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
+                Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION or
+                Intent.FLAG_GRANT_PREFIX_URI_PERMISSION)
+        }
+        pickFolder.launch(intent)
+    }
 
     private fun loadFontsFromFolder(folderUri: Uri, showToast: Boolean) {
         val recursive   = FontRepository.settings.folderRecursive

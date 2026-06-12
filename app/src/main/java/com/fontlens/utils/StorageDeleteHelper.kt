@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.net.Uri
 import android.os.Build
+import android.provider.DocumentsContract
 import android.provider.MediaStore
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
@@ -11,22 +12,16 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 
 /**
- * Handles permanent file deletion with proper Android storage permission.
+ * Handles permanent file deletion with proper Android storage permissions.
  *
- * Android 11+ (API 30+): Uses MediaStore.createDeleteRequest() which shows
- * the system "Allow <app> to delete this file?" dialog.
+ * For SAF (Storage Access Framework) URIs from ACTION_OPEN_DOCUMENT_TREE:
+ *   Uses DocumentsContract.deleteDocument() — works if write permission was persisted.
  *
- * Android 10 (API 29): Catches RecoverableSecurityException and launches
- * the recovery intent.
+ * For MediaStore URIs (Android 11+):
+ *   Uses MediaStore.createDeleteRequest() which shows system permission dialog.
  *
- * Android 8-9 (API 26-28): Direct delete via contentResolver works for
- * files the app has URI permission to (opened via document picker).
- *
- * Usage:
- *   val helper = StorageDeleteHelper(fragment) { success ->
- *       if (success) { // file deleted, remove from library }
- *   }
- *   helper.requestDelete(uri)
+ * For Android 10 MediaStore:
+ *   Catches RecoverableSecurityException and shows recovery dialog.
  */
 class StorageDeleteHelper(
     private val fragment: Fragment,
@@ -40,63 +35,72 @@ class StorageDeleteHelper(
         ) { result ->
             val success = result.resultCode == Activity.RESULT_OK
             if (success) {
-                pendingUri?.let { tryDirectDelete(fragment.requireContext(), it) }
+                // Permission granted — now actually delete
+                pendingUri?.let { uri ->
+                    val deleted = performDelete(fragment.requireContext(), uri)
+                    onResult(deleted)
+                }
+            } else {
+                onResult(false)
             }
-            onResult(success)
             pendingUri = null
         }
 
     fun requestDelete(uri: Uri) {
         val context = fragment.requireContext()
 
+        // SAF tree document URI — DocumentsContract.deleteDocument is the right API
+        if (isSafUri(uri)) {
+            val deleted = performDelete(context, uri)
+            onResult(deleted)
+            return
+        }
+
+        // MediaStore URI
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            // Android 11+ — system permission dialog
             try {
-                val pendingIntent = MediaStore.createDeleteRequest(
-                    context.contentResolver,
-                    listOf(uri)
-                )
+                val pending = MediaStore.createDeleteRequest(
+                    context.contentResolver, listOf(uri))
                 pendingUri = uri
-                launcher.launch(IntentSenderRequest.Builder(pendingIntent).build())
-            } catch (e: Exception) {
-                // URI may not be a MediaStore URI (e.g. from SAF document tree)
-                // Fall back to direct delete
-                val deleted = tryDirectDelete(context, uri)
-                onResult(deleted)
+                launcher.launch(IntentSenderRequest.Builder(pending).build())
+            } catch (_: Exception) {
+                onResult(performDelete(context, uri))
             }
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            // Android 10 — try direct, catch RecoverableSecurityException
             try {
-                tryDirectDelete(context, uri)
-                onResult(true)
+                onResult(performDelete(context, uri))
             } catch (e: android.app.RecoverableSecurityException) {
                 pendingUri = uri
                 launcher.launch(
-                    IntentSenderRequest.Builder(e.userAction.actionIntent.intentSender).build()
-                )
-            } catch (e: Exception) {
+                    IntentSenderRequest.Builder(
+                        e.userAction.actionIntent.intentSender).build())
+            } catch (_: Exception) {
                 onResult(false)
             }
         } else {
-            // Android 8-9 — direct delete with SAF URI permission
-            val deleted = tryDirectDelete(context, uri)
-            onResult(deleted)
+            onResult(performDelete(context, uri))
         }
     }
 
-    private fun tryDirectDelete(context: Context, uri: Uri): Boolean {
+    private fun isSafUri(uri: Uri): Boolean {
+        val authority = uri.authority ?: return false
+        // SAF URIs have authorities like "com.android.externalstorage.documents"
+        return authority.endsWith(".documents") ||
+               authority.endsWith(".downloads") ||
+               uri.scheme == "content" && uri.pathSegments.firstOrNull() == "tree"
+    }
+
+    private fun performDelete(context: Context, uri: Uri): Boolean {
+        // Try SAF DocumentsContract first (works for folder-picked files with write permission)
+        try {
+            return DocumentsContract.deleteDocument(context.contentResolver, uri)
+        } catch (_: Exception) {}
+
+        // Fallback: contentResolver.delete (works for some URI types)
         return try {
-            val rows = context.contentResolver.delete(uri, null, null)
-            rows > 0
-        } catch (e: Exception) {
-            // Last resort — try DocumentsContract delete
-            try {
-                android.provider.DocumentsContract.deleteDocument(
-                    context.contentResolver, uri
-                )
-            } catch (e2: Exception) {
-                false
-            }
+            context.contentResolver.delete(uri, null, null) > 0
+        } catch (_: Exception) {
+            false
         }
     }
 }
