@@ -162,7 +162,22 @@ class FontListFragment : Fragment() {
                 .setNegativeButton("Cancel", null).show()
         }
 
-        if (!initialLoadDone) { initialLoadDone = true; reloadSavedFolders() } else refresh()
+        if (!initialLoadDone) {
+            initialLoadDone = true
+            val cached = FontRepository.getAll()
+            if (cached.isNotEmpty()) {
+                // Cache exists — show list instantly, load typefaces in background silently
+                refresh()
+                startBackgroundTypefaceLoading(cached)
+                // Silently scan for new fonts without loading popup
+                scanFoldersForNewFonts()
+            } else {
+                // First launch or empty cache — show loading popup
+                reloadSavedFolders()
+            }
+        } else {
+            refresh()
+        }
     }
 
     private fun showSortSheet() {

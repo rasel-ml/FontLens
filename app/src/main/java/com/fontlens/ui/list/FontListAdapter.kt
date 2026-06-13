@@ -46,10 +46,28 @@ class FontListAdapter(
 
     /** Call when a typeface finishes loading to refresh that specific card */
     fun notifyTypefaceReady(fontId: String) {
+        // Find the index in currentList and update just that item
         val index = currentList.indexOfFirst {
             it is FontListItem.Font && it.font.id == fontId
         }
-        if (index >= 0) notifyItemChanged(index)
+        if (index >= 0) {
+            notifyItemChanged(index, "typeface") // payload prevents full rebind flicker
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, payloads: List<Any>) {
+        if (payloads.isNotEmpty() && payloads[0] == "typeface" && holder is FontVH) {
+            // Only update typeface-related views, skip full rebind
+            val item = getItem(position)
+            if (item is FontListItem.Font) {
+                val tf = com.fontlens.utils.TypefaceLoader.getTypeface(item.font.id)
+                    ?: android.graphics.Typeface.DEFAULT
+                holder.binding.tvPreviewLarge.typeface = tf
+                holder.binding.root.alpha = 1f
+            }
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
+        }
     }
 
     companion object {
