@@ -130,6 +130,21 @@ class FavoritesFragment : Fragment() {
         }
 
         refresh()
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : androidx.activity.OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (adapter.selectionMode) {
+                        adapter.exitSelectionMode()
+                        showNormalToolbar()
+                    } else {
+                        isEnabled = false
+                        requireActivity().onBackPressedDispatcher.onBackPressed()
+                    }
+                }
+            }
+        )
     }
 
     private fun showNormalToolbar() {

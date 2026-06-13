@@ -164,6 +164,22 @@ class FontListFragment : Fragment() {
                 .setNegativeButton("Cancel", null).show()
         }
 
+        // Back press in selection mode returns to normal
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : androidx.activity.OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (adapter.selectionMode) {
+                        adapter.exitSelectionMode()
+                        showNormalToolbar()
+                    } else {
+                        isEnabled = false
+                        requireActivity().onBackPressedDispatcher.onBackPressed()
+                    }
+                }
+            }
+        )
+
         if (!initialLoadDone) {
             initialLoadDone = true
             val cached = FontRepository.getAll()
@@ -212,14 +228,22 @@ class FontListFragment : Fragment() {
     }
 
     private fun showNormalToolbar() {
-        binding.toolbar.visibility          = View.VISIBLE
+        binding.toolbarNormal.visibility    = View.VISIBLE
         binding.toolbarSelection.visibility = View.GONE
+        binding.searchLayout.visibility     = View.VISIBLE
     }
 
     private fun updateSelectionToolbar(ids: Set<String>) {
+        if (ids.isEmpty()) {
+            // Auto-exit selection mode when nothing is selected
+            adapter.exitSelectionMode()
+            showNormalToolbar()
+            return
+        }
         val total = FontRepository.getAll().size
-        binding.toolbar.visibility          = View.GONE
+        binding.toolbarNormal.visibility    = View.GONE
         binding.toolbarSelection.visibility = View.VISIBLE
+        binding.searchLayout.visibility     = View.GONE
         binding.tvSelectedCount.text        = "${ids.size} / $total selected"
     }
 
