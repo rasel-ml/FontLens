@@ -29,6 +29,7 @@ import com.fontlens.ui.DeleteFontDialog
 import com.fontlens.utils.StorageDeleteHelper
 import com.fontlens.ui.LoadingDialog
 import com.fontlens.utils.FontLoader
+import com.fontlens.utils.TypefaceLoader
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,6 +45,7 @@ class FontListFragment : Fragment() {
     private var isNightMode = false
     private lateinit var storageDeleteHelper: StorageDeleteHelper
     private var pendingDeleteFontId: String? = null
+    private var typefaceJobRunning = false
 
     private val pickFolder = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -219,6 +221,47 @@ class FontListFragment : Fragment() {
         binding.toolbar.visibility          = View.GONE
         binding.toolbarSelection.visibility = View.VISIBLE
         binding.tvSelectedCount.text        = "${ids.size} / $total selected"
+    }
+
+    private fun scanFoldersForNewFonts() {
+        val uris = FontRepository.getSavedFolderUris()
+        if (uris.isEmpty()) return
+        lifecycleScope.launch {
+            val recursive = FontRepository.settings.folderRecursive
+            for (folderUri in uris) {
+                try {
+                    val folderLabel = "/" + (folderUri.lastPathSegment ?: "").substringAfter(":")
+                    val fontUris = withContext(Dispatchers.IO) { collectFontUris(folderUri, recursive) }
+                    val items = FontLoader.loadFontsFromUris(
+                        context = requireContext(), uris = fontUris, folderPath = folderLabel)
+                    val before = FontRepository.getAll().size
+                    FontRepository.addFontsAndSave(items, requireContext())
+                    val after = FontRepository.getAll().size
+                    if (after > before) {
+                        refresh()
+                        startBackgroundTypefaceLoading(FontRepository.getAll())
+                    }
+                } catch (_: Exception) {}
+            }
+        }
+    }
+
+    private fun startBackgroundTypefaceLoading(fonts: List<com.fontlens.data.FontItem>) {
+        if (typefaceJobRunning) return
+        typefaceJobRunning = true
+        var loadedCount = 0
+        lifecycleScope.launch {
+            val toLoad = fonts.filter { !TypefaceLoader.isLoaded(it.id) }
+                .map { it.id to it.uri }
+            TypefaceLoader.loadSequentially(requireContext(), toLoad) { fontId ->
+                if (_binding == null) return@loadSequentially
+                loadedCount++
+                adapter.notifyTypefaceReady(fontId)
+                if (loadedCount % 10 == 0) adapter.notifyDataSetChanged()
+            }
+            if (_binding != null) adapter.notifyDataSetChanged()
+            typefaceJobRunning = false
+        }
     }
 
     private fun reloadSavedFolders() {
