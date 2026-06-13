@@ -1,6 +1,7 @@
 package com.fontlens.utils
 
 import android.app.Activity
+import android.app.RecoverableSecurityException
 import android.content.Context
 import android.net.Uri
 import android.os.Build
@@ -10,97 +11,154 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-/**
- * Handles permanent file deletion with proper Android storage permissions.
- *
- * For SAF (Storage Access Framework) URIs from ACTION_OPEN_DOCUMENT_TREE:
- *   Uses DocumentsContract.deleteDocument() — works if write permission was persisted.
- *
- * For MediaStore URIs (Android 11+):
- *   Uses MediaStore.createDeleteRequest() which shows system permission dialog.
- *
- * For Android 10 MediaStore:
- *   Catches RecoverableSecurityException and shows recovery dialog.
- */
 class StorageDeleteHelper(
     private val fragment: Fragment,
     private val onResult: (success: Boolean) -> Unit
 ) {
-    private var pendingUri: Uri? = null
+    // For API 29 — store URIs pending second delete attempt after permission granted
+    private var pendingUris: List<Uri> = emptyList()
 
-    private val launcher: ActivityResultLauncher<IntentSenderRequest> =
+    private val intentSenderLauncher: ActivityResultLauncher<IntentSenderRequest> =
         fragment.registerForActivityResult(
             ActivityResultContracts.StartIntentSenderForResult()
         ) { result ->
-            val success = result.resultCode == Activity.RESULT_OK
-            if (success) {
-                // Permission granted — now actually delete
-                pendingUri?.let { uri ->
-                    val deleted = performDelete(fragment.requireContext(), uri)
-                    onResult(deleted)
+            if (result.resultCode == Activity.RESULT_OK) {
+                // API 29 needs a second delete call after permission granted
+                if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+                    fragment.lifecycleScope.launch {
+                        var allDeleted = true
+                        for (uri in pendingUris) {
+                            if (!deleteUri(fragment.requireContext(), uri)) allDeleted = false
+                        }
+                        onResult(allDeleted)
+                    }
+                } else {
+                    // API 30+ — system already deleted after permission
+                    onResult(true)
                 }
             } else {
                 onResult(false)
             }
-            pendingUri = null
+            pendingUris = emptyList()
         }
 
+    /** Delete a single font file */
     fun requestDelete(uri: Uri) {
-        val context = fragment.requireContext()
+        requestDeleteMultiple(listOf(uri))
+    }
 
-        // SAF tree document URI — DocumentsContract.deleteDocument is the right API
-        if (isSafUri(uri)) {
-            val deleted = performDelete(context, uri)
-            onResult(deleted)
-            return
+    /** Delete multiple font files (used in batch selection delete) */
+    fun requestDeleteMultiple(uris: List<Uri>) {
+        fragment.lifecycleScope.launch {
+            deleteUris(fragment.requireContext(), uris)
         }
+    }
 
-        // MediaStore URI
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            try {
-                val pending = MediaStore.createDeleteRequest(
-                    context.contentResolver, listOf(uri))
-                pendingUri = uri
-                launcher.launch(IntentSenderRequest.Builder(pending).build())
-            } catch (_: Exception) {
-                onResult(performDelete(context, uri))
+    private suspend fun deleteUris(context: Context, uris: List<Uri>) {
+        withContext(Dispatchers.IO) {
+            // SAF (Storage Access Framework) URIs from OPEN_DOCUMENT_TREE
+            // These use DocumentsContract, not MediaStore
+            val safUris   = uris.filter { isSafUri(it) }
+            val mediaUris = uris.filter { !isSafUri(it) }
+
+            // Delete SAF URIs directly — write permission was persisted at folder pick time
+            for (uri in safUris) {
+                try {
+                    DocumentsContract.deleteDocument(context.contentResolver, uri)
+                } catch (_: Exception) {
+                    // If DocumentsContract fails try raw delete
+                    try { context.contentResolver.delete(uri, null, null) } catch (_: Exception) {}
+                }
             }
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            try {
-                onResult(performDelete(context, uri))
-            } catch (e: android.app.RecoverableSecurityException) {
-                pendingUri = uri
-                launcher.launch(
-                    IntentSenderRequest.Builder(
-                        e.userAction.actionIntent.intentSender).build())
-            } catch (_: Exception) {
-                onResult(false)
+
+            // Delete MediaStore URIs with proper per-API handling
+            if (mediaUris.isNotEmpty()) {
+                deleteMediaUris(context, mediaUris)
+            } else {
+                withContext(Dispatchers.Main) { onResult(true) }
             }
-        } else {
-            onResult(performDelete(context, uri))
+        }
+    }
+
+    private suspend fun deleteMediaUris(context: Context, uris: List<Uri>) {
+        withContext(Dispatchers.IO) {
+            try {
+                when {
+                    // API 30+ — createDeleteRequest handles everything, single permission dialog
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+                        val pendingIntent = MediaStore.createDeleteRequest(
+                            context.contentResolver, uris
+                        )
+                        pendingUris = uris
+                        withContext(Dispatchers.Main) {
+                            intentSenderLauncher.launch(
+                                IntentSenderRequest.Builder(pendingIntent.intentSender).build()
+                            )
+                        }
+                    }
+
+                    // API 29 — try delete, catch SecurityException, show permission dialog,
+                    // then delete again in launcher callback
+                    Build.VERSION.SDK_INT == Build.VERSION_CODES.Q -> {
+                        try {
+                            for (uri in uris) context.contentResolver.delete(uri, null, null)
+                            withContext(Dispatchers.Main) { onResult(true) }
+                        } catch (e: SecurityException) {
+                            val recoverable = e as? RecoverableSecurityException
+                            val intentSender = recoverable?.userAction?.actionIntent?.intentSender
+                            if (intentSender != null) {
+                                pendingUris = uris
+                                withContext(Dispatchers.Main) {
+                                    intentSenderLauncher.launch(
+                                        IntentSenderRequest.Builder(intentSender).build()
+                                    )
+                                }
+                            } else {
+                                withContext(Dispatchers.Main) { onResult(false) }
+                            }
+                        }
+                    }
+
+                    // API 26-28 — direct delete, no permission dialog needed
+                    else -> {
+                        var allDeleted = true
+                        for (uri in uris) {
+                            try {
+                                context.contentResolver.delete(uri, null, null)
+                            } catch (_: Exception) { allDeleted = false }
+                        }
+                        withContext(Dispatchers.Main) { onResult(allDeleted) }
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) { onResult(false) }
+            }
+        }
+    }
+
+    private suspend fun deleteUri(context: Context, uri: Uri): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                if (isSafUri(uri)) {
+                    DocumentsContract.deleteDocument(context.contentResolver, uri)
+                } else {
+                    context.contentResolver.delete(uri, null, null) > 0
+                }
+            } catch (_: Exception) { false }
         }
     }
 
     private fun isSafUri(uri: Uri): Boolean {
         val authority = uri.authority ?: return false
-        // SAF URIs have authorities like "com.android.externalstorage.documents"
         return authority.endsWith(".documents") ||
                authority.endsWith(".downloads") ||
-               uri.scheme == "content" && uri.pathSegments.firstOrNull() == "tree"
-    }
-
-    private fun performDelete(context: Context, uri: Uri): Boolean {
-        // Try SAF DocumentsContract first (works for folder-picked files with write permission)
-        try {
-            return DocumentsContract.deleteDocument(context.contentResolver, uri)
-        } catch (_: Exception) {}
-
-        // Fallback: contentResolver.delete (works for some URI types)
-        return try {
-            context.contentResolver.delete(uri, null, null) > 0
-        } catch (_: Exception) {
-            false
-        }
+               authority == "com.android.externalstorage.documents" ||
+               authority == "com.android.providers.downloads.documents" ||
+               authority == "com.android.providers.media.documents"
     }
 }

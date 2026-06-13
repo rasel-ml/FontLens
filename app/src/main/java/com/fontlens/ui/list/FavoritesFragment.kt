@@ -111,9 +111,13 @@ class FavoritesFragment : Fragment() {
                         .setTitle("⚠ Permanently delete ${ids.size} font(s)?")
                         .setMessage("This cannot be undone.")
                         .setPositiveButton("Delete") { _, _ ->
-                            ids.forEach { FontRepository.removeFontFromStorage(it, requireContext()) }
+                            val uris = ids.mapNotNull { id -> FontRepository.getById(id)?.uri }
+                            pendingDeleteFontId = null // batch mode — handled in callback
+                            // Remove from library first so UI feels instant
+                            ids.forEach { FontRepository.removeFont(it, requireContext()) }
                             adapter.exitSelectionMode(); showNormalToolbar(); refresh()
-                            Toast.makeText(requireContext(), "${ids.size} file(s) deleted", Toast.LENGTH_SHORT).show()
+                            // Then request actual storage deletion
+                            storageDeleteHelper.requestDeleteMultiple(uris)
                         }
                         .setNegativeButton("Cancel", null).show()
                 }
