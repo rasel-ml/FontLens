@@ -83,7 +83,17 @@ class FontListFragment : Fragment() {
         adapter = FontListAdapter(
             onFontClick    = { font -> findNavController().navigate(FontListFragmentDirections.actionListToPreview(font.id)) },
             onFavoriteClick = { font -> FontRepository.toggleFavorite(font.id, requireContext()); adapter.notifyDataSetChanged() },
-            onRemoveClick  = { font -> DeleteFontDialog.show(requireContext(), font) { refresh() } },
+            onRemoveClick  = { font ->
+                DeleteFontDialog.show(
+                    context = requireContext(),
+                    font = font,
+                    onRemoveFromLibrary = { refresh() },
+                    onDeletePermanently = {
+                        pendingDeleteFontId = font.id
+                        storageDeleteHelper.requestDelete(font.uri)
+                    }
+                )
+            },
             isFavorite     = { FontRepository.isFavorite(it) },
             getSample      = { FontRepository.getSampleText(it) },
             onSelectionChanged = { ids -> updateSelectionToolbar(ids) }
