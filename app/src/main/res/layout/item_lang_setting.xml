@@ -33,7 +33,7 @@
         android:layout_height="36dp"
         android:layout_marginStart="6dp"
         android:gravity="center"
-        android:text="@string/icon_cancel"
+        android:text="✕"
         android:textSize="14sp"
         android:textColor="@color/text_muted"
         android:clickable="true"

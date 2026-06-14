@@ -26,7 +26,7 @@
             android:layout_gravity="end"
             android:layout_marginEnd="8dp"
             android:background="@drawable/bg_search_small"
-            android:hint="@string/glyph_search_hint"
+            android:hint="U+0041…"
             android:textColorHint="@color/text_muted"
             android:textColor="@color/text_primary"
             android:textSize="13sp"
@@ -84,7 +84,7 @@
             android:layout_width="44dp"
             android:layout_height="44dp"
             android:gravity="center"
-            android:text="@string/icon_prev_page"
+            android:text="‹"
             android:textSize="22sp"
             android:textColor="@color/text_secondary"
             android:background="@drawable/bg_style_btn"
@@ -99,14 +99,14 @@
             android:layout_marginEnd="20dp"
             android:textColor="@color/text_muted"
             android:textSize="13sp"
-            android:text="@string/page_label_default" />
+            android:text="1 / 1" />
 
         <TextView
             android:id="@+id/btn_next"
             android:layout_width="44dp"
             android:layout_height="44dp"
             android:gravity="center"
-            android:text="@string/icon_next_page"
+            android:text="›"
             android:textSize="22sp"
             android:textColor="@color/text_secondary"
             android:background="@drawable/bg_style_btn"

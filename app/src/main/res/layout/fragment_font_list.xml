@@ -30,7 +30,7 @@
                 android:layout_width="44dp"
                 android:layout_height="44dp"
                 android:gravity="center"
-                android:text="@string/icon_hamburger"
+                android:text="☰"
                 android:textSize="20sp"
                 android:textColor="@color/text_secondary"
                 android:clickable="true"
@@ -60,7 +60,7 @@
                 android:paddingBottom="3dp"
                 android:textColor="@color/text_muted"
                 android:textSize="12sp"
-                android:text="@string/count_default" />
+                android:text="0" />
 
             <TextView
                 android:id="@+id/btn_sort"
@@ -68,7 +68,7 @@
                 android:layout_height="40dp"
                 android:layout_marginStart="4dp"
                 android:gravity="center"
-                android:text="@string/icon_sort"
+                android:text="⇅"
                 android:textSize="18sp"
                 android:textColor="@color/text_secondary"
                 android:clickable="true"
@@ -80,7 +80,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:gravity="center"
-                android:text="@string/icon_theme_toggle"
+                android:text="☀"
                 android:textSize="18sp"
                 android:textColor="@color/text_secondary"
                 android:clickable="true"
@@ -103,7 +103,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:gravity="center"
-                android:text="@string/icon_cancel"
+                android:text="✕"
                 android:textSize="16sp"
                 android:textColor="@color/accent"
                 android:clickable="true"
@@ -118,13 +118,13 @@
                 android:layout_marginStart="8dp"
                 android:textColor="@color/text_primary"
                 android:textSize="15sp"
-                android:text="@string/selected_count_default" />
+                android:text="0 selected" />
 
             <TextView
                 android:id="@+id/btn_select_all"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/btn_select_all"
+                android:text="All"
                 android:textColor="@color/accent"
                 android:textSize="13sp"
                 android:padding="8dp"
@@ -137,7 +137,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:gravity="center"
-                android:text="@string/icon_favorite_filled"
+                android:text="★"
                 android:textSize="18sp"
                 android:textColor="@color/text_secondary"
                 android:clickable="true"
@@ -149,9 +149,9 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:gravity="center"
-                android:text="@string/icon_delete"
+                android:text="🗑"
                 android:textSize="16sp"
-                android:textColor="@color/error_red_bright"
+                android:textColor="#FF5252"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />
@@ -206,7 +206,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/icon_font_empty"
+            android:text="🔤"
             android:textSize="48sp" />
 
         <TextView

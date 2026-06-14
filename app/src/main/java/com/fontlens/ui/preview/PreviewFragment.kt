@@ -126,12 +126,12 @@ class PreviewFragment : Fragment() {
         fontSize = 32
         binding.seekbarSize.max = 152
         binding.seekbarSize.progress = fontSize - 8
-        binding.tvSizeLabel.text = getString(R.string.font_size, fontSize)
+        binding.tvSizeLabel.text = "${fontSize}px"
         binding.etPreview.textSize = fontSize.toFloat()
         binding.seekbarSize.setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(sb: android.widget.SeekBar?, p: Int, fromUser: Boolean) {
                 fontSize = p + 8
-                binding.tvSizeLabel.text = getString(R.string.font_size, fontSize)
+                binding.tvSizeLabel.text = "${fontSize}px"
                 binding.etPreview.textSize = fontSize.toFloat()
             }
             override fun onStartTrackingTouch(sb: android.widget.SeekBar?) {}

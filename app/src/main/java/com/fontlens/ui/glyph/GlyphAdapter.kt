@@ -29,7 +29,7 @@ class GlyphAdapter(
         val ch = String(Character.toChars(cp))
         holder.binding.tvGlyph.text = ch
         holder.binding.tvGlyph.typeface = typeface ?: Typeface.DEFAULT
-        holder.binding.tvCodepoint.text = holder.itemView.context.getString(R.string.codepoint_format, cp.toString(16).uppercase().padStart(4, '0'))
+        holder.binding.tvCodepoint.text = "U+${cp.toString(16).uppercase().padStart(4, '0')}"
         holder.binding.root.setOnClickListener { onClick(ch) }
     }
 

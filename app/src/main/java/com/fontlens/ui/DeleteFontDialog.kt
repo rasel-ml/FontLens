@@ -28,7 +28,7 @@ object DeleteFontDialog {
         val btnRemoveLib  = view.findViewById<android.widget.TextView>(R.id.btn_remove_library)
 
         tvName.text    = name
-        tvMessage.text = context.getString(R.string.delete_font_message)
+        tvMessage.text = "What would you like to do with this font?"
 
         val dialog = AlertDialog.Builder(context)
             .setView(view).create()

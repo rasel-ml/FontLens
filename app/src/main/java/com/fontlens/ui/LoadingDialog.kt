@@ -19,7 +19,7 @@ class LoadingDialog : DialogFragment() {
         if (_binding == null) return
         if (total > 0) {
             binding.tvProgress.visibility = View.VISIBLE
-            binding.tvProgress.text = context.getString(R.string.progress_format, loaded, total)
+            binding.tvProgress.text = "$loaded / $total"
             binding.progressBar.isIndeterminate = false
             binding.progressBar.max = total
             binding.progressBar.progress = loaded
@@ -42,7 +42,7 @@ class LoadingDialog : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.progressBar.isIndeterminate = true
         binding.tvProgress.visibility = View.GONE
-        binding.tvMessage.text = context.getString(R.string.loading_fonts)
+        binding.tvMessage.text = "Loading fonts…"
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

@@ -13,7 +13,7 @@
     <TextView
         android:layout_width="28dp"
         android:layout_height="wrap_content"
-        android:text="@string/icon_folder"
+        android:text="📁"
         android:textSize="16sp"
         android:gravity="center" />
 
@@ -35,7 +35,7 @@
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:gravity="center"
-        android:text="@string/icon_reload"
+        android:text="↺"
         android:textSize="18sp"
         android:textColor="@color/accent"
         android:clickable="true"
@@ -48,7 +48,7 @@
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:gravity="center"
-        android:text="@string/icon_cancel"
+        android:text="✕"
         android:textSize="14sp"
         android:textColor="@color/text_muted"
         android:clickable="true"

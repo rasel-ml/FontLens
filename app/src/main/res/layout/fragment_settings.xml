@@ -53,7 +53,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/section_theme"
+                        android:text="THEME"
                         android:textColor="@color/accent"
                         android:textSize="11sp"
                         android:letterSpacing="0.1"
@@ -69,7 +69,7 @@
                             android:id="@+id/rb_theme_system"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/theme_follow_system"
+                            android:text="Follow System"
                             android:textColor="@color/text_primary"
                             android:buttonTint="@color/accent"
                             android:paddingStart="8dp"
@@ -79,7 +79,7 @@
                             android:id="@+id/rb_theme_day"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/theme_day"
+                            android:text="☀ Day"
                             android:textColor="@color/text_primary"
                             android:buttonTint="@color/accent"
                             android:paddingStart="8dp"
@@ -89,7 +89,7 @@
                             android:id="@+id/rb_theme_night"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/theme_night"
+                            android:text="🌙 Night"
                             android:textColor="@color/text_primary"
                             android:buttonTint="@color/accent"
                             android:paddingStart="8dp" />
@@ -170,7 +170,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/sample_priority_description"
+                        android:text="When both metadata and user text exist, which takes precedence?"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp"
                         android:layout_marginBottom="10dp" />
@@ -230,7 +230,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:text="@string/btn_add_lang"
+                        android:text="+ Add Language"
                         android:textColor="@color/accent"
                         android:textSize="14sp"
                         android:padding="8dp"
@@ -260,7 +260,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/section_folder_scanning"
+                        android:text="FOLDER SCANNING"
                         android:textColor="@color/accent"
                         android:textSize="11sp"
                         android:letterSpacing="0.1"
@@ -282,14 +282,14 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/scan_subfolders_title"
+                                android:text="Scan Subfolders Recursively"
                                 android:textColor="@color/text_primary"
                                 android:textSize="14sp" />
             
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/scan_subfolders_summary"
+                                android:text="When on, fonts inside subfolders are also loaded"
                                 android:textColor="@color/text_muted"
                                 android:textSize="12sp"
                                 android:layout_marginTop="2dp" />

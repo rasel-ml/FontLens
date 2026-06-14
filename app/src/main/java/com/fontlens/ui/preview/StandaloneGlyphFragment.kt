@@ -75,7 +75,7 @@ class StandaloneGlyphFragment : Fragment() {
         val start = currentPage * PAGE_SIZE
         val slice = filteredChars.subList(start, minOf(start + PAGE_SIZE, filteredChars.size))
         val totalPages = maxOf(1, (filteredChars.size + PAGE_SIZE - 1) / PAGE_SIZE)
-        binding.tvPage.text = getString(R.string.progress_format, currentPage + 1, totalPages)
+        binding.tvPage.text = "${currentPage + 1} / $totalPages"
         binding.tvGlyphCount.text = getString(com.fontlens.R.string.glyph_count, filteredChars.size)
         binding.btnPrev.alpha = if (currentPage > 0) 1f else 0.3f
         binding.btnNext.alpha = if (currentPage < totalPages - 1) 1f else 0.3f

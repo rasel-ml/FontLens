@@ -216,7 +216,7 @@ class FontListFragment : Fragment() {
         binding.toolbarNormal.visibility    = View.GONE
         binding.toolbarSelection.visibility = View.VISIBLE
         binding.searchLayout.visibility     = View.GONE
-        binding.tvSelectedCount.text = getString(R.string.selected_count_format, ids.size, total)
+        binding.tvSelectedCount.text        = "${ids.size} / $total selected"
     }
 
     // ── Sort ───────────────────────────────────────────────────────────────────
