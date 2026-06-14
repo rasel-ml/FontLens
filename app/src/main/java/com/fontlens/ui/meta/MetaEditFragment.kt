@@ -11,6 +11,13 @@ import com.fontlens.data.FontRepository
 import com.fontlens.databinding.FragmentMetaEditBinding
 import com.fontlens.databinding.ItemEditFieldBinding
 
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import com.fontlens.utils.FontMetadataEditor
+
+
 class MetaEditFragment : Fragment() {
 
     private var _binding: FragmentMetaEditBinding? = null
@@ -48,7 +55,6 @@ class MetaEditFragment : Fragment() {
             ?: run { findNavController().popBackStack(); return }
 
         val originalMeta = font.meta  // raw parsed values
-        val savedOverrides = FontRepository.getMetaOverrides(font.id) // previously saved edits
 
         // Map of original values from parsed font
         val originalValues = mapOf(
@@ -74,25 +80,41 @@ class MetaEditFragment : Fragment() {
         fieldKeys.forEach { (key, label) ->
             val fb = ItemEditFieldBinding.inflate(inflater, binding.formContainer, false)
             fb.tvFieldLabel.text = label
-            // Show saved override if exists, otherwise show original parsed value
-            val currentValue = savedOverrides[key] ?: originalValues[key] ?: ""
+            val currentValue = originalValues[key] ?: ""
             fb.etFieldValue.setText(currentValue)
-            fb.etFieldValue.hint = originalValues[key]?.ifEmpty { "—" } ?: "—"
+            fb.etFieldValue.hint = currentValue.ifEmpty { "—" }
             binding.formContainer.addView(fb.root)
             fieldBindings.add(key to fb)
         }
-
         binding.btnSave.setOnClickListener {
-            val overrides = mutableMapOf<String, String>()
+            val updates = mutableMapOf<String, String>()
             fieldBindings.forEach { (key, fb) ->
                 val text = fb.etFieldValue.text?.toString() ?: ""
-                // Only save if different from original (no point overriding with same value)
-                if (text.isNotBlank() && text != (originalValues[key] ?: "")) {
-                    overrides[key] = text
+                val original = originalValues[key] ?: ""
+                if (text != original) {
+                    updates[key] = text
                 }
             }
-            FontRepository.saveMetaOverrides(font.id, overrides, requireContext())
-            findNavController().popBackStack()
+        
+            if (updates.isEmpty()) {
+                findNavController().popBackStack()
+                return@setOnClickListener
+            }
+        
+            binding.btnSave.isEnabled = false
+        
+            viewLifecycleOwner.lifecycleScope.launch {
+                val updatedMeta = withContext(Dispatchers.IO) {
+                    FontMetadataEditor.writeMetadata(requireContext(), font.uri, updates)
+                }
+        
+                if (updatedMeta != null) {
+                    FontRepository.updateFontMeta(font.id, updatedMeta, requireContext())
+                    findNavController().popBackStack()
+                } else {
+                    binding.btnSave.isEnabled = true
+                }
+            }
         }
     }
 

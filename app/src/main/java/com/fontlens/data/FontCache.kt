@@ -20,21 +20,19 @@ object FontCache {
         val uriString: String,
         val addedAt: Long,
         val folderPath: String,
-        val meta: FontMeta,
-        val metaOverrides: Map<String, String> = emptyMap()
+        val meta: FontMeta
     )
 
     fun save(context: Context, fonts: List<FontItem>) {
         try {
             val cached = fonts.map { f ->
                 CachedFont(
-                    id            = f.id,
-                    displayName   = f.displayName,
-                    uriString     = f.uri.toString(),
-                    addedAt       = f.addedAt,
-                    folderPath    = f.folderPath,
-                    meta          = f.meta,
-                    metaOverrides = f.metaOverrides
+                    id = f.id,
+                    displayName = f.displayName,
+                    uriString = f.uri.toString(),
+                    addedAt = f.addedAt,
+                    folderPath = f.folderPath,
+                    meta = f.meta
                 )
             }
             val json = gson.toJson(cached)
@@ -53,13 +51,12 @@ object FontCache {
             val cached: List<CachedFont> = gson.fromJson(json, type) ?: return emptyList()
             cached.map { c ->
                 FontItem(
-                    id            = c.id,
-                    displayName   = c.displayName,
-                    uri           = android.net.Uri.parse(c.uriString),
-                    addedAt       = c.addedAt,
-                    folderPath    = c.folderPath,
-                    meta          = c.meta,
-                    metaOverrides = c.metaOverrides
+                    id = c.id,
+                    displayName = c.displayName,
+                    uri = android.net.Uri.parse(c.uriString),
+                    addedAt = c.addedAt,
+                    folderPath = c.folderPath,
+                    meta = c.meta
                 )
             }
         } catch (_: Exception) { emptyList() }

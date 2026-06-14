@@ -156,7 +156,7 @@ class FavoritesFragment : Fragment() {
         val total = FontRepository.getFavorites().size
         binding.toolbar.visibility          = View.GONE
         binding.toolbarSelection.visibility = View.VISIBLE
-        binding.tvSelectedCount.text        = "${ids.size} / $total selected"
+        binding.tvSelectedCount.text = getString(R.string.selected_count_format, ids.size, total)
     }
 
     private fun refresh(query: String = "") {

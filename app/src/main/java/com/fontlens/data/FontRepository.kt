@@ -146,7 +146,26 @@ object FontRepository {
 
     fun getMetaOverrides(fontId: String): Map<String, String> =
         overridesCache[fontId] ?: emptyMap()
-
+    fun updateFontMeta(fontId: String, newMeta: FontMeta, context: Context) {
+        val idx = fonts.indexOfFirst { it.id == fontId }
+        if (idx >= 0) {
+            val old = fonts[idx]
+            fonts[idx] = old.copy(
+                meta = newMeta,
+                metaOverrides = emptyMap(),
+                displayName = newMeta.family.ifEmpty { old.displayName }
+            )
+            FontCache.save(context, fonts)
+        }
+    
+        tempFonts[fontId]?.let { old ->
+            tempFonts[fontId] = old.copy(
+                meta = newMeta,
+                metaOverrides = emptyMap(),
+                displayName = newMeta.family.ifEmpty { old.displayName }
+            )
+        }
+    }
     // ── Settings ──────────────────────────────────────────────────────────────
     fun saveSettings(context: Context) = save(context)
 
@@ -160,14 +179,6 @@ object FontRepository {
                 val type = object : TypeToken<Set<String>>() {}.type
                 val loaded: Set<String> = gson.fromJson(it, type) ?: emptySet()
                 favorites.clear(); favorites.addAll(loaded)
-            } catch (_: Exception) {}
-        }
-        prefs.getString(KEY_OVERRIDES, "{}")?.let {
-            try {
-                val type = object : TypeToken<Map<String, Map<String, String>>>() {}.type
-                val map: Map<String, Map<String, String>> = gson.fromJson(it, type) ?: emptyMap()
-                overridesCache.clear(); overridesCache.putAll(map)
-                fonts.forEach { f -> overridesCache[f.id]?.let { ov -> f.metaOverrides = ov } }
             } catch (_: Exception) {}
         }
         prefs.getString(KEY_FOLDERS, "[]")?.let {
