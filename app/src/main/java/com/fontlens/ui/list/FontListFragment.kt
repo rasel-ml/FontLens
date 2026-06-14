@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.widget.addTextChangedListener
@@ -26,9 +27,9 @@ import com.fontlens.data.SortOrder
 import com.fontlens.databinding.BottomSheetSortBinding
 import com.fontlens.databinding.FragmentFontListBinding
 import com.fontlens.ui.DeleteFontDialog
-import com.fontlens.utils.StorageDeleteHelper
 import com.fontlens.ui.LoadingDialog
 import com.fontlens.utils.FontLoader
+import com.fontlens.utils.StorageDeleteHelper
 import com.fontlens.utils.TypefaceLoader
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.Dispatchers
@@ -40,12 +41,13 @@ class FontListFragment : Fragment() {
     private var _binding: FragmentFontListBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: FontListAdapter
-    private var initialLoadDone = false
-    private var currentSort = SortOrder.NAME_ASC
-    private var isNightMode = false
     private lateinit var storageDeleteHelper: StorageDeleteHelper
-    private var pendingDeleteFontId: String? = null
+
+    private var initialLoadDone    = false
+    private var currentSort        = SortOrder.NAME_ASC
+    private var isNightMode        = false
     private var typefaceJobRunning = false
+    private var pendingDeleteId: String? = null
 
     private val pickFolder = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -53,7 +55,9 @@ class FontListFragment : Fragment() {
         if (result.resultCode == Activity.RESULT_OK) {
             val uri = result.data?.data ?: return@registerForActivityResult
             requireContext().contentResolver.takePersistableUriPermission(
-                uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                uri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
             FontRepository.saveFolderUri(uri, requireContext())
             (activity as? MainActivity)?.refreshDrawer()
             loadFontsFromFolder(uri, showToast = true)
@@ -68,37 +72,44 @@ class FontListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Storage delete helper — single font
         storageDeleteHelper = StorageDeleteHelper(this) { success ->
-            if (success) {
-                // File was deleted by system — now remove from library
-                pendingDeleteFontId?.let { id ->
-                    FontRepository.removeFont(id, requireContext())
-                    refresh()
-                    android.widget.Toast.makeText(requireContext(), "File deleted", android.widget.Toast.LENGTH_SHORT).show()
-                }
-            } else {
-                android.widget.Toast.makeText(requireContext(), "Delete cancelled or failed", android.widget.Toast.LENGTH_SHORT).show()
+            val id = pendingDeleteId
+            pendingDeleteId = null
+            if (success && id != null) {
+                FontRepository.removeFont(id, requireContext())
+                refresh()
+                Toast.makeText(requireContext(), "File deleted", Toast.LENGTH_SHORT).show()
+            } else if (!success) {
+                Toast.makeText(requireContext(), "Delete cancelled or failed", Toast.LENGTH_SHORT).show()
             }
-            pendingDeleteFontId = null
         }
 
         adapter = FontListAdapter(
-            onFontClick    = { font -> findNavController().navigate(FontListFragmentDirections.actionListToPreview(font.id)) },
+            onFontClick     = { font -> findNavController().navigate(FontListFragmentDirections.actionListToPreview(font.id)) },
             onFavoriteClick = { font -> FontRepository.toggleFavorite(font.id, requireContext()); adapter.notifyDataSetChanged() },
-            onRemoveClick  = { font ->
+            onRemoveClick   = { font ->
                 DeleteFontDialog.show(
                     context = requireContext(),
                     font = font,
                     onRemoveFromLibrary = { refresh() },
                     onDeletePermanently = {
-                        pendingDeleteFontId = font.id
+                        pendingDeleteId = font.id
                         storageDeleteHelper.requestDelete(font.uri)
                     }
                 )
             },
-            isFavorite     = { FontRepository.isFavorite(it) },
-            getSample      = { FontRepository.getSampleText(it) },
-            onSelectionChanged = { ids -> updateSelectionToolbar(ids) }
+            isFavorite      = { FontRepository.isFavorite(it) },
+            getSample       = { FontRepository.getSampleText(it) },
+            onSelectionChanged = { ids ->
+                if (ids.isEmpty() && adapter.selectionMode) {
+                    // All deselected — exit selection mode
+                    adapter.exitSelectionMode()
+                    showNormalToolbar()
+                } else {
+                    updateSelectionToolbar(ids)
+                }
+            }
         )
 
         binding.rvFonts.layoutManager = LinearLayoutManager(requireContext())
@@ -107,28 +118,26 @@ class FontListFragment : Fragment() {
         binding.btnHamburger.setOnClickListener { (activity as? MainActivity)?.openDrawer() }
         binding.fabAdd.setOnClickListener { openFolderPicker() }
         binding.etSearch.addTextChangedListener { refresh(it?.toString() ?: "") }
-
-        // Sort button
         binding.btnSort.setOnClickListener { showSortSheet() }
-
-        // Theme toggle
         binding.btnTheme.setOnClickListener {
             isNightMode = !isNightMode
             AppCompatDelegate.setDefaultNightMode(
-                if (isNightMode) AppCompatDelegate.MODE_NIGHT_YES
-                else AppCompatDelegate.MODE_NIGHT_NO
-            )
+                if (isNightMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO)
             binding.btnTheme.text = if (isNightMode) "🌙" else "☀"
         }
 
-        // Selection toolbar actions
-        binding.btnCancelSelection.setOnClickListener { adapter.exitSelectionMode(); showNormalToolbar() }
+        // Selection toolbar buttons
+        binding.btnCancelSelection.setOnClickListener {
+            adapter.exitSelectionMode()
+            showNormalToolbar()
+        }
         binding.btnSelectAll.setOnClickListener {
             adapter.selectAll(FontRepository.getAll())
             updateSelectionToolbar(adapter.getSelectedIds())
         }
         binding.btnSelFavorite.setOnClickListener {
             val ids = adapter.getSelectedIds()
+            if (ids.isEmpty()) return@setOnClickListener
             ids.forEach { id ->
                 if (!FontRepository.isFavorite(id)) FontRepository.toggleFavorite(id, requireContext())
             }
@@ -138,20 +147,19 @@ class FontListFragment : Fragment() {
         binding.btnSelDelete.setOnClickListener {
             val ids = adapter.getSelectedIds()
             if (ids.isEmpty()) return@setOnClickListener
-            AlertDialog.Builder(requireContext())
+            AlertDialog.Builder(requireContext(), R.style.Theme_FontLens_Dialog)
                 .setTitle("Delete ${ids.size} font(s)?")
                 .setMessage("Choose how to remove the selected fonts.")
                 .setPositiveButton("🗑 Delete from Storage") { _, _ ->
-                    AlertDialog.Builder(requireContext())
+                    AlertDialog.Builder(requireContext(), R.style.Theme_FontLens_Dialog)
                         .setTitle("⚠ Permanently delete ${ids.size} font(s)?")
                         .setMessage("This cannot be undone.")
                         .setPositiveButton("Delete") { _, _ ->
-                            val uris = ids.mapNotNull { id -> FontRepository.getById(id)?.uri }
-                            pendingDeleteFontId = null // batch mode — handled in callback
-                            // Remove from library first so UI feels instant
+                            val uris = ids.mapNotNull { FontRepository.getById(it)?.uri }
+                            // Remove from library immediately so UI feels instant
                             ids.forEach { FontRepository.removeFont(it, requireContext()) }
                             adapter.exitSelectionMode(); showNormalToolbar(); refresh()
-                            // Then request actual storage deletion
+                            // Request storage deletion
                             storageDeleteHelper.requestDeleteMultiple(uris)
                         }
                         .setNegativeButton("Cancel", null).show()
@@ -164,10 +172,10 @@ class FontListFragment : Fragment() {
                 .setNegativeButton("Cancel", null).show()
         }
 
-        // Back press in selection mode returns to normal
+        // Back press exits selection mode
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
-            object : androidx.activity.OnBackPressedCallback(true) {
+            object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     if (adapter.selectionMode) {
                         adapter.exitSelectionMode()
@@ -184,13 +192,10 @@ class FontListFragment : Fragment() {
             initialLoadDone = true
             val cached = FontRepository.getAll()
             if (cached.isNotEmpty()) {
-                // Cache exists — show list instantly, load typefaces in background silently
                 refresh()
                 startBackgroundTypefaceLoading(cached)
-                // Silently scan for new fonts without loading popup
                 scanFoldersForNewFonts()
             } else {
-                // First launch or empty cache — show loading popup
                 reloadSavedFolders()
             }
         } else {
@@ -198,20 +203,35 @@ class FontListFragment : Fragment() {
         }
     }
 
+    // ── Toolbar helpers ────────────────────────────────────────────────────────
+
+    private fun showNormalToolbar() {
+        binding.toolbarNormal.visibility    = View.VISIBLE
+        binding.toolbarSelection.visibility = View.GONE
+        binding.searchLayout.visibility     = View.VISIBLE
+    }
+
+    private fun updateSelectionToolbar(ids: Set<String>) {
+        val total = FontRepository.getAll().size
+        binding.toolbarNormal.visibility    = View.GONE
+        binding.toolbarSelection.visibility = View.VISIBLE
+        binding.searchLayout.visibility     = View.GONE
+        binding.tvSelectedCount.text        = "${ids.size} / $total selected"
+    }
+
+    // ── Sort ───────────────────────────────────────────────────────────────────
+
     private fun showSortSheet() {
         val dialog = BottomSheetDialog(requireContext(), R.style.Theme_FontLens_BottomSheet)
         val sheetBinding = BottomSheetSortBinding.inflate(LayoutInflater.from(requireContext()))
         dialog.setContentView(sheetBinding.root)
-
-        val rb = when (currentSort) {
+        when (currentSort) {
             SortOrder.NAME_ASC  -> sheetBinding.rbNameAsc
             SortOrder.NAME_DESC -> sheetBinding.rbNameDesc
             SortOrder.DATE_ASC  -> sheetBinding.rbDateAsc
             SortOrder.DATE_DESC -> sheetBinding.rbDateDesc
             SortOrder.FOLDER    -> sheetBinding.rbFolder
-        }
-        rb.isChecked = true
-
+        }.isChecked = true
         sheetBinding.rgSort.setOnCheckedChangeListener { _, id ->
             currentSort = when (id) {
                 R.id.rb_name_asc  -> SortOrder.NAME_ASC
@@ -221,30 +241,19 @@ class FontListFragment : Fragment() {
                 R.id.rb_folder    -> SortOrder.FOLDER
                 else              -> SortOrder.NAME_ASC
             }
-            dialog.dismiss()
-            refresh()
+            dialog.dismiss(); refresh()
         }
         dialog.show()
     }
 
-    private fun showNormalToolbar() {
-        binding.toolbarNormal.visibility    = View.VISIBLE
-        binding.toolbarSelection.visibility = View.GONE
-        binding.searchLayout.visibility     = View.VISIBLE
-    }
+    // ── Font loading ───────────────────────────────────────────────────────────
 
-    private fun updateSelectionToolbar(ids: Set<String>) {
-        if (ids.isEmpty()) {
-            // Auto-exit selection mode when nothing is selected
-            adapter.exitSelectionMode()
-            showNormalToolbar()
-            return
+    private fun reloadSavedFolders() {
+        val newUris = FontRepository.getSavedFolderUris().filter { !FontRepository.isFolderLoaded(it) }
+        if (newUris.isEmpty()) { refresh(); return }
+        lifecycleScope.launch {
+            for (uri in newUris) try { loadFontsFromFolder(uri, showToast = false) } catch (_: Exception) {}
         }
-        val total = FontRepository.getAll().size
-        binding.toolbarNormal.visibility    = View.GONE
-        binding.toolbarSelection.visibility = View.VISIBLE
-        binding.searchLayout.visibility     = View.GONE
-        binding.tvSelectedCount.text        = "${ids.size} / $total selected"
     }
 
     private fun scanFoldersForNewFonts() {
@@ -256,12 +265,10 @@ class FontListFragment : Fragment() {
                 try {
                     val folderLabel = "/" + (folderUri.lastPathSegment ?: "").substringAfter(":")
                     val fontUris = withContext(Dispatchers.IO) { collectFontUris(folderUri, recursive) }
-                    val items = FontLoader.loadFontsFromUris(
-                        context = requireContext(), uris = fontUris, folderPath = folderLabel)
+                    val items = FontLoader.loadFontsFromUris(requireContext(), fontUris, folderLabel)
                     val before = FontRepository.getAll().size
                     FontRepository.addFontsAndSave(items, requireContext())
-                    val after = FontRepository.getAll().size
-                    if (after > before) {
+                    if (FontRepository.getAll().size > before) {
                         refresh()
                         startBackgroundTypefaceLoading(FontRepository.getAll())
                     }
@@ -270,29 +277,22 @@ class FontListFragment : Fragment() {
         }
     }
 
-    private fun startBackgroundTypefaceLoading(fonts: List<com.fontlens.data.FontItem>) {
+    private fun startBackgroundTypefaceLoading(fonts: List<FontItem>) {
         if (typefaceJobRunning) return
         typefaceJobRunning = true
-        var loadedCount = 0
+        var count = 0
         lifecycleScope.launch {
-            val toLoad = fonts.filter { !TypefaceLoader.isLoaded(it.id) }
-                .map { it.id to it.uri }
-            TypefaceLoader.loadSequentially(requireContext(), toLoad) { fontId ->
+            TypefaceLoader.loadSequentially(
+                requireContext(),
+                fonts.filter { !TypefaceLoader.isLoaded(it.id) }.map { it.id to it.uri }
+            ) { fontId ->
                 if (_binding == null) return@loadSequentially
-                loadedCount++
+                count++
                 adapter.notifyTypefaceReady(fontId)
-                if (loadedCount % 10 == 0) adapter.notifyDataSetChanged()
+                if (count % 10 == 0) adapter.notifyDataSetChanged()
             }
             if (_binding != null) adapter.notifyDataSetChanged()
             typefaceJobRunning = false
-        }
-    }
-
-    private fun reloadSavedFolders() {
-        val newUris = FontRepository.getSavedFolderUris().filter { !FontRepository.isFolderLoaded(it) }
-        if (newUris.isEmpty()) { refresh(); return }
-        lifecycleScope.launch {
-            for (uri in newUris) try { loadFontsFromFolder(uri, showToast = false) } catch (_: Exception) {}
         }
     }
 
@@ -300,10 +300,12 @@ class FontListFragment : Fragment() {
 
     private fun openFolderPicker() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or
+            addFlags(
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or
                 Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
                 Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION or
-                Intent.FLAG_GRANT_PREFIX_URI_PERMISSION)
+                Intent.FLAG_GRANT_PREFIX_URI_PERMISSION
+            )
         }
         pickFolder.launch(intent)
     }
@@ -324,21 +326,22 @@ class FontListFragment : Fragment() {
                 context = requireContext(), uris = fontUris, folderPath = folderLabel,
                 onProgress = { loaded, total -> lifecycleScope.launch { loadingDialog.updateProgress(loaded, total) } }
             )
-            FontRepository.addFonts(items)
+            FontRepository.addFontsAndSave(items, requireContext())
             FontRepository.markFolderLoaded(folderUri)
             refresh()
             loadingDialog.dismissAllowingStateLoss()
             if (showToast) Toast.makeText(requireContext(), "${items.size} font(s) loaded", Toast.LENGTH_SHORT).show()
+            startBackgroundTypefaceLoading(FontRepository.getAll())
         }
     }
 
     private fun collectFontUris(folderUri: Uri, recursive: Boolean): List<Uri> {
         val cr = requireContext().contentResolver
-        val fontExtensions = setOf("ttf", "otf", "woff", "woff2", "ttc")
+        val fontExts = setOf("ttf", "otf", "woff", "woff2", "ttc")
         val result = mutableListOf<Uri>()
-        fun scanFolder(treeUri: Uri, docId: String) {
-            val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(treeUri, docId)
-            cr.query(childrenUri, arrayOf(
+        fun scan(treeUri: Uri, docId: String) {
+            val childUri = DocumentsContract.buildChildDocumentsUriUsingTree(treeUri, docId)
+            cr.query(childUri, arrayOf(
                 DocumentsContract.Document.COLUMN_DOCUMENT_ID,
                 DocumentsContract.Document.COLUMN_DISPLAY_NAME,
                 DocumentsContract.Document.COLUMN_MIME_TYPE
@@ -352,13 +355,13 @@ class FontListFragment : Fragment() {
                     val mime    = cursor.getString(mimeCol) ?: ""
                     val ext     = name.substringAfterLast(".").lowercase()
                     when {
-                        ext in fontExtensions -> result.add(DocumentsContract.buildDocumentUriUsingTree(treeUri, childId))
-                        recursive && mime == DocumentsContract.Document.MIME_TYPE_DIR -> scanFolder(treeUri, childId)
+                        ext in fontExts -> result.add(DocumentsContract.buildDocumentUriUsingTree(treeUri, childId))
+                        recursive && mime == DocumentsContract.Document.MIME_TYPE_DIR -> scan(treeUri, childId)
                     }
                 }
             }
         }
-        scanFolder(folderUri, DocumentsContract.getTreeDocumentId(folderUri))
+        scan(folderUri, DocumentsContract.getTreeDocumentId(folderUri))
         return result
     }
 
@@ -382,16 +385,11 @@ class FontListFragment : Fragment() {
             SortOrder.FOLDER    -> fonts.sortedBy { it.folderPath }
         }
         if (currentSort != SortOrder.FOLDER) return sorted.map { FontListItem.Font(it) }
-
-        // Group by folder with headers
         val result = mutableListOf<FontListItem>()
         var lastFolder = ""
         sorted.forEach { font ->
             val folder = font.folderPath.ifEmpty { "/ (root)" }
-            if (folder != lastFolder) {
-                result.add(FontListItem.FolderHeader(folder))
-                lastFolder = folder
-            }
+            if (folder != lastFolder) { result.add(FontListItem.FolderHeader(folder)); lastFolder = folder }
             result.add(FontListItem.Font(font))
         }
         return result

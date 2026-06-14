@@ -27,13 +27,12 @@ class FontListAdapter(
     var selectionMode = false
         private set
 
-    fun enterSelectionMode() { selectionMode = true; notifyDataSetChanged() }
-
     fun exitSelectionMode() {
         selectionMode = false
         selected.clear()
-        onSelectionChanged(emptySet())
         notifyDataSetChanged()
+        // Notify AFTER clearing so updateSelectionToolbar is not called with empty set from adapter
+        onSelectionChanged(emptySet())
     }
 
     fun selectAll(items: List<FontItem>) {
@@ -44,24 +43,18 @@ class FontListAdapter(
 
     fun getSelectedIds() = selected.toSet()
 
-    /** Call when a typeface finishes loading to refresh that specific card */
     fun notifyTypefaceReady(fontId: String) {
-        // Find the index in currentList and update just that item
         val index = currentList.indexOfFirst {
             it is FontListItem.Font && it.font.id == fontId
         }
-        if (index >= 0) {
-            notifyItemChanged(index, "typeface") // payload prevents full rebind flicker
-        }
+        if (index >= 0) notifyItemChanged(index, "typeface")
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, payloads: List<Any>) {
         if (payloads.isNotEmpty() && payloads[0] == "typeface" && holder is FontVH) {
-            // Only update typeface-related views, skip full rebind
             val item = getItem(position)
             if (item is FontListItem.Font) {
-                val tf = com.fontlens.utils.TypefaceLoader.getTypeface(item.font.id)
-                    ?: android.graphics.Typeface.DEFAULT
+                val tf = TypefaceLoader.getTypeface(item.font.id) ?: Typeface.DEFAULT
                 holder.binding.tvPreviewLarge.typeface = tf
                 holder.binding.root.alpha = 1f
             }
@@ -75,7 +68,7 @@ class FontListAdapter(
         const val TYPE_HEADER = 1
 
         val DIFF = object : DiffUtil.ItemCallback<FontListItem>() {
-            override fun areItemsTheSame(a: FontListItem, b: FontListItem): Boolean = when {
+            override fun areItemsTheSame(a: FontListItem, b: FontListItem) = when {
                 a is FontListItem.Font && b is FontListItem.Font -> a.font.id == b.font.id
                 a is FontListItem.FolderHeader && b is FontListItem.FolderHeader -> a.path == b.path
                 else -> false
@@ -105,9 +98,9 @@ class FontListAdapter(
             }
             is FontListItem.Font -> {
                 val font = item.font
-                val b = (holder as FontVH).binding
-                val m = font.effectiveMeta
-                val ctx = holder.itemView.context
+                val b    = (holder as FontVH).binding
+                val m    = font.effectiveMeta
+                val ctx  = holder.itemView.context
 
                 b.tvFontName.text = m.family.ifEmpty { font.displayName }
                 b.tvFontSub.text = buildString {
@@ -120,17 +113,12 @@ class FontListAdapter(
                 val sample = getSample(font).replace("\n", "  ").replace("\r", "")
                 b.tvPreviewLarge.text     = sample
                 b.tvPreviewLarge.typeface = tf
-                // tv_preview_small is hidden in layout
+                b.root.alpha = if (TypefaceLoader.isLoaded(font.id)) 1f else 0.6f
 
-                // Selection highlight
                 val isSelected = selected.contains(font.id)
-                b.root.alpha = if (TypefaceLoader.isLoaded(font.id)) 1f else 0.7f
-
-                b.root.strokeColor = if (isSelected)
-                    ctx.getColor(R.color.accent) else ctx.getColor(R.color.divider)
+                b.root.strokeColor = if (isSelected) ctx.getColor(R.color.accent) else ctx.getColor(R.color.divider)
                 b.root.strokeWidth = if (isSelected) 2 else 1
 
-                // Favorite
                 b.btnFavorite.text = if (isFavorite(font.id)) "★" else "☆"
                 b.btnFavorite.setTextColor(ctx.getColor(
                     if (isFavorite(font.id)) R.color.accent else R.color.text_muted))
@@ -144,6 +132,7 @@ class FontListAdapter(
                     if (selectionMode) {
                         if (selected.contains(font.id)) selected.remove(font.id)
                         else selected.add(font.id)
+                        // Notify fragment — empty set triggers auto-exit in fragment
                         onSelectionChanged(selected.toSet())
                         notifyItemChanged(position)
                     } else {
