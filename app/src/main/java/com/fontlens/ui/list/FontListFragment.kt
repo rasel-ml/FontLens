@@ -115,6 +115,7 @@ class FontListFragment : Fragment() {
 
         binding.btnHamburger.setOnClickListener { (activity as? MainActivity)?.openDrawer() }
         binding.fabAdd.setOnClickListener { openFolderPicker() }
+        binding.ivEmptyIcon.setOnClickListener { openFolderPicker() }
         binding.etSearch.addTextChangedListener { refresh(it?.toString() ?: "") }
         binding.btnSort.setOnClickListener { showSortSheet() }
 
@@ -212,7 +213,7 @@ class FontListFragment : Fragment() {
             binding.btnTheme.visibility = View.GONE
         } else {
             binding.btnTheme.visibility = View.VISIBLE
-            binding.btnTheme.text = if (s.darkMode) "🌙" else "☀"
+            binding.btnTheme.setImageResource(if (s.darkMode) com.fontlens.R.drawable.ic_moon else com.fontlens.R.drawable.ic_sun)
         }
     }
 

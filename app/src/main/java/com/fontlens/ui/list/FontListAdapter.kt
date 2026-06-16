@@ -116,12 +116,14 @@ class FontListAdapter(
                 b.root.alpha = if (TypefaceLoader.isLoaded(font.id)) 1f else 0.6f
 
                 val isSelected = selected.contains(font.id)
-                b.root.strokeColor = if (isSelected) ctx.getColor(R.color.accent) else ctx.getColor(R.color.divider)
+                val p = com.fontlens.utils.ThemeManager.activePalette
+                b.root.strokeColor = if (isSelected) p.accent else p.divider
                 b.root.strokeWidth = if (isSelected) 2 else 1
 
-                b.btnFavorite.text = if (isFavorite(font.id)) "★" else "☆"
-                b.btnFavorite.setTextColor(ctx.getColor(
-                    if (isFavorite(font.id)) R.color.accent else R.color.text_muted))
+                val favIcon = if (isFavorite(font.id)) R.drawable.ic_star else R.drawable.ic_star_outline
+                val favTint = if (isFavorite(font.id)) p.accent else p.textMuted
+                b.btnFavorite.setImageResource(favIcon)
+                b.btnFavorite.imageTintList = android.content.res.ColorStateList.valueOf(favTint)
                 b.btnFavorite.visibility = if (selectionMode) View.GONE else View.VISIBLE
                 b.btnFavorite.setOnClickListener { if (!selectionMode) onFavoriteClick(font) }
 

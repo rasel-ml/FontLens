@@ -44,7 +44,7 @@
                 android:layout_weight="1"
                 android:text="@string/library"
                 android:textColor="?attr/textPrimary"
-                android:textSize="25sp"
+                android:textSize="20sp"
                 android:fontFamily="serif"
                 android:letterSpacing="0.05"
                 android:layout_marginStart="4dp" />
@@ -62,27 +62,25 @@
                 android:textSize="12sp"
                 android:text="0" />
 
-            <TextView
+            <ImageView
                 android:id="@+id/btn_sort"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginStart="4dp"
-                android:gravity="center"
-                android:text="⇅"
-                android:textSize="18sp"
-                android:textColor="?attr/textSecondary"
+                android:padding="9dp"
+                android:src="@drawable/ic_sort"
+                app:tint="@color/ic_tint_secondary"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
-            <TextView
+            <ImageView
                 android:id="@+id/btn_theme"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:gravity="center"
-                android:text="☀"
-                android:textSize="18sp"
-                android:textColor="?attr/textSecondary"
+                android:padding="9dp"
+                android:src="@drawable/ic_sun"
+                app:tint="@color/ic_tint_secondary"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />
@@ -132,26 +130,24 @@
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
-            <TextView
+            <ImageView
                 android:id="@+id/btn_sel_favorite"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:gravity="center"
-                android:text="★"
-                android:textSize="18sp"
-                android:textColor="?attr/textSecondary"
+                android:padding="8dp"
+                android:src="@drawable/ic_star_outline"
+                app:tint="@color/ic_tint_secondary"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
-            <TextView
+            <ImageView
                 android:id="@+id/btn_sel_delete"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:gravity="center"
-                android:text="🗑"
-                android:textSize="16sp"
-                android:textColor="#FF5252"
+                android:padding="8dp"
+                android:src="@drawable/ic_delete"
+                app:tint="@color/ic_delete_tint"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />
@@ -203,11 +199,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/search_layout">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="🔤"
-            android:textSize="48sp" />
+        <ImageView
+            android:id="@+id/iv_empty_icon"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_add_circle"
+            app:tint="@color/ic_tint_muted"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
 
         <TextView
             android:id="@+id/tv_empty"

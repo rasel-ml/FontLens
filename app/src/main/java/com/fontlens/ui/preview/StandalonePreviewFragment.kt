@@ -65,11 +65,11 @@ class StandalonePreviewFragment : Fragment() {
         // ── Favorite ──────────────────────────────────────────────────────────
         fun updateFav() {
             val fav = FontRepository.isFavorite(font.id)
-            binding.btnFavorite.text = if (fav) "★" else "☆"
-            binding.btnFavorite.setTextColor(
-                ContextCompat.getColor(requireContext(),
-                    if (fav) R.color.accent else R.color.text_muted)
-            )
+            val p = com.fontlens.utils.ThemeManager.activePalette
+            binding.btnFavorite.setImageResource(
+                if (fav) R.drawable.ic_star else R.drawable.ic_star_outline)
+            binding.btnFavorite.imageTintList =
+                android.content.res.ColorStateList.valueOf(if (fav) p.accent else p.textMuted)
         }
         updateFav()
         binding.btnFavorite.setOnClickListener {

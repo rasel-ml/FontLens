@@ -23,7 +23,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textColor="?attr/textPrimary"
-            android:textSize="16sp"
+            android:textSize="13sp"
             android:letterSpacing="0.05"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@id/btn_remove"
@@ -41,27 +41,26 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_font_name" />
 
-        <TextView
+        <ImageView
             android:id="@+id/btn_remove"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:gravity="center"
-            android:text="🗑"
-            android:textSize="16sp"
+            android:padding="7dp"
+            android:src="@drawable/ic_delete"
+            app:tint="@color/ic_delete_tint"
             android:clickable="true"
             android:focusable="true"
             android:background="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintEnd_toStartOf="@id/btn_favorite"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <ImageView
             android:id="@+id/btn_favorite"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:gravity="center"
-            android:text="☆"
-            android:textSize="20sp"
-            android:textColor="?attr/textMuted"
+            android:padding="6dp"
+            android:src="@drawable/ic_star_outline"
+            app:tint="@color/ic_tint_muted"
             android:clickable="true"
             android:focusable="true"
             android:background="?attr/selectableItemBackgroundBorderless"

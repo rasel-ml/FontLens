@@ -54,62 +54,58 @@
                 android:focusable="true"
                 android:visibility="gone" />
 
-            <TextView
+            <ImageView
                 android:id="@+id/btn_delete"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:gravity="center"
-                android:text="🗑"
-                android:textSize="16sp"
+                android:padding="8dp"
+                android:src="@drawable/ic_delete"
+                app:tint="@color/ic_delete_tint"
                 android:clickable="true"
                 android:focusable="true"
                 android:visibility="gone"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
-            <TextView
+            <ImageView
                 android:id="@+id/btn_info"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:gravity="center"
-                android:text="ℹ"
-                android:textSize="18sp"
-                android:textColor="?attr/textSecondary"
+                android:padding="8dp"
+                android:src="@drawable/ic_info"
+                app:tint="@color/ic_tint_secondary"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
-            <TextView
+            <ImageView
                 android:id="@+id/btn_meta"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:gravity="center"
-                android:text="⊙"
-                android:textSize="18sp"
-                android:textColor="?attr/textSecondary"
+                android:padding="8dp"
+                android:src="@drawable/ic_meta"
+                app:tint="@color/ic_tint_secondary"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
-            <TextView
+            <ImageView
                 android:id="@+id/btn_glyph"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:gravity="center"
-                android:text="⌨"
-                android:textSize="18sp"
-                android:textColor="?attr/textSecondary"
+                android:padding="8dp"
+                android:src="@drawable/ic_glyph"
+                app:tint="@color/ic_tint_secondary"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
-            <TextView
+            <ImageView
                 android:id="@+id/btn_favorite"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:gravity="center"
-                android:text="☆"
-                android:textSize="20sp"
-                android:textColor="?attr/textMuted"
+                android:padding="7dp"
+                android:src="@drawable/ic_star_outline"
+                app:tint="@color/ic_tint_muted"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />

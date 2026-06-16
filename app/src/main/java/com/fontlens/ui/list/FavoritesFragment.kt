@@ -42,6 +42,8 @@ class FavoritesFragment : Fragment() {
         binding.btnSort.visibility   = View.GONE
         binding.btnTheme.visibility  = View.GONE
         binding.searchLayout.visibility = View.VISIBLE
+        binding.ivEmptyIcon.setImageResource(com.fontlens.R.drawable.ic_star_sad)
+        binding.ivEmptyIcon.isClickable = false
 
         storageDeleteHelper = StorageDeleteHelper(this) { success ->
             if (success) {
