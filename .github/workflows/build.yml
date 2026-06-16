@@ -59,7 +59,8 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: FontLens
-          path: app/build/outputs/apk/debug/app-release-unsigned.apk
+          # path: app/build/outputs/apk/debug/app-debug.apk
+          path: app/build/outputs/apk/release/app-release-unsigned.apk
           archive: false
           retention-days: 30
 
