@@ -45,105 +45,105 @@ This generates the `gradlew` binary and `.jar` needed by CI.
 app/src/main/
 ├── AndroidManifest.xml
 ├── java/com/fontlens/
-│    ├── FontPreviewActivity.kt
-│    ├── MainActivity.kt
-│    ├── data/
-│    │     ├── FontCache.kt
-│    │     ├── FontData.kt
-│    │     └── FontRepository.kt
-│    ├── ui/
-│    │     ├── DeleteFontDialog.kt
-│    │     ├── LoadingDialog.kt
-│    │     ├── glyph/
-│    │     │    ├── GlyphAdapter.kt
-│    │     │    └── GlyphFragment.kt
-│    │     ├── info/
-│    │     │    └── FontInfoFragment.kt
-│    │     ├── list/
-│    │     │    ├── FavoritesFragment.kt
-│    │     │    ├── FontListAdapter.kt
-│    │     │    └── FontListFragment.kt
-│    │     ├── meta/
-│    │     │    ├── MetaAdapter.kt
-│    │     │    ├── MetaEditFragment.kt
-│    │     │    └── MetaFragment.kt
-│    │     ├── preview/
-│    │     │    ├── PreviewFragment.kt
-│    │     │    ├── StandaloneGlyphFragment.kt
-│    │     │    ├── StandaloneInfoFragment.kt
-│    │     │    ├── StandaloneMetaFragment.kt
-│    │     │    └── StandalonePreviewFragment.kt
-│    │     └── settings/
-│    │           └── SettingsFragment.kt
-│    └── utils/
-│          ├── FontLoader.kt
-│          ├── FontMetadataEditor.kt
-│          ├── FontParser.kt
-│          ├── StorageDeleteHelper.kt
-│          ├── ThemeManager.kt
-│          └── TypefaceLoader.kt
+│   ├── FontPreviewActivity.kt
+│   ├── MainActivity.kt
+│   ├── data/
+│   │   ├── FontCache.kt
+│   │   ├── FontData.kt
+│   │   └── FontRepository.kt
+│   ├── ui/
+│   │   ├── DeleteFontDialog.kt
+│   │   ├── LoadingDialog.kt
+│   │   ├── glyph/
+│   │   │   ├── GlyphAdapter.kt
+│   │   │   └── GlyphFragment.kt
+│   │   ├── info/
+│   │   │   └── FontInfoFragment.kt
+│   │   ├── list/
+│   │   │   ├── FavoritesFragment.kt
+│   │   │   ├── FontListAdapter.kt
+│   │   │   └── FontListFragment.kt
+│   │   ├── meta/
+│   │   │   ├── MetaAdapter.kt
+│   │   │   ├── MetaEditFragment.kt
+│   │   │   └── MetaFragment.kt
+│   │   ├── preview/
+│   │   │   ├── PreviewFragment.kt
+│   │   │   ├── StandaloneGlyphFragment.kt
+│   │   │   ├── StandaloneInfoFragment.kt
+│   │   │   ├── StandaloneMetaFragment.kt
+│   │   │   └── StandalonePreviewFragment.kt
+│   │   └── settings/
+│   │        └── SettingsFragment.kt
+│   └── utils/
+│        ├── FontLoader.kt
+│        ├── FontMetadataEditor.kt
+│        ├── FontParser.kt
+│        ├── StorageDeleteHelper.kt
+│        ├── ThemeManager.kt
+│        └── TypefaceLoader.kt
 └── res/
-     ├── color/
-     │    ├── nav_item_color.xml
-     │    └── switch_track_color.xml
-     ├── drawable/
-     │    ├── bg_accent_btn.xml
-     │    ├── bg_badge.xml
-     │    ├── bg_bottom_sheet.xml
-     │    ├── bg_delete_btn.xml
-     │    ├── bg_drawer_item.xml
-     │    ├── bg_glyph_cell.xml
-     │    ├── bg_input.xml
-     │    ├── bg_loading_dialog.xml
-     │    ├── bg_search_small.xml
-     │    ├── bg_sheet_handle.xml
-     │    ├── bg_spinner.xml
-     │    ├── bg_style_btn.xml
-     │    ├── bg_style_btn_active.xml
-     │    ├── ic_add.xml
-     │    ├── ic_back.xml
-     │    ├── ic_launcher_foreground.png
-     │    ├── ic_library.xml
-     │    ├── ic_search.xml
-     │    ├── ic_settings.xml
-     │    └── ic_star.xml
-     ├── layout/
-     │    ├── activity_font_preview.xml
-     │    ├── activity_main.xml
-     │    ├── bottom_sheet_sort.xml
-     │    ├── dialog_add_lang.xml
-     │    ├── dialog_delete_font.xml
-     │    ├── dialog_loading.xml
-     │    ├── fragment_font_info.xml
-     │    ├── fragment_font_list.xml
-     │    ├── fragment_glyph.xml
-     │    ├── fragment_meta_edit.xml
-     │    ├── fragment_metadata.xml
-     │    ├── fragment_preview.xml
-     │    ├── fragment_settings.xml
-     │    ├── item_drawer_folder.xml
-     │    ├── item_edit_field.xml
-     │    ├── item_folder_header.xml
-     │    ├── item_font_card.xml
-     │    ├── item_glyph_cell.xml
-     │    ├── item_info_row.xml
-     │    ├── item_lang_setting.xml
-     │    └── item_meta_row.xml
-     ├── menu/
-     │    └── bottom_nav_menu.xml
-     ├── mipmap-anydpi-v26
-     │    ├── ic_launcher.xml
-     │    └── ic_launcher_round.xml
-     ├── navigation/
-     │    └── nav_graph.xml
-     ├── values/
-     │    ├── attrs.xml
-     │    ├── colors.xml
-     │    ├── dimens.xml
-     │    ├── strings.xml
-     │    └── themes.xml
-     └── values-night/
-           └── themes_night.xml
+    ├── color/
+    │   ├── nav_item_color.xml
+    │   └── switch_track_color.xml
+    ├── drawable/
+    │   ├── bg_accent_btn.xml
+    │   ├── bg_badge.xml
+    │   ├── bg_bottom_sheet.xml
+    │   ├── bg_delete_btn.xml
+    │   ├── bg_drawer_item.xml
+    │   ├── bg_glyph_cell.xml
+    │   ├── bg_input.xml
+    │   ├── bg_loading_dialog.xml
+    │   ├── bg_search_small.xml
+    │   ├── bg_sheet_handle.xml
+    │   ├── bg_spinner.xml
+    │   ├── bg_style_btn.xml
+    │   ├── bg_style_btn_active.xml
+    │   ├── ic_add.xml
+    │   ├── ic_back.xml
+    │   ├── ic_launcher_foreground.png
+    │   ├── ic_library.xml
+    │   ├── ic_search.xml
+    │   ├── ic_settings.xml
+    │   └── ic_star.xml
+    ├── layout/
+    │   ├── activity_font_preview.xml
+    │   ├── activity_main.xml
+    │   ├── bottom_sheet_sort.xml
+    │   ├── dialog_add_lang.xml
+    │   ├── dialog_delete_font.xml
+    │   ├── dialog_loading.xml
+    │   ├── fragment_font_info.xml
+    │   ├── fragment_font_list.xml
+    │   ├── fragment_glyph.xml
+    │   ├── fragment_meta_edit.xml
+    │   ├── fragment_metadata.xml
+    │   ├── fragment_preview.xml
+    │   ├── fragment_settings.xml
+    │   ├── item_drawer_folder.xml
+    │   ├── item_edit_field.xml
+    │   ├── item_folder_header.xml
+    │   ├── item_font_card.xml
+    │   ├── item_glyph_cell.xml
+    │   ├── item_info_row.xml
+    │   ├── item_lang_setting.xml
+    │   └── item_meta_row.xml
+    ├── menu/
+    │   └── bottom_nav_menu.xml
+    ├── mipmap-anydpi-v26
+    │   ├── ic_launcher.xml
+    │   └── ic_launcher_round.xml
+    ├── navigation/
+    │   └── nav_graph.xml
+    ├── values/
+    │   ├── attrs.xml
+    │   ├── colors.xml
+    │   ├── dimens.xml
+    │   ├── strings.xml
+    │   └── themes.xml
+    └── values-night/
+         └── themes_night.xml
 ```
 ## Disclaimer
 This app is made by/with help of
@@ -156,7 +156,8 @@ No Laptop/Computer is used.
 ## Copyright
     Copyright (C) 2026 Md. Rasel Molla
     
-    This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.
+    This program is free software.
+    You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.
     
     This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU General Public License for more details.
+    See the [GNU General Public License](LICENSE) for more details.
