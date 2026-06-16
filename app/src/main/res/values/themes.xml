@@ -1,53 +1,267 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.FontLens" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/accent</item>
-        <item name="colorPrimaryVariant">@color/accent_dim</item>
-        <item name="colorOnPrimary">@color/bg_primary</item>
-        <item name="colorSecondary">@color/accent</item>
-        <item name="colorSurface">@color/bg_surface</item>
-        <item name="colorOnSurface">@color/text_primary</item>
-        <item name="android:colorBackground">@color/bg_primary</item>
-        <item name="android:windowBackground">@color/bg_primary</item>
-        <item name="android:statusBarColor">@color/bg_sidebar</item>
-        <item name="android:navigationBarColor">@color/bg_sidebar</item>
-        <item name="android:textColorPrimary">@color/text_primary</item>
-        <item name="android:textColorSecondary">@color/text_secondary</item>
-        <item name="materialCardViewStyle">@style/CardStyle</item>
+
+    <!-- ════════════════════════════════════════════════════════════════════
+         GREEN – Light  (default)
+    ════════════════════════════════════════════════════════════════════ -->
+    <style name="Theme.FontLens" parent="Theme.FontLens.Green.Light" />
+
+    <style name="Theme.FontLens.Green.Light" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/green_light_accent</item>
+        <item name="colorPrimaryVariant">@color/green_light_accent_dim</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSecondary">@color/green_light_accent</item>
+        <item name="colorSurface">@color/green_light_bg_surface</item>
+        <item name="colorOnSurface">@color/green_light_text_primary</item>
+        <item name="android:colorBackground">@color/green_light_bg_primary</item>
+        <item name="android:windowBackground">@color/green_light_bg_primary</item>
+        <item name="android:statusBarColor">@color/green_light_bg_sidebar</item>
+        <item name="android:navigationBarColor">@color/green_light_bg_sidebar</item>
+        <item name="android:textColorPrimary">@color/green_light_text_primary</item>
+        <item name="android:textColorSecondary">@color/green_light_text_secondary</item>
+        <!-- Semantic attrs -->
+        <item name="bgPrimary">@color/green_light_bg_primary</item>
+        <item name="bgSurface">@color/green_light_bg_surface</item>
+        <item name="bgElevated">@color/green_light_bg_elevated</item>
+        <item name="bgSidebar">@color/green_light_bg_sidebar</item>
+        <item name="accentColor">@color/green_light_accent</item>
+        <item name="accentDim">@color/green_light_accent_dim</item>
+        <item name="textPrimary">@color/green_light_text_primary</item>
+        <item name="textSecondary">@color/green_light_text_secondary</item>
+        <item name="textMuted">@color/green_light_text_muted</item>
+        <item name="dividerColor">@color/green_light_divider</item>
+        <item name="borderColor">@color/green_light_border</item>
     </style>
 
-    <style name="CardStyle" parent="Widget.MaterialComponents.CardView">
-        <item name="cardBackgroundColor">@color/bg_surface</item>
-        <item name="cardCornerRadius">8dp</item>
-        <item name="cardElevation">0dp</item>
-        <item name="strokeColor">@color/divider</item>
-        <item name="strokeWidth">1dp</item>
+    <!-- ════════════════════════════════════════════════════════════════════
+         GREEN – Dark
+    ════════════════════════════════════════════════════════════════════ -->
+    <style name="Theme.FontLens.Green.Dark" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="colorPrimary">@color/green_dark_accent</item>
+        <item name="colorPrimaryVariant">@color/green_dark_accent_dim</item>
+        <item name="colorOnPrimary">@color/green_dark_bg_primary</item>
+        <item name="colorSecondary">@color/green_dark_accent</item>
+        <item name="colorSurface">@color/green_dark_bg_surface</item>
+        <item name="colorOnSurface">@color/green_dark_text_primary</item>
+        <item name="android:colorBackground">@color/green_dark_bg_primary</item>
+        <item name="android:windowBackground">@color/green_dark_bg_primary</item>
+        <item name="android:statusBarColor">@color/green_dark_bg_sidebar</item>
+        <item name="android:navigationBarColor">@color/green_dark_bg_sidebar</item>
+        <item name="android:textColorPrimary">@color/green_dark_text_primary</item>
+        <item name="android:textColorSecondary">@color/green_dark_text_secondary</item>
+        <item name="bgPrimary">@color/green_dark_bg_primary</item>
+        <item name="bgSurface">@color/green_dark_bg_surface</item>
+        <item name="bgElevated">@color/green_dark_bg_elevated</item>
+        <item name="bgSidebar">@color/green_dark_bg_sidebar</item>
+        <item name="accentColor">@color/green_dark_accent</item>
+        <item name="accentDim">@color/green_dark_accent_dim</item>
+        <item name="textPrimary">@color/green_dark_text_primary</item>
+        <item name="textSecondary">@color/green_dark_text_secondary</item>
+        <item name="textMuted">@color/green_dark_text_muted</item>
+        <item name="dividerColor">@color/green_dark_divider</item>
+        <item name="borderColor">@color/green_dark_border</item>
     </style>
 
-    <style name="Theme.FontLens.BottomSheet" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
-        <item name="android:colorBackground">@color/bg_elevated</item>
+    <!-- ════════════════════════════════════════════════════════════════════
+         BLUE – Light
+    ════════════════════════════════════════════════════════════════════ -->
+    <style name="Theme.FontLens.Blue.Light" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/blue_light_accent</item>
+        <item name="colorPrimaryVariant">@color/blue_light_accent_dim</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSecondary">@color/blue_light_accent</item>
+        <item name="colorSurface">@color/blue_light_bg_surface</item>
+        <item name="colorOnSurface">@color/blue_light_text_primary</item>
+        <item name="android:colorBackground">@color/blue_light_bg_primary</item>
+        <item name="android:windowBackground">@color/blue_light_bg_primary</item>
+        <item name="android:statusBarColor">@color/blue_light_bg_sidebar</item>
+        <item name="android:navigationBarColor">@color/blue_light_bg_sidebar</item>
+        <item name="android:textColorPrimary">@color/blue_light_text_primary</item>
+        <item name="android:textColorSecondary">@color/blue_light_text_secondary</item>
+        <item name="bgPrimary">@color/blue_light_bg_primary</item>
+        <item name="bgSurface">@color/blue_light_bg_surface</item>
+        <item name="bgElevated">@color/blue_light_bg_elevated</item>
+        <item name="bgSidebar">@color/blue_light_bg_sidebar</item>
+        <item name="accentColor">@color/blue_light_accent</item>
+        <item name="accentDim">@color/blue_light_accent_dim</item>
+        <item name="textPrimary">@color/blue_light_text_primary</item>
+        <item name="textSecondary">@color/blue_light_text_secondary</item>
+        <item name="textMuted">@color/blue_light_text_muted</item>
+        <item name="dividerColor">@color/blue_light_divider</item>
+        <item name="borderColor">@color/blue_light_border</item>
+    </style>
+
+    <!-- ════════════════════════════════════════════════════════════════════
+         BLUE – Dark
+    ════════════════════════════════════════════════════════════════════ -->
+    <style name="Theme.FontLens.Blue.Dark" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="colorPrimary">@color/blue_dark_accent</item>
+        <item name="colorPrimaryVariant">@color/blue_dark_accent_dim</item>
+        <item name="colorOnPrimary">@color/blue_dark_bg_primary</item>
+        <item name="colorSecondary">@color/blue_dark_accent</item>
+        <item name="colorSurface">@color/blue_dark_bg_surface</item>
+        <item name="colorOnSurface">@color/blue_dark_text_primary</item>
+        <item name="android:colorBackground">@color/blue_dark_bg_primary</item>
+        <item name="android:windowBackground">@color/blue_dark_bg_primary</item>
+        <item name="android:statusBarColor">@color/blue_dark_bg_sidebar</item>
+        <item name="android:navigationBarColor">@color/blue_dark_bg_sidebar</item>
+        <item name="android:textColorPrimary">@color/blue_dark_text_primary</item>
+        <item name="android:textColorSecondary">@color/blue_dark_text_secondary</item>
+        <item name="bgPrimary">@color/blue_dark_bg_primary</item>
+        <item name="bgSurface">@color/blue_dark_bg_surface</item>
+        <item name="bgElevated">@color/blue_dark_bg_elevated</item>
+        <item name="bgSidebar">@color/blue_dark_bg_sidebar</item>
+        <item name="accentColor">@color/blue_dark_accent</item>
+        <item name="accentDim">@color/blue_dark_accent_dim</item>
+        <item name="textPrimary">@color/blue_dark_text_primary</item>
+        <item name="textSecondary">@color/blue_dark_text_secondary</item>
+        <item name="textMuted">@color/blue_dark_text_muted</item>
+        <item name="dividerColor">@color/blue_dark_divider</item>
+        <item name="borderColor">@color/blue_dark_border</item>
+    </style>
+
+    <!-- ════════════════════════════════════════════════════════════════════
+         RED – Light
+    ════════════════════════════════════════════════════════════════════ -->
+    <style name="Theme.FontLens.Red.Light" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/red_light_accent</item>
+        <item name="colorPrimaryVariant">@color/red_light_accent_dim</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSecondary">@color/red_light_accent</item>
+        <item name="colorSurface">@color/red_light_bg_surface</item>
+        <item name="colorOnSurface">@color/red_light_text_primary</item>
+        <item name="android:colorBackground">@color/red_light_bg_primary</item>
+        <item name="android:windowBackground">@color/red_light_bg_primary</item>
+        <item name="android:statusBarColor">@color/red_light_bg_sidebar</item>
+        <item name="android:navigationBarColor">@color/red_light_bg_sidebar</item>
+        <item name="android:textColorPrimary">@color/red_light_text_primary</item>
+        <item name="android:textColorSecondary">@color/red_light_text_secondary</item>
+        <item name="bgPrimary">@color/red_light_bg_primary</item>
+        <item name="bgSurface">@color/red_light_bg_surface</item>
+        <item name="bgElevated">@color/red_light_bg_elevated</item>
+        <item name="bgSidebar">@color/red_light_bg_sidebar</item>
+        <item name="accentColor">@color/red_light_accent</item>
+        <item name="accentDim">@color/red_light_accent_dim</item>
+        <item name="textPrimary">@color/red_light_text_primary</item>
+        <item name="textSecondary">@color/red_light_text_secondary</item>
+        <item name="textMuted">@color/red_light_text_muted</item>
+        <item name="dividerColor">@color/red_light_divider</item>
+        <item name="borderColor">@color/red_light_border</item>
+    </style>
+
+    <!-- ════════════════════════════════════════════════════════════════════
+         RED – Dark
+    ════════════════════════════════════════════════════════════════════ -->
+    <style name="Theme.FontLens.Red.Dark" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="colorPrimary">@color/red_dark_accent</item>
+        <item name="colorPrimaryVariant">@color/red_dark_accent_dim</item>
+        <item name="colorOnPrimary">@color/red_dark_bg_primary</item>
+        <item name="colorSecondary">@color/red_dark_accent</item>
+        <item name="colorSurface">@color/red_dark_bg_surface</item>
+        <item name="colorOnSurface">@color/red_dark_text_primary</item>
+        <item name="android:colorBackground">@color/red_dark_bg_primary</item>
+        <item name="android:windowBackground">@color/red_dark_bg_primary</item>
+        <item name="android:statusBarColor">@color/red_dark_bg_sidebar</item>
+        <item name="android:navigationBarColor">@color/red_dark_bg_sidebar</item>
+        <item name="android:textColorPrimary">@color/red_dark_text_primary</item>
+        <item name="android:textColorSecondary">@color/red_dark_text_secondary</item>
+        <item name="bgPrimary">@color/red_dark_bg_primary</item>
+        <item name="bgSurface">@color/red_dark_bg_surface</item>
+        <item name="bgElevated">@color/red_dark_bg_elevated</item>
+        <item name="bgSidebar">@color/red_dark_bg_sidebar</item>
+        <item name="accentColor">@color/red_dark_accent</item>
+        <item name="accentDim">@color/red_dark_accent_dim</item>
+        <item name="textPrimary">@color/red_dark_text_primary</item>
+        <item name="textSecondary">@color/red_dark_text_secondary</item>
+        <item name="textMuted">@color/red_dark_text_muted</item>
+        <item name="dividerColor">@color/red_dark_divider</item>
+        <item name="borderColor">@color/red_dark_border</item>
+    </style>
+
+    <!-- ════════════════════════════════════════════════════════════════════
+         YELLOW – Light
+    ════════════════════════════════════════════════════════════════════ -->
+    <style name="Theme.FontLens.Yellow.Light" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/yellow_light_accent</item>
+        <item name="colorPrimaryVariant">@color/yellow_light_accent_dim</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSecondary">@color/yellow_light_accent</item>
+        <item name="colorSurface">@color/yellow_light_bg_surface</item>
+        <item name="colorOnSurface">@color/yellow_light_text_primary</item>
+        <item name="android:colorBackground">@color/yellow_light_bg_primary</item>
+        <item name="android:windowBackground">@color/yellow_light_bg_primary</item>
+        <item name="android:statusBarColor">@color/yellow_light_bg_sidebar</item>
+        <item name="android:navigationBarColor">@color/yellow_light_bg_sidebar</item>
+        <item name="android:textColorPrimary">@color/yellow_light_text_primary</item>
+        <item name="android:textColorSecondary">@color/yellow_light_text_secondary</item>
+        <item name="bgPrimary">@color/yellow_light_bg_primary</item>
+        <item name="bgSurface">@color/yellow_light_bg_surface</item>
+        <item name="bgElevated">@color/yellow_light_bg_elevated</item>
+        <item name="bgSidebar">@color/yellow_light_bg_sidebar</item>
+        <item name="accentColor">@color/yellow_light_accent</item>
+        <item name="accentDim">@color/yellow_light_accent_dim</item>
+        <item name="textPrimary">@color/yellow_light_text_primary</item>
+        <item name="textSecondary">@color/yellow_light_text_secondary</item>
+        <item name="textMuted">@color/yellow_light_text_muted</item>
+        <item name="dividerColor">@color/yellow_light_divider</item>
+        <item name="borderColor">@color/yellow_light_border</item>
+    </style>
+
+    <!-- ════════════════════════════════════════════════════════════════════
+         YELLOW – Dark
+    ════════════════════════════════════════════════════════════════════ -->
+    <style name="Theme.FontLens.Yellow.Dark" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="colorPrimary">@color/yellow_dark_accent</item>
+        <item name="colorPrimaryVariant">@color/yellow_dark_accent_dim</item>
+        <item name="colorOnPrimary">@color/yellow_dark_bg_primary</item>
+        <item name="colorSecondary">@color/yellow_dark_accent</item>
+        <item name="colorSurface">@color/yellow_dark_bg_surface</item>
+        <item name="colorOnSurface">@color/yellow_dark_text_primary</item>
+        <item name="android:colorBackground">@color/yellow_dark_bg_primary</item>
+        <item name="android:windowBackground">@color/yellow_dark_bg_primary</item>
+        <item name="android:statusBarColor">@color/yellow_dark_bg_sidebar</item>
+        <item name="android:navigationBarColor">@color/yellow_dark_bg_sidebar</item>
+        <item name="android:textColorPrimary">@color/yellow_dark_text_primary</item>
+        <item name="android:textColorSecondary">@color/yellow_dark_text_secondary</item>
+        <item name="bgPrimary">@color/yellow_dark_bg_primary</item>
+        <item name="bgSurface">@color/yellow_dark_bg_surface</item>
+        <item name="bgElevated">@color/yellow_dark_bg_elevated</item>
+        <item name="bgSidebar">@color/yellow_dark_bg_sidebar</item>
+        <item name="accentColor">@color/yellow_dark_accent</item>
+        <item name="accentDim">@color/yellow_dark_accent_dim</item>
+        <item name="textPrimary">@color/yellow_dark_text_primary</item>
+        <item name="textSecondary">@color/yellow_dark_text_secondary</item>
+        <item name="textMuted">@color/yellow_dark_text_muted</item>
+        <item name="dividerColor">@color/yellow_dark_divider</item>
+        <item name="borderColor">@color/yellow_dark_border</item>
+    </style>
+
+    <!-- ════════════════════════════════════════════════════════════════════
+         Shared styles
+    ════════════════════════════════════════════════════════════════════ -->
+    <style name="Theme.FontLens.BottomSheet" parent="Theme.MaterialComponents.BottomSheetDialog">
+        <item name="android:colorBackground">?attr/bgSurface</item>
     </style>
 
     <style name="AccentButton" parent="Widget.MaterialComponents.Button">
-        <item name="android:backgroundTint">@color/accent</item>
-        <item name="android:textColor">@color/bg_primary</item>
+        <item name="android:backgroundTint">?attr/colorPrimary</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
         <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">0.08</item>
     </style>
 
     <style name="OutlineButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="strokeColor">@color/border</item>
-        <item name="android:textColor">@color/text_secondary</item>
+        <item name="strokeColor">?attr/colorOnSurface</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
-    <style name="Theme.FontLens.Dialog" parent="Theme.MaterialComponents.DayNight.Dialog.Alert">
-        <item name="colorPrimary">@color/accent</item>
-        <item name="colorOnSurface">@color/text_primary</item>
-        <item name="android:colorBackground">@color/bg_elevated</item>
-        <item name="android:textColorPrimary">@color/text_primary</item>
-        <item name="android:textColorSecondary">@color/text_secondary</item>
+    <style name="Theme.FontLens.Dialog" parent="Theme.MaterialComponents.Dialog.Alert">
+        <item name="colorPrimary">?attr/colorPrimary</item>
+        <item name="colorOnSurface">?attr/colorOnSurface</item>
+        <item name="android:colorBackground">?attr/bgSurface</item>
+        <item name="android:textColorPrimary">?attr/colorOnSurface</item>
         <item name="buttonBarPositiveButtonStyle">@style/AccentButton</item>
         <item name="buttonBarNegativeButtonStyle">@style/OutlineButton</item>
     </style>
-</resources>
 
+</resources>

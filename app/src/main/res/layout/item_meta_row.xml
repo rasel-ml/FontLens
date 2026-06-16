@@ -13,7 +13,7 @@
         android:id="@+id/tv_key"
         android:layout_width="130dp"
         android:layout_height="wrap_content"
-        android:textColor="@color/text_muted"
+        android:textColor="?attr/textMuted"
         android:textSize="11sp"
         android:letterSpacing="0.06"
         android:textAllCaps="true"
@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:layout_marginStart="12dp"
-        android:textColor="@color/text_primary"
+        android:textColor="?attr/textPrimary"
         android:textSize="14sp"
         android:lineSpacingMultiplier="1.4" />
 

@@ -15,7 +15,7 @@
         android:id="@+id/tv_delete_font_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/accent"
+        android:textColor="?attr/accentColor"
         android:textSize="16sp"
         android:fontFamily="serif"
         android:maxLines="1"
@@ -27,7 +27,7 @@
         android:id="@+id/tv_delete_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/text_muted"
+        android:textColor="?attr/textMuted"
         android:textSize="13sp"
         android:layout_marginBottom="24dp" />
 
@@ -35,7 +35,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/divider"
+        android:background="?attr/dividerColor"
         android:layout_marginBottom="16dp" />
 
     <!-- Two action buttons -->
@@ -70,7 +70,7 @@
             android:layout_marginStart="6dp"
             android:gravity="center"
             android:text="Remove from Library"
-            android:textColor="@color/text_secondary"
+            android:textColor="?attr/textSecondary"
             android:textSize="13sp"
             android:background="@drawable/bg_style_btn"
             android:clickable="true"

@@ -4,20 +4,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_primary">
+    android:background="?attr/bgPrimary">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/bg_sidebar"
+        android:background="?attr/bgSidebar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_back"
-        app:navigationIconTint="@color/text_secondary"
+        app:navigationIconTint="?attr/textSecondary"
         app:title="@string/metadata"
-        app:titleTextColor="@color/text_primary">
+        app:titleTextColor="?attr/textPrimary">
 
         <TextView
             android:id="@+id/btn_edit"
@@ -27,7 +27,7 @@
             android:layout_marginEnd="12dp"
             android:text="✎ Edit"
             android:textSize="14sp"
-            android:textColor="@color/accent"
+            android:textColor="?attr/accentColor"
             android:padding="8dp"
             android:clickable="true"
             android:focusable="true"
@@ -51,7 +51,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="No metadata found in this font."
-        android:textColor="@color/text_muted"
+        android:textColor="?attr/textMuted"
         android:textSize="15sp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"

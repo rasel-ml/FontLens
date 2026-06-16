@@ -13,7 +13,7 @@
         android:id="@+id/tv_info_key"
         android:layout_width="160dp"
         android:layout_height="wrap_content"
-        android:textColor="@color/text_muted"
+        android:textColor="?attr/textMuted"
         android:textSize="13sp" />
 
     <TextView
@@ -23,6 +23,6 @@
         android:layout_weight="1"
         android:layout_marginStart="12dp"
         android:textSize="14sp"
-        android:textColor="@color/text_primary" />
+        android:textColor="?attr/textPrimary" />
 
 </LinearLayout>

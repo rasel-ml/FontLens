@@ -14,8 +14,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:indeterminate="true"
-        android:progressTint="@color/accent"
-        android:indeterminateTint="@color/accent" />
+        android:progressTint="?attr/accentColor"
+        android:indeterminateTint="?attr/accentColor" />
 
     <TextView
         android:id="@+id/tv_message"
@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="Loading fonts…"
-        android:textColor="@color/text_primary"
+        android:textColor="?attr/textPrimary"
         android:textSize="15sp"
         android:fontFamily="serif"
         android:letterSpacing="0.03" />
@@ -33,7 +33,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
-        android:textColor="@color/accent"
+        android:textColor="?attr/accentColor"
         android:textSize="13sp"
         android:fontFamily="monospace"
         android:visibility="gone" />

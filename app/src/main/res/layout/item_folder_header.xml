@@ -14,7 +14,7 @@
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_weight="1"
-        android:background="@color/divider" />
+        android:background="?attr/dividerColor" />
 
     <TextView
         android:id="@+id/tv_folder_header"
@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
-        android:textColor="@color/accent"
+        android:textColor="?attr/accentColor"
         android:textSize="11sp"
         android:letterSpacing="0.06"
         android:maxLines="1"
@@ -32,6 +32,6 @@
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_weight="1"
-        android:background="@color/divider" />
+        android:background="?attr/dividerColor" />
 
 </LinearLayout>

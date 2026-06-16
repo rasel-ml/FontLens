@@ -4,20 +4,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_primary">
+    android:background="?attr/bgPrimary">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/bg_sidebar"
+        android:background="?attr/bgSidebar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_back"
-        app:navigationIconTint="@color/text_secondary"
+        app:navigationIconTint="?attr/textSecondary"
         app:title="@string/font_info"
-        app:titleTextColor="@color/text_primary" />
+        app:titleTextColor="?attr/textPrimary" />
 
     <ScrollView
         android:layout_width="0dp"
@@ -38,7 +38,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/style_support"
-                android:textColor="@color/accent"
+                android:textColor="?attr/accentColor"
                 android:textSize="11sp"
                 android:letterSpacing="0.12"
                 android:paddingStart="16dp"
@@ -46,7 +46,7 @@
                 android:paddingTop="20dp"
                 android:paddingBottom="6dp" />
 
-            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider" android:layout_marginStart="16dp" />
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/dividerColor" android:layout_marginStart="16dp" />
 
             <!-- Bold Support -->
             <include layout="@layout/item_info_row" android:id="@+id/row_bold" />
@@ -60,7 +60,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/technical"
-                android:textColor="@color/accent"
+                android:textColor="?attr/accentColor"
                 android:textSize="11sp"
                 android:letterSpacing="0.12"
                 android:paddingStart="16dp"
@@ -68,7 +68,7 @@
                 android:paddingTop="20dp"
                 android:paddingBottom="6dp" />
 
-            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider" android:layout_marginStart="16dp" />
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/dividerColor" android:layout_marginStart="16dp" />
 
             <include layout="@layout/item_info_row" android:id="@+id/row_glyphs" />
             <include layout="@layout/item_info_row" android:id="@+id/row_weight" />

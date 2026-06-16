@@ -40,8 +40,8 @@ data class FontItem(
     val uri: Uri,
     val meta: FontMeta,
     var metaOverrides: Map<String, String> = emptyMap(),
-    val addedAt: Long = System.currentTimeMillis(), // for date sort
-    val folderPath: String = ""                     // for folder grouping
+    val addedAt: Long = System.currentTimeMillis(),
+    val folderPath: String = ""
 ) {
     val effectiveMeta: FontMeta get() = meta.copy(
         family       = metaOverrides["family"]       ?: meta.family,
@@ -70,11 +70,17 @@ data class AppSettings(
     val glyphShowAll: Boolean = false,
     val defaultLang: String = "English",
     val folderRecursive: Boolean = true,
-    val theme: AppTheme = AppTheme.SYSTEM
+    // New theme fields — defaults: Green color, Light mode, not following system
+    val colorTheme: ColorTheme = ColorTheme.GREEN,
+    val darkMode: Boolean = false,
+    val followSystem: Boolean = false,
+    // Keep old field for migration (ignored after first load)
+    val theme: AppTheme = AppTheme.DAY
 )
 
 enum class SamplePriority { METADATA_FIRST, USER_FIRST, ALWAYS_USER, ALWAYS_META }
 enum class AppTheme { SYSTEM, DAY, NIGHT }
+enum class ColorTheme { RED, YELLOW, GREEN, BLUE }
 enum class SortOrder {
     NAME_ASC, NAME_DESC,
     DATE_ASC, DATE_DESC,

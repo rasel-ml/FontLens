@@ -1,30 +1,31 @@
 package com.fontlens
 
+import android.content.Context
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.lifecycleScope
-import com.fontlens.data.AppTheme
 import com.fontlens.data.FontRepository
 import com.fontlens.databinding.ActivityFontPreviewBinding
 import com.fontlens.utils.FontLoader
+import com.fontlens.utils.ThemeManager
 import kotlinx.coroutines.launch
 
 class FontPreviewActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityFontPreviewBinding
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun attachBaseContext(newBase: Context) {
+        FontRepository.load(newBase)
+        val s = FontRepository.settings
+        ThemeManager.applyTheme(s)
+        ThemeManager.applyNightMode(s)
+        super.attachBaseContext(android.view.ContextThemeWrapper(newBase, ThemeManager.themeResId(s)))
+    }
 
-        // Apply saved theme before showing UI
-        FontRepository.load(this)
-        AppCompatDelegate.setDefaultNightMode(when (FontRepository.settings.theme) {
-            AppTheme.SYSTEM -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-            AppTheme.DAY    -> AppCompatDelegate.MODE_NIGHT_NO
-            AppTheme.NIGHT  -> AppCompatDelegate.MODE_NIGHT_YES
-        })
+    override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(ThemeManager.themeResId(FontRepository.settings))
+        super.onCreate(savedInstanceState)
 
         binding = ActivityFontPreviewBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -63,11 +64,8 @@ class FontPreviewActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (supportFragmentManager.backStackEntryCount > 0) {
-            supportFragmentManager.popBackStack()
-        } else {
-            super.onBackPressed()
-        }
+        if (supportFragmentManager.backStackEntryCount > 0) supportFragmentManager.popBackStack()
+        else super.onBackPressed()
     }
 
     private fun getFileNameFromUri(uri: android.net.Uri): String {

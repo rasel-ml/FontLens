@@ -20,8 +20,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="SORT BY"
-        android:textColor="@color/accent"
-        android:textSize="11sp"
+        android:textColor="?attr/accentColor"
+        android:textSize="16sp"
         android:letterSpacing="0.12"
         android:paddingStart="20dp"
         android:paddingBottom="8dp" />
@@ -36,28 +36,28 @@
         <RadioButton android:id="@+id/rb_name_asc"
             android:layout_width="match_parent" android:layout_height="48dp"
             android:text="Name  A → Z"
-            android:textColor="@color/text_primary" android:textSize="14sp"
-            android:buttonTint="@color/accent" android:paddingStart="8dp" />
+            android:textColor="?attr/textPrimary" android:textSize="14sp"
+            android:buttonTint="?attr/accentColor" android:paddingStart="8dp" />
         <RadioButton android:id="@+id/rb_name_desc"
             android:layout_width="match_parent" android:layout_height="48dp"
             android:text="Name  Z → A"
-            android:textColor="@color/text_primary" android:textSize="14sp"
-            android:buttonTint="@color/accent" android:paddingStart="8dp" />
+            android:textColor="?attr/textPrimary" android:textSize="14sp"
+            android:buttonTint="?attr/accentColor" android:paddingStart="8dp" />
         <RadioButton android:id="@+id/rb_date_asc"
             android:layout_width="match_parent" android:layout_height="48dp"
             android:text="Date  Oldest first"
-            android:textColor="@color/text_primary" android:textSize="14sp"
-            android:buttonTint="@color/accent" android:paddingStart="8dp" />
+            android:textColor="?attr/textPrimary" android:textSize="14sp"
+            android:buttonTint="?attr/accentColor" android:paddingStart="8dp" />
         <RadioButton android:id="@+id/rb_date_desc"
             android:layout_width="match_parent" android:layout_height="48dp"
             android:text="Date  Newest first"
-            android:textColor="@color/text_primary" android:textSize="14sp"
-            android:buttonTint="@color/accent" android:paddingStart="8dp" />
+            android:textColor="?attr/textPrimary" android:textSize="14sp"
+            android:buttonTint="?attr/accentColor" android:paddingStart="8dp" />
         <RadioButton android:id="@+id/rb_folder"
             android:layout_width="match_parent" android:layout_height="48dp"
             android:text="Folder"
-            android:textColor="@color/text_primary" android:textSize="14sp"
-            android:buttonTint="@color/accent" android:paddingStart="8dp" />
+            android:textColor="?attr/textPrimary" android:textSize="14sp"
+            android:buttonTint="?attr/accentColor" android:paddingStart="8dp" />
 
     </RadioGroup>
 

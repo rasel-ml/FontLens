@@ -1,20 +1,23 @@
 package com.fontlens.ui.settings
 
 import android.app.AlertDialog
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import androidx.appcompat.app.AppCompatDelegate
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.fontlens.R
 import com.fontlens.data.AppSettings
-import com.fontlens.data.AppTheme
+import com.fontlens.data.ColorTheme
 import com.fontlens.data.FontRepository
 import com.fontlens.data.SamplePriority
 import com.fontlens.databinding.FragmentSettingsBinding
 import com.fontlens.databinding.ItemLangSettingBinding
+import com.fontlens.utils.ThemeManager
 import com.google.android.material.textfield.TextInputEditText
 
 class SettingsFragment : Fragment() {
@@ -34,7 +37,9 @@ class SettingsFragment : Fragment() {
 
     private fun renderAll() {
         val s = FontRepository.settings
-        renderTheme(s)
+        renderColorThemeSpinner(s)
+        renderFollowSystemSwitch(s)
+        renderDarkModeSwitch(s)
         renderPriority(s)
         renderGlyphSwitch(s)
         renderRecursiveSwitch(s)
@@ -42,29 +47,102 @@ class SettingsFragment : Fragment() {
         renderLangSpinner(s)
     }
 
-    private fun renderTheme(s: AppSettings) {
-        val rb = when (s.theme) {
-            AppTheme.SYSTEM -> binding.rbThemeSystem
-            AppTheme.DAY    -> binding.rbThemeDay
-            AppTheme.NIGHT  -> binding.rbThemeNight
-        }
-        rb.isChecked = true
-        binding.rgTheme.setOnCheckedChangeListener { _, id ->
-            val theme = when (id) {
-                R.id.rb_theme_system -> AppTheme.SYSTEM
-                R.id.rb_theme_day    -> AppTheme.DAY
-                R.id.rb_theme_night  -> AppTheme.NIGHT
-                else                 -> AppTheme.SYSTEM
+    // ── Color theme spinner ───────────────────────────────────────────────
+
+    private fun renderColorThemeSpinner(s: AppSettings) {
+        data class ThemeOption(val theme: ColorTheme, val label: String, val color: Int)
+
+        val options = listOf(
+            ThemeOption(ColorTheme.GREEN,  "Green",  ThemeManager.bulletColor(ColorTheme.GREEN)),
+            ThemeOption(ColorTheme.BLUE,   "Blue",   ThemeManager.bulletColor(ColorTheme.BLUE)),
+            ThemeOption(ColorTheme.RED,    "Red",    ThemeManager.bulletColor(ColorTheme.RED)),
+            ThemeOption(ColorTheme.YELLOW, "Yellow", ThemeManager.bulletColor(ColorTheme.YELLOW))
+        )
+
+        val adapter = object : ArrayAdapter<ThemeOption>(
+            requireContext(), android.R.layout.simple_spinner_item, options
+        ) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View =
+                buildRow(position, convertView, parent)
+
+            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View =
+                buildRow(position, convertView, parent)
+
+            private fun buildRow(position: Int, convertView: View?, parent: ViewGroup): View {
+                val opt = options[position]
+                val row = convertView
+                    ?: LayoutInflater.from(context)
+                        .inflate(android.R.layout.simple_spinner_item, parent, false)
+                val tv = row.findViewById<TextView>(android.R.id.text1)
+                tv.text = opt.label
+                tv.textSize = 14f
+                val density = context.resources.displayMetrics.density
+                val size = (20 * density).toInt()
+                val circle = GradientDrawable().apply {
+                    shape = GradientDrawable.OVAL
+                    setColor(opt.color)
+                    setSize(size, size)
+                }
+                tv.setCompoundDrawablesWithIntrinsicBounds(circle, null, null, null)
+                tv.compoundDrawablePadding = (6 * density).toInt()
+                return row
             }
-            FontRepository.settings = FontRepository.settings.copy(theme = theme)
+        }
+
+        binding.spinnerColorTheme.adapter = adapter
+        val idx = options.indexOfFirst { it.theme == s.colorTheme }.coerceAtLeast(0)
+        binding.spinnerColorTheme.setSelection(idx)
+
+        var userInteracted = false
+        binding.spinnerColorTheme.post { userInteracted = true }
+
+        binding.spinnerColorTheme.onItemSelectedListener =
+            object : android.widget.AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(p: android.widget.AdapterView<*>?, v: View?, pos: Int, id: Long) {
+                    if (!userInteracted) return
+                    val chosen = options[pos].theme
+                    if (chosen == FontRepository.settings.colorTheme) return
+                    FontRepository.settings = FontRepository.settings.copy(colorTheme = chosen)
+                    FontRepository.saveSettings(requireContext())
+                    restartActivity()
+                }
+                override fun onNothingSelected(p: android.widget.AdapterView<*>?) {}
+            }
+    }
+
+    // ── Follow system switch ──────────────────────────────────────────────
+
+    private fun renderFollowSystemSwitch(s: AppSettings) {
+        binding.switchFollowSystem.isChecked = s.followSystem
+        updateDarkModeRowVisibility(s.followSystem)
+        binding.switchFollowSystem.setOnCheckedChangeListener { _, checked ->
+            FontRepository.settings = FontRepository.settings.copy(followSystem = checked)
             FontRepository.saveSettings(requireContext())
-            AppCompatDelegate.setDefaultNightMode(when (theme) {
-                AppTheme.SYSTEM -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                AppTheme.DAY    -> AppCompatDelegate.MODE_NIGHT_NO
-                AppTheme.NIGHT  -> AppCompatDelegate.MODE_NIGHT_YES
-            })
+            updateDarkModeRowVisibility(checked)
+            restartActivity()
         }
     }
+
+    private fun updateDarkModeRowVisibility(followSystem: Boolean) {
+        binding.rowDarkMode.visibility = if (followSystem) View.GONE else View.VISIBLE
+    }
+
+    // ── Dark mode switch ──────────────────────────────────────────────────
+
+    private fun renderDarkModeSwitch(s: AppSettings) {
+        binding.switchDarkMode.isChecked = s.darkMode
+        binding.switchDarkMode.setOnCheckedChangeListener { _, checked ->
+            FontRepository.settings = FontRepository.settings.copy(darkMode = checked)
+            FontRepository.saveSettings(requireContext())
+            restartActivity()
+        }
+    }
+
+    private fun restartActivity() {
+        requireActivity().recreate()
+    }
+
+    // ── Priority ──────────────────────────────────────────────────────────
 
     private fun renderPriority(s: AppSettings) {
         val rb = when (s.samplePriority) {
@@ -87,6 +165,8 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    // ── Glyph switch ──────────────────────────────────────────────────────
+
     private fun renderGlyphSwitch(s: AppSettings) {
         binding.switchGlyphAll.isChecked = s.glyphShowAll
         binding.switchGlyphAll.setOnCheckedChangeListener { _, checked ->
@@ -95,6 +175,8 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    // ── Recursive switch ──────────────────────────────────────────────────
+
     private fun renderRecursiveSwitch(s: AppSettings) {
         binding.switchRecursive.isChecked = s.folderRecursive
         binding.switchRecursive.setOnCheckedChangeListener { _, checked ->
@@ -102,6 +184,8 @@ class SettingsFragment : Fragment() {
             FontRepository.saveSettings(requireContext())
         }
     }
+
+    // ── Language list ─────────────────────────────────────────────────────
 
     private fun renderLangList(s: AppSettings) {
         binding.langListContainer.removeAllViews()
@@ -148,10 +232,12 @@ class SettingsFragment : Fragment() {
     }
 
     private fun showAddLangDialog() {
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_lang, null)
+        val dialogView = LayoutInflater.from(
+            ContextThemeWrapper(requireContext(), ThemeManager.currentThemeResId(requireContext()))
+        ).inflate(R.layout.dialog_add_lang, null)
         val etName = dialogView.findViewById<TextInputEditText>(R.id.et_lang_name)
         val etText = dialogView.findViewById<TextInputEditText>(R.id.et_lang_sample)
-        AlertDialog.Builder(requireContext())
+        AlertDialog.Builder(ContextThemeWrapper(requireContext(), ThemeManager.currentThemeResId(requireContext())))
             .setTitle(getString(R.string.add_language))
             .setView(dialogView)
             .setPositiveButton(getString(R.string.save)) { _, _ ->

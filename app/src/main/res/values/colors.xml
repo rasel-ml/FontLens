@@ -1,20 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#123122</color>
-    <color name="bg_primary">#0E0E0E</color>
-    <color name="bg_surface">#141414</color>
-    <color name="bg_elevated">#1A1A1A</color>
-    <color name="bg_sidebar">#0A0A0A</color>
-    <color name="accent">#E8C547</color>
-    <color name="accent_dim">#1A1800</color>
-    <color name="text_primary">#E0E0E0</color>
-    <color name="text_secondary">#AAAAAA</color>
-    <color name="text_muted">#666666</color>
-    <color name="divider">#1F1F1F</color>
-    <color name="border">#2A2A2A</color>
-    <color name="success">#6DDE6D</color>
-    <color name="error_red">#DE6D6D</color>
-    <color name="colorPrimary">#E8C547</color>
-    <color name="colorPrimaryDark">#0A0A0A</color>
-    <color name="colorAccent">#E8C547</color>
+
+    <!-- ── Semantic tokens (overridden at runtime via ThemeManager) ─────── -->
+    <!-- Default = Green Light (set programmatically; these are fallbacks)  -->
+    <color name="bg_primary">#F4F6F4</color>
+    <color name="bg_surface">#FFFFFF</color>
+    <color name="bg_elevated">#EAEEEA</color>
+    <color name="bg_sidebar">#DDE5DD</color>
+    <color name="accent">#2E7D32</color>
+    <color name="accent_dim">#C8E6C9</color>
+    <color name="text_primary">#1B1B1B</color>
+    <color name="text_secondary">#4A4A4A</color>
+    <color name="text_muted">#888888</color>
+    <color name="divider">#D0D9D0</color>
+    <color name="border">#B8C8B8</color>
+    <color name="success">#2E7D32</color>
+    <color name="error_red">#C62828</color>
+    <color name="colorPrimary">#2E7D32</color>
+    <color name="colorPrimaryDark">#DDE5DD</color>
+    <color name="colorAccent">#2E7D32</color>
+
+    <!-- ── GREEN palette ────────────────────────────────────────────────── -->
+    <!-- Light -->
+    <color name="green_light_bg_primary">#F4F6F4</color>
+    <color name="green_light_bg_surface">#FFFFFF</color>
+    <color name="green_light_bg_elevated">#EAEEEA</color>
+    <color name="green_light_bg_sidebar">#DDE5DD</color>
+    <color name="green_light_accent">#2E7D32</color>
+    <color name="green_light_accent_dim">#C8E6C9</color>
+    <color name="green_light_text_primary">#1B1B1B</color>
+    <color name="green_light_text_secondary">#4A4A4A</color>
+    <color name="green_light_text_muted">#888888</color>
+    <color name="green_light_divider">#D0D9D0</color>
+    <color name="green_light_border">#B8C8B8</color>
+    <!-- Dark -->
+    <color name="green_dark_bg_primary">#0D1410</color>
+    <color name="green_dark_bg_surface">#111A13</color>
+    <color name="green_dark_bg_elevated">#172019</color>
+    <color name="green_dark_bg_sidebar">#0A100C</color>
+    <color name="green_dark_accent">#66BB6A</color>
+    <color name="green_dark_accent_dim">#1B2E1C</color>
+    <color name="green_dark_text_primary">#E0EBE1</color>
+    <color name="green_dark_text_secondary">#9EB59F</color>
+    <color name="green_dark_text_muted">#557055</color>
+    <color name="green_dark_divider">#1E2E1F</color>
+    <color name="green_dark_border">#2A3D2B</color>
+
+    <!-- ── BLUE palette ─────────────────────────────────────────────────── -->
+    <!-- Light -->
+    <color name="blue_light_bg_primary">#F3F5F8</color>
+    <color name="blue_light_bg_surface">#FFFFFF</color>
+    <color name="blue_light_bg_elevated">#E8EDF4</color>
+    <color name="blue_light_bg_sidebar">#D8E2EF</color>
+    <color name="blue_light_accent">#1565C0</color>
+    <color name="blue_light_accent_dim">#BBDEFB</color>
+    <color name="blue_light_text_primary">#1A1A2E</color>
+    <color name="blue_light_text_secondary">#3A4A5C</color>
+    <color name="blue_light_text_muted">#7A8A9A</color>
+    <color name="blue_light_divider">#CBD5E0</color>
+    <color name="blue_light_border">#B0C0D5</color>
+    <!-- Dark -->
+    <color name="blue_dark_bg_primary">#0A0E18</color>
+    <color name="blue_dark_bg_surface">#0E1420</color>
+    <color name="blue_dark_bg_elevated">#141C2A</color>
+    <color name="blue_dark_bg_sidebar">#080C16</color>
+    <color name="blue_dark_accent">#5C9CE6</color>
+    <color name="blue_dark_accent_dim">#162040</color>
+    <color name="blue_dark_text_primary">#DCE8F5</color>
+    <color name="blue_dark_text_secondary">#8AAAC8</color>
+    <color name="blue_dark_text_muted">#446080</color>
+    <color name="blue_dark_divider">#1A2438</color>
+    <color name="blue_dark_border">#243048</color>
+
+    <!-- ── RED palette ──────────────────────────────────────────────────── -->
+    <!-- Light -->
+    <color name="red_light_bg_primary">#F8F3F3</color>
+    <color name="red_light_bg_surface">#FFFFFF</color>
+    <color name="red_light_bg_elevated">#F0E8E8</color>
+    <color name="red_light_bg_sidebar">#EAD8D8</color>
+    <color name="red_light_accent">#B71C1C</color>
+    <color name="red_light_accent_dim">#FFCDD2</color>
+    <color name="red_light_text_primary">#1E0E0E</color>
+    <color name="red_light_text_secondary">#5C3A3A</color>
+    <color name="red_light_text_muted">#9A6A6A</color>
+    <color name="red_light_divider">#E0CECE</color>
+    <color name="red_light_border">#D0B8B8</color>
+    <!-- Dark -->
+    <color name="red_dark_bg_primary">#160A0A</color>
+    <color name="red_dark_bg_surface">#1E0E0E</color>
+    <color name="red_dark_bg_elevated">#261414</color>
+    <color name="red_dark_bg_sidebar">#100606</color>
+    <color name="red_dark_accent">#EF5350</color>
+    <color name="red_dark_accent_dim">#3E1414</color>
+    <color name="red_dark_text_primary">#F5E0E0</color>
+    <color name="red_dark_text_secondary">#C09090</color>
+    <color name="red_dark_text_muted">#805050</color>
+    <color name="red_dark_divider">#2E1818</color>
+    <color name="red_dark_border">#3E2020</color>
+
+    <!-- ── YELLOW palette ───────────────────────────────────────────────── -->
+    <!-- Light -->
+    <color name="yellow_light_bg_primary">#F8F6EE</color>
+    <color name="yellow_light_bg_surface">#FFFFFF</color>
+    <color name="yellow_light_bg_elevated">#F2EDD8</color>
+    <color name="yellow_light_bg_sidebar">#EAE4CC</color>
+    <color name="yellow_light_accent">#E65100</color>
+    <color name="yellow_light_accent_dim">#FFF8E1</color>
+    <color name="yellow_light_text_primary">#1E1800</color>
+    <color name="yellow_light_text_secondary">#5C4A10</color>
+    <color name="yellow_light_text_muted">#9A8050</color>
+    <color name="yellow_light_divider">#E0D8BC</color>
+    <color name="yellow_light_border">#D0C8A4</color>
+    <!-- Dark -->
+    <color name="yellow_dark_bg_primary">#141000</color>
+    <color name="yellow_dark_bg_surface">#1C1600</color>
+    <color name="yellow_dark_bg_elevated">#221C00</color>
+    <color name="yellow_dark_bg_sidebar">#0E0C00</color>
+    <color name="yellow_dark_accent">#FFB300</color>
+    <color name="yellow_dark_accent_dim">#2E2200</color>
+    <color name="yellow_dark_text_primary">#F5EDD0</color>
+    <color name="yellow_dark_text_secondary">#C0A860</color>
+    <color name="yellow_dark_text_muted">#806830</color>
+    <color name="yellow_dark_divider">#2A2000</color>
+    <color name="yellow_dark_border">#3A2E00</color>
 </resources>

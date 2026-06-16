@@ -12,7 +12,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -28,7 +27,9 @@ import com.fontlens.databinding.BottomSheetSortBinding
 import com.fontlens.databinding.FragmentFontListBinding
 import com.fontlens.ui.DeleteFontDialog
 import com.fontlens.ui.LoadingDialog
+import android.view.ContextThemeWrapper
 import com.fontlens.utils.FontLoader
+import com.fontlens.utils.ThemeManager
 import com.fontlens.utils.StorageDeleteHelper
 import com.fontlens.utils.TypefaceLoader
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -45,7 +46,6 @@ class FontListFragment : Fragment() {
 
     private var initialLoadDone    = false
     private var currentSort        = SortOrder.NAME_ASC
-    private var isNightMode        = false
     private var typefaceJobRunning = false
     private var pendingDeleteId: String? = null
 
@@ -72,7 +72,6 @@ class FontListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Storage delete helper — single font
         storageDeleteHelper = StorageDeleteHelper(this) { success ->
             val id = pendingDeleteId
             pendingDeleteId = null
@@ -103,7 +102,6 @@ class FontListFragment : Fragment() {
             getSample       = { FontRepository.getSampleText(it) },
             onSelectionChanged = { ids ->
                 if (ids.isEmpty() && adapter.selectionMode) {
-                    // All deselected — exit selection mode
                     adapter.exitSelectionMode()
                     showNormalToolbar()
                 } else {
@@ -119,11 +117,16 @@ class FontListFragment : Fragment() {
         binding.fabAdd.setOnClickListener { openFolderPicker() }
         binding.etSearch.addTextChangedListener { refresh(it?.toString() ?: "") }
         binding.btnSort.setOnClickListener { showSortSheet() }
+
+        // ── Theme toggle button ─────────────────────────────────────────────
+        // Synced to persisted darkMode; hidden when followSystem is enabled
+        applyThemeButtonState()
         binding.btnTheme.setOnClickListener {
-            isNightMode = !isNightMode
-            AppCompatDelegate.setDefaultNightMode(
-                if (isNightMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO)
-            binding.btnTheme.text = if (isNightMode) "🌙" else "☀"
+            val newDark = !FontRepository.settings.darkMode
+            FontRepository.settings = FontRepository.settings.copy(darkMode = newDark)
+            FontRepository.saveSettings(requireContext())
+            // Recreate to apply new theme
+            requireActivity().recreate()
         }
 
         // Selection toolbar buttons
@@ -147,19 +150,17 @@ class FontListFragment : Fragment() {
         binding.btnSelDelete.setOnClickListener {
             val ids = adapter.getSelectedIds()
             if (ids.isEmpty()) return@setOnClickListener
-            AlertDialog.Builder(requireContext(), R.style.Theme_FontLens_Dialog)
+            AlertDialog.Builder(ContextThemeWrapper(requireContext(), ThemeManager.currentThemeResId(requireContext())))
                 .setTitle("Delete ${ids.size} font(s)?")
                 .setMessage("Choose how to remove the selected fonts.")
                 .setPositiveButton("🗑 Delete from Storage") { _, _ ->
-                    AlertDialog.Builder(requireContext(), R.style.Theme_FontLens_Dialog)
+                    AlertDialog.Builder(ContextThemeWrapper(requireContext(), ThemeManager.currentThemeResId(requireContext())))
                         .setTitle("⚠ Permanently delete ${ids.size} font(s)?")
                         .setMessage("This cannot be undone.")
                         .setPositiveButton("Delete") { _, _ ->
                             val uris = ids.mapNotNull { FontRepository.getById(it)?.uri }
-                            // Remove from library immediately so UI feels instant
                             ids.forEach { FontRepository.removeFont(it, requireContext()) }
                             adapter.exitSelectionMode(); showNormalToolbar(); refresh()
-                            // Request storage deletion
                             storageDeleteHelper.requestDeleteMultiple(uris)
                         }
                         .setNegativeButton("Cancel", null).show()
@@ -172,7 +173,6 @@ class FontListFragment : Fragment() {
                 .setNegativeButton("Cancel", null).show()
         }
 
-        // Back press exits selection mode
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
@@ -200,6 +200,19 @@ class FontListFragment : Fragment() {
             }
         } else {
             refresh()
+        }
+    }
+
+    // ── Theme button state ─────────────────────────────────────────────────────
+
+    private fun applyThemeButtonState() {
+        val s = FontRepository.settings
+        if (s.followSystem) {
+            // Hide the button entirely — system handles dark/light
+            binding.btnTheme.visibility = View.GONE
+        } else {
+            binding.btnTheme.visibility = View.VISIBLE
+            binding.btnTheme.text = if (s.darkMode) "🌙" else "☀"
         }
     }
 
@@ -395,6 +408,13 @@ class FontListFragment : Fragment() {
         return result
     }
 
-    override fun onResume() { super.onResume(); if (initialLoadDone) refresh() }
+    override fun onResume() {
+        super.onResume()
+        if (initialLoadDone) {
+            applyThemeButtonState() // re-check in case settings changed in Settings tab
+            refresh()
+        }
+    }
+
     override fun onDestroyView() { super.onDestroyView(); _binding = null }
 }

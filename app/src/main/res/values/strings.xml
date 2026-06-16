@@ -27,7 +27,7 @@
     <string name="sample_text_hint">Sample text for this language</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
-    <string name="non_destructive_note">* Edits are local. Original file is not modified.</string>
+    <string name="non_destructive_note">* Do not edit if you dont have proper rights.</string>
     <string name="yes">✓ Yes</string>
     <string name="no_str">✗ No</string>
     <string name="style_support">STYLE SUPPORT</string>

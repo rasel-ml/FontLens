@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Semantic color attributes — declared once, defined per theme -->
+    <attr name="bgPrimary"    format="color" />
+    <attr name="bgSurface"    format="color" />
+    <attr name="bgElevated"   format="color" />
+    <attr name="bgSidebar"    format="color" />
+    <attr name="accentColor"  format="color" />
+    <attr name="accentDim"    format="color" />
+    <attr name="textPrimary"  format="color" />
+    <attr name="textSecondary" format="color" />
+    <attr name="textMuted"    format="color" />
+    <attr name="dividerColor" format="color" />
+    <attr name="borderColor"  format="color" />
+</resources>

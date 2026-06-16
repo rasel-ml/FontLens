@@ -1,19 +1,22 @@
 package com.fontlens
 
+import android.content.Context
+import android.content.res.ColorStateList
 import android.net.Uri
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.GravityCompat
 import androidx.navigation.fragment.NavHostFragment
-import com.fontlens.data.AppTheme
 import com.fontlens.data.FontRepository
 import com.fontlens.databinding.ActivityMainBinding
 import com.fontlens.databinding.ItemDrawerFolderBinding
+import android.view.ContextThemeWrapper
+import com.fontlens.utils.ThemeManager
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,14 +24,23 @@ class MainActivity : AppCompatActivity() {
     private var backPressedOnce = false
     private val backToastHandler = android.os.Handler(android.os.Looper.getMainLooper())
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        // Apply saved theme BEFORE setContentView
-        FontRepository.load(this)
-        applyTheme(FontRepository.settings.theme)
+    override fun attachBaseContext(newBase: Context) {
+        FontRepository.load(newBase)
+        val s = FontRepository.settings
+        ThemeManager.applyTheme(s)
+        ThemeManager.applyNightMode(s)
+        val themeResId = ThemeManager.themeResId(s)
+        super.attachBaseContext(android.view.ContextThemeWrapper(newBase, themeResId))
+    }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        val s = FontRepository.settings
+        setTheme(ThemeManager.themeResId(s))
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        applyBottomNavTint()
 
         val navHost = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -84,12 +96,12 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private fun applyTheme(theme: AppTheme) {
-        AppCompatDelegate.setDefaultNightMode(when (theme) {
-            AppTheme.SYSTEM -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-            AppTheme.DAY    -> AppCompatDelegate.MODE_NIGHT_NO
-            AppTheme.NIGHT  -> AppCompatDelegate.MODE_NIGHT_YES
-        })
+    private fun applyBottomNavTint() {
+        val p      = ThemeManager.activePalette
+        val states = arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf())
+        val tint   = ColorStateList(states, intArrayOf(p.accent, p.textMuted))
+        binding.bottomNav.itemIconTintList = tint
+        binding.bottomNav.itemTextColor    = tint
     }
 
     fun openDrawer()  { refreshDrawer(); binding.drawerLayout.openDrawer(GravityCompat.START) }
@@ -111,17 +123,16 @@ class MainActivity : AppCompatActivity() {
                 getLibraryFragment()?.reloadFolder(uri)
             }
             fb.btnRemoveFolder.setOnClickListener {
-                val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_FontLens_Dialog)
+                android.app.AlertDialog.Builder(ContextThemeWrapper(this, ThemeManager.currentThemeResId(this)))
                     .setTitle("Remove Folder")
-                    .setMessage("Remove \"${getFolderDisplayName(uri)}\" and all its fonts from the library?")
+                    .setMessage("Remove \"${getFolderDisplayName(uri)}\" and all its fonts from library?")
                     .setPositiveButton("Remove") { _, _ ->
                         FontRepository.removeSavedFolder(uri, this)
                         refreshDrawer()
                         getLibraryFragment()?.refresh()
                     }
                     .setNegativeButton("Cancel", null)
-                    .create()
-                dialog.show()
+                    .show()
             }
             container.addView(fb.root)
         }
@@ -136,4 +147,3 @@ class MainActivity : AppCompatActivity() {
         try { "/" + (uri.lastPathSegment ?: uri.toString()).substringAfter(":") }
         catch (_: Exception) { uri.toString() }
 }
-

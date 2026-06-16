@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:layout_marginStart="8dp"
-        android:textColor="@color/text_secondary"
+        android:textColor="?attr/textSecondary"
         android:textSize="12sp"
         android:maxLines="2"
         android:ellipsize="middle" />
@@ -37,7 +37,7 @@
         android:gravity="center"
         android:text="↺"
         android:textSize="18sp"
-        android:textColor="@color/accent"
+        android:textColor="?attr/accentColor"
         android:clickable="true"
         android:focusable="true"
         android:background="?attr/selectableItemBackgroundBorderless" />
@@ -50,7 +50,7 @@
         android:gravity="center"
         android:text="✕"
         android:textSize="14sp"
-        android:textColor="@color/text_muted"
+        android:textColor="?attr/textMuted"
         android:clickable="true"
         android:focusable="true"
         android:background="?attr/selectableItemBackgroundBorderless" />

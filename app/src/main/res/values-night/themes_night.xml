@@ -1,31 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Night mode uses same dark theme as default — app is already dark -->
-    <style name="Theme.FontLens" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/accent</item>
-        <item name="colorPrimaryVariant">@color/accent_dim</item>
-        <item name="colorOnPrimary">@color/bg_primary</item>
-        <item name="colorSecondary">@color/accent</item>
-        <item name="colorSurface">@color/bg_surface</item>
-        <item name="colorOnSurface">@color/text_primary</item>
-        <item name="android:colorBackground">@color/bg_primary</item>
-        <item name="android:windowBackground">@color/bg_primary</item>
-        <item name="android:statusBarColor">@color/bg_sidebar</item>
-        <item name="android:navigationBarColor">@color/bg_sidebar</item>
-        <item name="android:textColorPrimary">@color/text_primary</item>
-        <item name="android:textColorSecondary">@color/text_secondary</item>
-        <item name="materialCardViewStyle">@style/CardStyle</item>
-    </style>
-
-    <style name="CardStyle" parent="Widget.MaterialComponents.CardView">
-        <item name="cardBackgroundColor">@color/bg_surface</item>
-        <item name="cardCornerRadius">8dp</item>
-        <item name="cardElevation">0dp</item>
-        <item name="strokeColor">@color/divider</item>
-        <item name="strokeWidth">1dp</item>
-    </style>
-
-    <style name="Theme.FontLens.BottomSheet" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
-        <item name="android:colorBackground">@color/bg_elevated</item>
-    </style>
+    <!-- Night-mode overrides are handled programmatically via ThemeManager.
+         This file intentionally left minimal to avoid conflicting with our
+         runtime theme switching. -->
 </resources>

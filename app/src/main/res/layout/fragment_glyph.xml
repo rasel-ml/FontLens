@@ -4,20 +4,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_primary">
+    android:background="?attr/bgPrimary">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/bg_sidebar"
+        android:background="?attr/bgSidebar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_back"
-        app:navigationIconTint="@color/text_secondary"
+        app:navigationIconTint="?attr/textSecondary"
         app:title="@string/glyph_map"
-        app:titleTextColor="@color/text_primary">
+        app:titleTextColor="?attr/textPrimary">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_search"
@@ -27,8 +27,8 @@
             android:layout_marginEnd="8dp"
             android:background="@drawable/bg_search_small"
             android:hint="U+0041…"
-            android:textColorHint="@color/text_muted"
-            android:textColor="@color/text_primary"
+            android:textColorHint="?attr/textMuted"
+            android:textColor="?attr/textPrimary"
             android:textSize="13sp"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
@@ -45,10 +45,10 @@
         android:layout_height="wrap_content"
         android:padding="8dp"
         android:paddingStart="16dp"
-        android:textColor="@color/text_muted"
+        android:textColor="?attr/textMuted"
         android:textSize="12sp"
         android:letterSpacing="0.05"
-        android:background="@color/bg_sidebar"
+        android:background="?attr/bgSidebar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar" />
@@ -74,7 +74,7 @@
         android:orientation="horizontal"
         android:gravity="center"
         android:padding="10dp"
-        android:background="@color/bg_sidebar"
+        android:background="?attr/bgSidebar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -86,7 +86,7 @@
             android:gravity="center"
             android:text="‹"
             android:textSize="22sp"
-            android:textColor="@color/text_secondary"
+            android:textColor="?attr/textSecondary"
             android:background="@drawable/bg_style_btn"
             android:clickable="true"
             android:focusable="true" />
@@ -97,7 +97,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
-            android:textColor="@color/text_muted"
+            android:textColor="?attr/textMuted"
             android:textSize="13sp"
             android:text="1 / 1" />
 
@@ -108,7 +108,7 @@
             android:gravity="center"
             android:text="›"
             android:textSize="22sp"
-            android:textColor="@color/text_secondary"
+            android:textColor="?attr/textSecondary"
             android:background="@drawable/bg_style_btn"
             android:clickable="true"
             android:focusable="true" />

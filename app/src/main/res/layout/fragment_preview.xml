@@ -4,18 +4,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_primary">
+    android:background="?attr/bgPrimary">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/bg_sidebar"
+        android:background="?attr/bgSidebar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_back"
-        app:navigationIconTint="@color/text_secondary">
+        app:navigationIconTint="?attr/textSecondary">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -29,7 +29,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="@color/text_primary"
+                android:textColor="?attr/textPrimary"
                 android:textSize="16sp"
                 android:fontFamily="serif"
                 android:maxLines="1"
@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:text="+ Add"
                 android:textSize="13sp"
-                android:textColor="@color/bg_primary"
+                android:textColor="?attr/colorOnPrimary"
                 android:background="@drawable/bg_accent_btn"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
@@ -73,7 +73,7 @@
                 android:gravity="center"
                 android:text="ℹ"
                 android:textSize="18sp"
-                android:textColor="@color/text_secondary"
+                android:textColor="?attr/textSecondary"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />
@@ -85,7 +85,7 @@
                 android:gravity="center"
                 android:text="⊙"
                 android:textSize="18sp"
-                android:textColor="@color/text_secondary"
+                android:textColor="?attr/textSecondary"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />
@@ -97,7 +97,7 @@
                 android:gravity="center"
                 android:text="⌨"
                 android:textSize="18sp"
-                android:textColor="@color/text_secondary"
+                android:textColor="?attr/textSecondary"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />
@@ -109,7 +109,7 @@
                 android:gravity="center"
                 android:text="☆"
                 android:textSize="20sp"
-                android:textColor="@color/text_muted"
+                android:textColor="?attr/textMuted"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />
@@ -124,7 +124,7 @@
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:padding="10dp"
-        android:background="@color/bg_sidebar"
+        android:background="?attr/bgSidebar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar">
@@ -134,7 +134,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="32px"
-            android:textColor="@color/text_muted"
+            android:textColor="?attr/textMuted"
             android:textSize="12sp"
             android:minWidth="52dp" />
 
@@ -145,8 +145,8 @@
             android:layout_weight="1"
             android:max="152"
             android:progress="24"
-            android:progressTint="@color/accent"
-            android:thumbTint="@color/accent" />
+            android:progressTint="?attr/accentColor"
+            android:thumbTint="?attr/accentColor" />
 
         <TextView
             android:id="@+id/btn_bold"
@@ -157,7 +157,7 @@
             android:text="B"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="@color/text_muted"
+            android:textColor="?attr/textMuted"
             android:background="@drawable/bg_style_btn"
             android:clickable="true"
             android:focusable="true" />
@@ -172,7 +172,7 @@
             android:textSize="16sp"
             android:textStyle="italic"
             android:fontFamily="serif"
-            android:textColor="@color/text_muted"
+            android:textColor="?attr/textMuted"
             android:background="@drawable/bg_style_btn"
             android:clickable="true"
             android:focusable="true" />
@@ -183,7 +183,7 @@
         android:id="@+id/divider"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:background="@color/divider"
+        android:background="?attr/dividerColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/controls_bar" />
@@ -204,11 +204,11 @@
             android:minHeight="300dp"
             android:padding="24dp"
             android:background="@null"
-            android:textColor="@color/text_primary"
+            android:textColor="?attr/textPrimary"
             android:textSize="32sp"
             android:gravity="top|start"
             android:hint="@string/tap_to_type"
-            android:textColorHint="@color/text_muted"
+            android:textColorHint="?attr/textMuted"
             android:inputType="textMultiLine|textCapSentences"
             android:lineSpacingMultiplier="1.4" />
 

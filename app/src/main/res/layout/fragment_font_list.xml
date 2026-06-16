@@ -4,13 +4,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_primary">
+    android:background="?attr/bgPrimary">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/bg_sidebar"
+        android:background="?attr/bgSidebar"
         android:paddingStart="4dp"
         android:paddingEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -32,7 +32,7 @@
                 android:gravity="center"
                 android:text="☰"
                 android:textSize="20sp"
-                android:textColor="@color/text_secondary"
+                android:textColor="?attr/textSecondary"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />
@@ -43,8 +43,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/library"
-                android:textColor="@color/text_primary"
-                android:textSize="20sp"
+                android:textColor="?attr/textPrimary"
+                android:textSize="25sp"
                 android:fontFamily="serif"
                 android:letterSpacing="0.05"
                 android:layout_marginStart="4dp" />
@@ -58,7 +58,7 @@
                 android:paddingEnd="10dp"
                 android:paddingTop="3dp"
                 android:paddingBottom="3dp"
-                android:textColor="@color/text_muted"
+                android:textColor="?attr/textMuted"
                 android:textSize="12sp"
                 android:text="0" />
 
@@ -70,7 +70,7 @@
                 android:gravity="center"
                 android:text="⇅"
                 android:textSize="18sp"
-                android:textColor="@color/text_secondary"
+                android:textColor="?attr/textSecondary"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />
@@ -82,7 +82,7 @@
                 android:gravity="center"
                 android:text="☀"
                 android:textSize="18sp"
-                android:textColor="@color/text_secondary"
+                android:textColor="?attr/textSecondary"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />
@@ -105,7 +105,7 @@
                 android:gravity="center"
                 android:text="✕"
                 android:textSize="16sp"
-                android:textColor="@color/accent"
+                android:textColor="?attr/accentColor"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />
@@ -116,7 +116,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
-                android:textColor="@color/text_primary"
+                android:textColor="?attr/textPrimary"
                 android:textSize="15sp"
                 android:text="0 selected" />
 
@@ -125,7 +125,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="All"
-                android:textColor="@color/accent"
+                android:textColor="?attr/accentColor"
                 android:textSize="13sp"
                 android:padding="8dp"
                 android:clickable="true"
@@ -139,7 +139,7 @@
                 android:gravity="center"
                 android:text="★"
                 android:textSize="18sp"
-                android:textColor="@color/text_secondary"
+                android:textColor="?attr/textSecondary"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless" />
@@ -169,14 +169,14 @@
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
         android:layout_marginTop="10dp"
-        app:boxBackgroundColor="@color/bg_elevated"
-        app:boxStrokeColor="@color/border"
-        app:hintTextColor="@color/text_muted"
+        app:boxBackgroundColor="?attr/bgElevated"
+        app:boxStrokeColor="?attr/borderColor"
+        app:hintTextColor="?attr/textMuted"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:startIconDrawable="@drawable/ic_search"
-        app:startIconTint="@color/text_muted">
+        app:startIconTint="?attr/textMuted">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_search"
@@ -186,8 +186,8 @@
             android:hint="@string/search_fonts"
             android:imeOptions="actionSearch"
             android:inputType="text"
-            android:textColor="@color/text_primary"
-            android:textColorHint="@color/text_muted"
+            android:textColor="?attr/textPrimary"
+            android:textColorHint="?attr/textMuted"
             android:textSize="14sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -216,7 +216,7 @@
             android:layout_marginTop="16dp"
             android:gravity="center"
             android:text="@string/no_fonts"
-            android:textColor="@color/text_muted"
+            android:textColor="?attr/textMuted"
             android:textSize="15sp" />
     </LinearLayout>
 
@@ -240,10 +240,10 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/accent"
+        android:backgroundTint="?attr/accentColor"
         android:contentDescription="@string/add_fonts"
         android:src="@drawable/ic_add"
-        app:tint="@color/bg_primary"
+        app:tint="?attr/bgPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
