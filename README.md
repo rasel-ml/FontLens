@@ -74,14 +74,14 @@ app/src/main/
 │   │   │   ├── StandaloneMetaFragment.kt
 │   │   │   └── StandalonePreviewFragment.kt
 │   │   └── settings/
-│   │        └── SettingsFragment.kt
+│   │       └── SettingsFragment.kt
 │   └── utils/
-│        ├── FontLoader.kt
-│        ├── FontMetadataEditor.kt
-│        ├── FontParser.kt
-│        ├── StorageDeleteHelper.kt
-│        ├── ThemeManager.kt
-│        └── TypefaceLoader.kt
+│       ├── FontLoader.kt
+│       ├── FontMetadataEditor.kt
+│       ├── FontParser.kt
+│       ├── StorageDeleteHelper.kt
+│       ├── ThemeManager.kt
+│       └── TypefaceLoader.kt
 └── res/
     ├── color/
     │   ├── nav_item_color.xml
@@ -143,7 +143,7 @@ app/src/main/
     │   ├── strings.xml
     │   └── themes.xml
     └── values-night/
-         └── themes_night.xml
+        └── themes_night.xml
 ```
 ## Disclaimer
 This app is made by/with help of
@@ -154,10 +154,10 @@ This app is made by/with help of
 No Laptop/Computer is used.
 
 ## Copyright
-    Copyright (C) 2026 Md. Rasel Molla
-    
-    This program is free software.
-    You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.
-    
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the [GNU General Public License](LICENSE) for more details.
+Copyright (C) 2026 Md. Rasel Molla
+
+This program is free software.
+You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the [GNU General Public License](LICENSE) for more details.
