@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.fontlens.R
 import com.fontlens.data.AppSettings
 import com.fontlens.data.ColorTheme
+import com.fontlens.data.ThemeMode
 
 object ThemeManager {
 
@@ -25,7 +26,11 @@ object ThemeManager {
     )
 
     fun getPalette(settings: AppSettings): Palette {
-        val dark = if (settings.followSystem) isSystemDark() else settings.darkMode
+        val dark = when (settings.themeMode) {
+            ThemeMode.SYSTEM -> isSystemDark()
+            ThemeMode.DAY    -> false
+            ThemeMode.NIGHT  -> true
+        }
         return when (settings.colorTheme) {
             ColorTheme.GREEN  -> if (dark) greenDark  else greenLight
             ColorTheme.BLUE   -> if (dark) blueDark   else blueLight
@@ -38,7 +43,11 @@ object ThemeManager {
         themeResId(com.fontlens.data.FontRepository.settings)
 
     fun themeResId(settings: AppSettings): Int {
-        val dark = if (settings.followSystem) isSystemDark() else settings.darkMode
+        val dark = when (settings.themeMode) {
+            ThemeMode.SYSTEM -> isSystemDark()
+            ThemeMode.DAY    -> false
+            ThemeMode.NIGHT  -> true
+        }
         return when (settings.colorTheme) {
             ColorTheme.GREEN  -> if (dark) R.style.Theme_FontLens_Green_Dark  else R.style.Theme_FontLens_Green_Light
             ColorTheme.BLUE   -> if (dark) R.style.Theme_FontLens_Blue_Dark   else R.style.Theme_FontLens_Blue_Light
@@ -48,13 +57,11 @@ object ThemeManager {
     }
 
     fun applyNightMode(settings: AppSettings) {
-        if (settings.followSystem) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-            return
-        }
-        AppCompatDelegate.setDefaultNightMode(
-            if (settings.darkMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-        )
+        AppCompatDelegate.setDefaultNightMode(when (settings.themeMode) {
+            ThemeMode.SYSTEM -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            ThemeMode.DAY    -> AppCompatDelegate.MODE_NIGHT_NO
+            ThemeMode.NIGHT  -> AppCompatDelegate.MODE_NIGHT_YES
+        })
     }
 
     /**

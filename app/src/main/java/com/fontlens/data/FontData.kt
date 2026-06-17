@@ -70,24 +70,23 @@ data class AppSettings(
     val glyphShowAll: Boolean = false,
     val defaultLang: String = "English",
     val folderRecursive: Boolean = true,
-    // New theme fields — defaults: Green color, Light mode, not following system
     val colorTheme: ColorTheme = ColorTheme.GREEN,
     val darkMode: Boolean = false,
     val followSystem: Boolean = false,
-    // Keep old field for migration (ignored after first load)
+    // New fields
+    val themeMode: ThemeMode = ThemeMode.DAY,   // replaces followSystem+darkMode
+    val preferMetaSample: Boolean = true,        // replaces 4-option SamplePriority
+    val showFullFontName: Boolean = false,        // new display option
+    // Legacy (kept for Gson backward compat)
     val theme: AppTheme = AppTheme.DAY
 )
 
 enum class SamplePriority { METADATA_FIRST, USER_FIRST, ALWAYS_USER, ALWAYS_META }
 enum class AppTheme { SYSTEM, DAY, NIGHT }
 enum class ColorTheme { RED, YELLOW, GREEN, BLUE }
-enum class SortOrder {
-    NAME_ASC, NAME_DESC,
-    DATE_ASC, DATE_DESC,
-    FOLDER
-}
+enum class ThemeMode { SYSTEM, DAY, NIGHT }
+enum class SortOrder { NAME_ASC, NAME_DESC, DATE_ASC, DATE_DESC, FOLDER }
 
-// List item — either a font or a folder separator
 sealed class FontListItem {
     data class Font(val font: FontItem) : FontListItem()
     data class FolderHeader(val path: String) : FontListItem()

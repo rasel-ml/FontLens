@@ -4,22 +4,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurface">
+    android:background="?attr/bgPrimary">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimaryVariant"
+        android:background="?attr/bgSidebar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:title="@string/settings"
-        app:titleTextColor="?attr/colorOnSurface" />
+        app:title="Settings"
+        app:titleTextColor="?attr/textPrimary" />
 
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -29,20 +30,33 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:paddingTop="12dp"
-            android:paddingBottom="24dp">
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="32dp">
 
-            <!-- ── THEME CARD ─────────────────────────────────────────── -->
+            <!-- ══════════════════════════════════════════════════════════
+                 THEME SECTION
+            ══════════════════════════════════════════════════════════ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="APPEARANCE"
+                android:textColor="?attr/colorPrimary"
+                android:textSize="11sp"
+                android:letterSpacing="0.12"
+                android:textAllCaps="true"
+                android:layout_marginStart="4dp"
+                android:layout_marginBottom="8dp" />
+
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                app:cardBackgroundColor="?attr/colorSurface"
-                app:strokeColor="?attr/colorPrimaryVariant"
+                android:layout_marginBottom="14dp"
+                app:cardBackgroundColor="?attr/bgSurface"
+                app:strokeColor="?attr/dividerColor"
                 app:strokeWidth="1dp"
-                app:cardCornerRadius="8dp"
+                app:cardCornerRadius="12dp"
                 app:cardElevation="0dp">
 
                 <LinearLayout
@@ -51,265 +65,93 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <!-- Section label -->
+                    <!-- Theme Color label -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="THEME"
-                        android:textColor="?attr/colorPrimary"
-                        android:textSize="11sp"
-                        android:letterSpacing="0.1"
-                        android:textAllCaps="true"
-                        android:layout_marginBottom="12dp" />
-
-                    <!-- Color picker label -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Color"
-                        android:textColor="?attr/colorOnSurface"
-                        android:textSize="14sp"
-                        android:layout_marginBottom="6dp" />
-
-                    <!-- Color theme Spinner -->
-                    <Spinner
-                        android:id="@+id/spinner_color_theme"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_spinner"
-                        android:paddingStart="10dp"
-                        android:paddingEnd="10dp"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp"
-                        android:layout_marginBottom="16dp" />
-
-                    <!-- Follow System switch row -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="12dp">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Follow System Dark Mode"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textSize="14sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Hides the mode toggle in the library toolbar"
-                                android:textColor="?android:attr/textColorSecondary"
-                                android:textSize="12sp"
-                                android:layout_marginTop="2dp" />
-
-                        </LinearLayout>
-
-                        <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/switch_follow_system"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-
-                    </LinearLayout>
-
-                    <!-- Dark mode switch row (hidden when followSystem is on) -->
-                    <LinearLayout
-                        android:id="@+id/row_dark_mode"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Dark Mode"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textSize="14sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Switch between light and dark appearance"
-                                android:textColor="?android:attr/textColorSecondary"
-                                android:textSize="12sp"
-                                android:layout_marginTop="2dp" />
-
-                        </LinearLayout>
-
-                        <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/switch_dark_mode"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Default Language Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                app:cardBackgroundColor="?attr/colorSurface"
-                app:strokeColor="?attr/colorPrimaryVariant"
-                app:strokeWidth="1dp"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="0dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/default_lang_title"
-                        android:textColor="?attr/colorPrimary"
-                        android:textSize="11sp"
-                        android:letterSpacing="0.1"
-                        android:textAllCaps="true"
-                        android:layout_marginBottom="12dp" />
-
-                    <Spinner
-                        android:id="@+id/spinner_lang"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_spinner"
-                        android:paddingStart="10dp"
-                        android:paddingEnd="10dp"
-                        android:paddingTop="8dp"
-                        android:paddingBottom="8dp" />
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Priority Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                app:cardBackgroundColor="?attr/colorSurface"
-                app:strokeColor="?attr/colorPrimaryVariant"
-                app:strokeWidth="1dp"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="0dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/sample_priority_title"
-                        android:textColor="?attr/colorPrimary"
-                        android:textSize="11sp"
-                        android:letterSpacing="0.1"
-                        android:textAllCaps="true"
+                        android:text="Theme Color"
+                        android:textColor="?attr/textPrimary"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
                         android:layout_marginBottom="4dp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="When both metadata and user text exist, which takes precedence?"
-                        android:textColor="?android:attr/textColorSecondary"
+                        android:text="Choose an accent color for the app"
+                        android:textColor="?attr/textMuted"
                         android:textSize="12sp"
-                        android:layout_marginBottom="10dp" />
+                        android:layout_marginBottom="14dp" />
 
-                    <RadioGroup
-                        android:id="@+id/rg_priority"
+                    <!-- Color chip grid — 2×2 -->
+                    <LinearLayout
+                        android:id="@+id/color_chip_container"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="20dp" />
 
-                        <RadioButton android:id="@+id/rb_meta_first"  android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/priority_metadata_first" android:textColor="?attr/colorOnSurface" android:buttonTint="?attr/colorPrimary" android:paddingStart="8dp" android:layout_marginBottom="4dp" />
-                        <RadioButton android:id="@+id/rb_user_first"  android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/priority_user_first"     android:textColor="?attr/colorOnSurface" android:buttonTint="?attr/colorPrimary" android:paddingStart="8dp" android:layout_marginBottom="4dp" />
-                        <RadioButton android:id="@+id/rb_always_user" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/priority_always_user"    android:textColor="?attr/colorOnSurface" android:buttonTint="?attr/colorPrimary" android:paddingStart="8dp" android:layout_marginBottom="4dp" />
-                        <RadioButton android:id="@+id/rb_always_meta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/priority_always_meta"    android:textColor="?attr/colorOnSurface" android:buttonTint="?attr/colorPrimary" android:paddingStart="8dp" />
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="?attr/dividerColor"
+                        android:layout_marginBottom="16dp" />
 
-                    </RadioGroup>
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Language Samples Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                app:cardBackgroundColor="?attr/colorSurface"
-                app:strokeColor="?attr/colorPrimaryVariant"
-                app:strokeWidth="1dp"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="0dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    <!-- Theme Mode label -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Theme Mode"
+                        android:textColor="?attr/textPrimary"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="4dp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/lang_samples_title"
-                        android:textColor="?attr/colorPrimary"
-                        android:textSize="11sp"
-                        android:letterSpacing="0.1"
-                        android:textAllCaps="true"
+                        android:text="System Default hides the mode toggle in the library"
+                        android:textColor="?attr/textMuted"
+                        android:textSize="12sp"
                         android:layout_marginBottom="12dp" />
 
-                    <LinearLayout
-                        android:id="@+id/lang_list_container"
+                    <!-- Mode dropdown -->
+                    <Spinner
+                        android:id="@+id/spinner_theme_mode"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical" />
-
-                    <TextView
-                        android:id="@+id/btn_add_lang"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="+ Add Language"
-                        android:textColor="?attr/colorPrimary"
-                        android:textSize="14sp"
-                        android:padding="8dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:background="?attr/selectableItemBackgroundBorderless" />
+                        android:background="@drawable/bg_spinner"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:paddingTop="11dp"
+                        android:paddingBottom="11dp" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Folder Scanning Card -->
+            <!-- ══════════════════════════════════════════════════════════
+                 DISPLAY SECTION
+            ══════════════════════════════════════════════════════════ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DISPLAY"
+                android:textColor="?attr/colorPrimary"
+                android:textSize="11sp"
+                android:letterSpacing="0.12"
+                android:textAllCaps="true"
+                android:layout_marginStart="4dp"
+                android:layout_marginBottom="8dp" />
+
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                app:cardBackgroundColor="?attr/colorSurface"
-                app:strokeColor="?attr/colorPrimaryVariant"
+                android:layout_marginBottom="14dp"
+                app:cardBackgroundColor="?attr/bgSurface"
+                app:strokeColor="?attr/dividerColor"
                 app:strokeWidth="1dp"
-                app:cardCornerRadius="8dp"
+                app:cardCornerRadius="12dp"
                 app:cardElevation="0dp">
 
                 <LinearLayout
@@ -318,21 +160,13 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="FOLDER SCANNING"
-                        android:textColor="?attr/colorPrimary"
-                        android:textSize="11sp"
-                        android:letterSpacing="0.1"
-                        android:textAllCaps="true"
-                        android:layout_marginBottom="8dp" />
-
+                    <!-- Show Full Font Name -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="14dp">
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -343,56 +177,34 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Scan Subfolders Recursively"
-                                android:textColor="?attr/colorOnSurface"
+                                android:text="Show Full Font Name"
+                                android:textColor="?attr/textPrimary"
                                 android:textSize="14sp" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="When on, fonts inside subfolders are also loaded"
-                                android:textColor="?android:attr/textColorSecondary"
+                                android:text="Display full font names instead of family names"
+                                android:textColor="?attr/textMuted"
                                 android:textSize="12sp"
                                 android:layout_marginTop="2dp" />
 
                         </LinearLayout>
 
                         <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/switch_recursive"
+                            android:id="@+id/switch_show_full_name"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="false" />
+                            android:layout_height="wrap_content" />
 
                     </LinearLayout>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
 
-            <!-- Glyph Keyboard Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardBackgroundColor="?attr/colorSurface"
-                app:strokeColor="?attr/colorPrimaryVariant"
-                app:strokeWidth="1dp"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="0dp">
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="?attr/dividerColor"
+                        android:layout_marginBottom="14dp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/glyph_settings_title"
-                        android:textColor="?attr/colorPrimary"
-                        android:textSize="11sp"
-                        android:letterSpacing="0.1"
-                        android:textAllCaps="true"
-                        android:layout_marginBottom="8dp" />
-
+                    <!-- Glyph -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -408,15 +220,15 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/pref_glyph_show_all"
-                                android:textColor="?attr/colorOnSurface"
+                                android:text="Show All Unicode Glyphs"
+                                android:textColor="?attr/textPrimary"
                                 android:textSize="14sp" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/pref_glyph_show_all_summary"
-                                android:textColor="?android:attr/textColorSecondary"
+                                android:text="When off, shows only glyphs supported by the font"
+                                android:textColor="?attr/textMuted"
                                 android:textSize="12sp"
                                 android:layout_marginTop="2dp" />
 
@@ -428,6 +240,211 @@
                             android:layout_height="wrap_content" />
 
                     </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ══════════════════════════════════════════════════════════
+                 SAMPLE TEXT SECTION
+            ══════════════════════════════════════════════════════════ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SAMPLE TEXT"
+                android:textColor="?attr/colorPrimary"
+                android:textSize="11sp"
+                android:letterSpacing="0.12"
+                android:textAllCaps="true"
+                android:layout_marginStart="4dp"
+                android:layout_marginBottom="8dp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardBackgroundColor="?attr/bgSurface"
+                app:strokeColor="?attr/dividerColor"
+                app:strokeWidth="1dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Prefer Metadata Sample -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="14dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Prefer Metadata Sample Text"
+                                android:textColor="?attr/textPrimary"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="When available, use sample text stored inside the font file"
+                                android:textColor="?attr/textMuted"
+                                android:textSize="12sp"
+                                android:layout_marginTop="2dp" />
+
+                        </LinearLayout>
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/switch_prefer_meta"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="?attr/dividerColor"
+                        android:layout_marginBottom="14dp" />
+
+                    <!-- Default Language -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Default Preview Language"
+                        android:textColor="?attr/textPrimary"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="8dp" />
+
+                    <Spinner
+                        android:id="@+id/spinner_lang"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_spinner"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:layout_marginBottom="14dp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="?attr/dividerColor"
+                        android:layout_marginBottom="14dp" />
+
+                    <!-- Language Samples header -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Language Sample Texts"
+                            android:textColor="?attr/textPrimary"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/btn_add_lang"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="+ Add"
+                            android:textColor="?attr/colorPrimary"
+                            android:textSize="13sp"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:paddingTop="6dp"
+                            android:paddingBottom="6dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="?attr/selectableItemBackgroundBorderless" />
+
+                    </LinearLayout>
+
+                    <!-- Language list -->
+                    <LinearLayout
+                        android:id="@+id/lang_list_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ══════════════════════════════════════════════════════════
+                 FOLDER SCANNING SECTION
+            ══════════════════════════════════════════════════════════ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="FOLDER SCANNING"
+                android:textColor="?attr/colorPrimary"
+                android:textSize="11sp"
+                android:letterSpacing="0.12"
+                android:textAllCaps="true"
+                android:layout_marginStart="4dp"
+                android:layout_marginBottom="8dp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="?attr/bgSurface"
+                app:strokeColor="?attr/dividerColor"
+                app:strokeWidth="1dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Scan Subfolders Recursively"
+                            android:textColor="?attr/textPrimary"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="When on, fonts inside subfolders are also loaded"
+                            android:textColor="?attr/textMuted"
+                            android:textSize="12sp"
+                            android:layout_marginTop="2dp" />
+
+                    </LinearLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_recursive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

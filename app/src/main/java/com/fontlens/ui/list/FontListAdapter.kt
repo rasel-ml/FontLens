@@ -102,7 +102,9 @@ class FontListAdapter(
                 val m    = font.effectiveMeta
                 val ctx  = holder.itemView.context
 
-                b.tvFontName.text = m.family.ifEmpty { font.displayName }
+                val showFull = com.fontlens.data.FontRepository.settings.showFullFontName
+                b.tvFontName.text = if (showFull) m.fullName.ifEmpty { m.family.ifEmpty { font.displayName } }
+                                    else m.family.ifEmpty { font.displayName }
                 b.tvFontSub.text = buildString {
                     if (m.weightName.isNotEmpty()) append(m.weightName)
                     if (m.subfamily.isNotEmpty() && m.subfamily != "Regular") append(" · ${m.subfamily}")

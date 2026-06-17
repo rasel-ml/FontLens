@@ -211,11 +211,11 @@ object FontRepository {
         val userText = s.langSamples[s.defaultLang] ?: ""
         val metaText = font.effectiveMeta.sampleText
         val default  = "The quick brown fox jumps over the lazy dog 0123456789"
-        return when (s.samplePriority) {
-            SamplePriority.ALWAYS_USER    -> userText.ifEmpty { default }
-            SamplePriority.ALWAYS_META    -> metaText.ifEmpty { default }
-            SamplePriority.METADATA_FIRST -> metaText.ifEmpty { userText.ifEmpty { default } }
-            SamplePriority.USER_FIRST     -> userText.ifEmpty { metaText.ifEmpty { default } }
+        // New simple switch: preferMetaSample (true = metadata first, false = always user)
+        return if (s.preferMetaSample) {
+            metaText.ifEmpty { userText.ifEmpty { default } }
+        } else {
+            userText.ifEmpty { default }
         }
     }
 }

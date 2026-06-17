@@ -22,6 +22,7 @@ import com.fontlens.R
 import com.fontlens.data.FontItem
 import com.fontlens.data.FontListItem
 import com.fontlens.data.FontRepository
+import com.fontlens.data.ThemeMode
 import com.fontlens.data.SortOrder
 import com.fontlens.databinding.BottomSheetSortBinding
 import com.fontlens.databinding.FragmentFontListBinding
@@ -123,10 +124,9 @@ class FontListFragment : Fragment() {
         // Synced to persisted darkMode; hidden when followSystem is enabled
         applyThemeButtonState()
         binding.btnTheme.setOnClickListener {
-            val newDark = !FontRepository.settings.darkMode
-            FontRepository.settings = FontRepository.settings.copy(darkMode = newDark)
+            val newMode = if (FontRepository.settings.themeMode == ThemeMode.NIGHT) ThemeMode.DAY else ThemeMode.NIGHT
+            FontRepository.settings = FontRepository.settings.copy(themeMode = newMode)
             FontRepository.saveSettings(requireContext())
-            // Recreate to apply new theme
             requireActivity().recreate()
         }
 
@@ -208,12 +208,12 @@ class FontListFragment : Fragment() {
 
     private fun applyThemeButtonState() {
         val s = FontRepository.settings
-        if (s.followSystem) {
-            // Hide the button entirely — system handles dark/light
+        if (s.themeMode == ThemeMode.SYSTEM) {
             binding.btnTheme.visibility = View.GONE
         } else {
             binding.btnTheme.visibility = View.VISIBLE
-            binding.btnTheme.setImageResource(if (s.darkMode) com.fontlens.R.drawable.ic_moon else com.fontlens.R.drawable.ic_sun)
+            binding.btnTheme.setImageResource(
+                if (s.themeMode == ThemeMode.NIGHT) com.fontlens.R.drawable.ic_moon else com.fontlens.R.drawable.ic_sun)
         }
     }
 

@@ -1,6 +1,7 @@
 package com.fontlens.ui.settings
 
-import android.app.AlertDialog
+import android.app.Dialog
+import android.content.res.ColorStateList
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.ContextThemeWrapper
@@ -9,12 +10,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.fontlens.R
 import com.fontlens.data.AppSettings
 import com.fontlens.data.ColorTheme
 import com.fontlens.data.FontRepository
-import com.fontlens.data.SamplePriority
+import com.fontlens.data.ThemeMode
 import com.fontlens.databinding.FragmentSettingsBinding
 import com.fontlens.databinding.ItemLangSettingBinding
 import com.fontlens.utils.ThemeManager
@@ -37,130 +39,149 @@ class SettingsFragment : Fragment() {
 
     private fun renderAll() {
         val s = FontRepository.settings
-        renderColorThemeSpinner(s)
-        renderFollowSystemSwitch(s)
-        renderDarkModeSwitch(s)
-        renderPriority(s)
+        renderColorChips(s)
+        renderThemeModeSpinner(s)
+        renderShowFullNameSwitch(s)
         renderGlyphSwitch(s)
-        renderRecursiveSwitch(s)
-        renderLangList(s)
+        renderPreferMetaSwitch(s)
         renderLangSpinner(s)
+        renderLangList(s)
+        renderRecursiveSwitch(s)
     }
 
-    // ── Color theme spinner ───────────────────────────────────────────────
+    // ── Color chips ───────────────────────────────────────────────────────
 
-    private fun renderColorThemeSpinner(s: AppSettings) {
-        data class ThemeOption(val theme: ColorTheme, val label: String, val color: Int)
+    private fun renderColorChips(s: AppSettings) {
+        val container = binding.colorChipContainer
+        container.removeAllViews()
+        val p = ThemeManager.activePalette
 
+        data class ChipOption(val theme: ColorTheme, val label: String, val color: Int)
         val options = listOf(
-            ThemeOption(ColorTheme.GREEN,  "Green",  ThemeManager.bulletColor(ColorTheme.GREEN)),
-            ThemeOption(ColorTheme.BLUE,   "Blue",   ThemeManager.bulletColor(ColorTheme.BLUE)),
-            ThemeOption(ColorTheme.RED,    "Red",    ThemeManager.bulletColor(ColorTheme.RED)),
-            ThemeOption(ColorTheme.YELLOW, "Yellow", ThemeManager.bulletColor(ColorTheme.YELLOW))
+            ChipOption(ColorTheme.GREEN,  "Green",  ThemeManager.bulletColor(ColorTheme.GREEN)),
+            ChipOption(ColorTheme.BLUE,   "Blue",   ThemeManager.bulletColor(ColorTheme.BLUE)),
+            ChipOption(ColorTheme.RED,    "Red",    ThemeManager.bulletColor(ColorTheme.RED)),
+            ChipOption(ColorTheme.YELLOW, "Yellow", ThemeManager.bulletColor(ColorTheme.YELLOW))
         )
 
-        val adapter = object : ArrayAdapter<ThemeOption>(
-            requireContext(), android.R.layout.simple_spinner_item, options
-        ) {
-            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View =
-                buildRow(position, convertView, parent)
+        val density = requireContext().resources.displayMetrics.density
 
-            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View =
-                buildRow(position, convertView, parent)
+        // Two chips per row
+        val rows = options.chunked(2)
+        rows.forEach { rowOptions ->
+            val row = android.widget.LinearLayout(requireContext()).apply {
+                orientation = android.widget.LinearLayout.HORIZONTAL
+                layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            }
 
-            private fun buildRow(position: Int, convertView: View?, parent: ViewGroup): View {
-                val opt = options[position]
-                val row = convertView
-                    ?: LayoutInflater.from(context)
-                        .inflate(android.R.layout.simple_spinner_item, parent, false)
-                val tv = row.findViewById<TextView>(android.R.id.text1)
-                tv.text = opt.label
-                tv.textSize = 14f
-                val density = context.resources.displayMetrics.density
-                val size = (20 * density).toInt()
+            rowOptions.forEach { opt ->
+                val isSelected = opt.theme == s.colorTheme
+                val chipView = LayoutInflater.from(requireContext())
+                    .inflate(android.R.layout.simple_list_item_1, row, false) as TextView
+
+                // Chip background
+                val bg = GradientDrawable().apply {
+                    shape = GradientDrawable.RECTANGLE
+                    cornerRadius = 10f * density
+                    if (isSelected) {
+                        setColor(android.graphics.Color.argb(30,
+                            android.graphics.Color.red(opt.color),
+                            android.graphics.Color.green(opt.color),
+                            android.graphics.Color.blue(opt.color)))
+                        setStroke((2f * density).toInt(), opt.color)
+                    } else {
+                        setColor(p.bgElevated)
+                        setStroke((1f * density).toInt(), p.border)
+                    }
+                }
+                chipView.background = bg
+
+                // Color circle drawable
+                val circleSize = (22f * density).toInt()
                 val circle = GradientDrawable().apply {
                     shape = GradientDrawable.OVAL
                     setColor(opt.color)
-                    setSize(size, size)
+                    setSize(circleSize, circleSize)
                 }
-                tv.setCompoundDrawablesWithIntrinsicBounds(circle, null, null, null)
-                tv.compoundDrawablePadding = (6 * density).toInt()
-                return row
-            }
-        }
 
-        binding.spinnerColorTheme.adapter = adapter
-        val idx = options.indexOfFirst { it.theme == s.colorTheme }.coerceAtLeast(0)
-        binding.spinnerColorTheme.setSelection(idx)
+                // Checkmark for selected
+                val checkSize = (18f * density).toInt()
+                val checkDrawable = if (isSelected) {
+                    GradientDrawable().apply {
+                        shape = GradientDrawable.OVAL
+                        setColor(opt.color)
+                        setSize(checkSize, checkSize)
+                    }
+                } else null
 
-        var userInteracted = false
-        binding.spinnerColorTheme.post { userInteracted = true }
+                chipView.text = opt.label
+                chipView.textSize = 13f
+                chipView.setTextColor(if (isSelected) opt.color else p.textPrimary)
+                chipView.setCompoundDrawablesWithIntrinsicBounds(circle, null, checkDrawable, null)
+                chipView.compoundDrawablePadding = (8f * density).toInt()
 
-        binding.spinnerColorTheme.onItemSelectedListener =
-            object : android.widget.AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(p: android.widget.AdapterView<*>?, v: View?, pos: Int, id: Long) {
-                    if (!userInteracted) return
-                    val chosen = options[pos].theme
-                    if (chosen == FontRepository.settings.colorTheme) return
-                    FontRepository.settings = FontRepository.settings.copy(colorTheme = chosen)
+                val padH = (14f * density).toInt()
+                val padV = (12f * density).toInt()
+                chipView.setPadding(padH, padV, padH, padV)
+
+                val lp = android.widget.LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+                lp.marginEnd = if (rowOptions.last() != opt) (6f * density).toInt() else 0
+                lp.bottomMargin = (6f * density).toInt()
+                chipView.layoutParams = lp
+
+                chipView.setOnClickListener {
+                    if (opt.theme == FontRepository.settings.colorTheme) return@setOnClickListener
+                    FontRepository.settings = FontRepository.settings.copy(colorTheme = opt.theme)
                     FontRepository.saveSettings(requireContext())
                     restartActivity()
                 }
-                override fun onNothingSelected(p: android.widget.AdapterView<*>?) {}
+
+                row.addView(chipView)
+            }
+
+            container.addView(row)
+        }
+    }
+
+    // ── Theme mode spinner ────────────────────────────────────────────────
+
+    private fun renderThemeModeSpinner(s: AppSettings) {
+        val modes = listOf("System Default", "Day Mode", "Night Mode")
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, modes)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerThemeMode.adapter = adapter
+
+        val idx = when (s.themeMode) {
+            ThemeMode.SYSTEM -> 0
+            ThemeMode.DAY    -> 1
+            ThemeMode.NIGHT  -> 2
+        }
+        binding.spinnerThemeMode.setSelection(idx)
+
+        var ready = false
+        binding.spinnerThemeMode.post { ready = true }
+
+        binding.spinnerThemeMode.onItemSelectedListener =
+            object : android.widget.AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(p0: android.widget.AdapterView<*>?, v: View?, pos: Int, id: Long) {
+                    if (!ready) return
+                    val mode = when (pos) { 0 -> ThemeMode.SYSTEM; 1 -> ThemeMode.DAY; else -> ThemeMode.NIGHT }
+                    if (mode == FontRepository.settings.themeMode) return
+                    // Bug fix: preserve language settings — only change themeMode
+                    FontRepository.settings = FontRepository.settings.copy(themeMode = mode)
+                    FontRepository.saveSettings(requireContext())
+                    restartActivity()
+                }
+                override fun onNothingSelected(p0: android.widget.AdapterView<*>?) {}
             }
     }
 
-    // ── Follow system switch ──────────────────────────────────────────────
+    // ── Show full font name ───────────────────────────────────────────────
 
-    private fun renderFollowSystemSwitch(s: AppSettings) {
-        binding.switchFollowSystem.isChecked = s.followSystem
-        updateDarkModeRowVisibility(s.followSystem)
-        binding.switchFollowSystem.setOnCheckedChangeListener { _, checked ->
-            FontRepository.settings = FontRepository.settings.copy(followSystem = checked)
-            FontRepository.saveSettings(requireContext())
-            updateDarkModeRowVisibility(checked)
-            restartActivity()
-        }
-    }
-
-    private fun updateDarkModeRowVisibility(followSystem: Boolean) {
-        binding.rowDarkMode.visibility = if (followSystem) View.GONE else View.VISIBLE
-    }
-
-    // ── Dark mode switch ──────────────────────────────────────────────────
-
-    private fun renderDarkModeSwitch(s: AppSettings) {
-        binding.switchDarkMode.isChecked = s.darkMode
-        binding.switchDarkMode.setOnCheckedChangeListener { _, checked ->
-            FontRepository.settings = FontRepository.settings.copy(darkMode = checked)
-            FontRepository.saveSettings(requireContext())
-            restartActivity()
-        }
-    }
-
-    private fun restartActivity() {
-        requireActivity().recreate()
-    }
-
-    // ── Priority ──────────────────────────────────────────────────────────
-
-    private fun renderPriority(s: AppSettings) {
-        val rb = when (s.samplePriority) {
-            SamplePriority.METADATA_FIRST -> binding.rbMetaFirst
-            SamplePriority.USER_FIRST     -> binding.rbUserFirst
-            SamplePriority.ALWAYS_USER    -> binding.rbAlwaysUser
-            SamplePriority.ALWAYS_META    -> binding.rbAlwaysMeta
-        }
-        rb.isChecked = true
-        binding.rgPriority.setOnCheckedChangeListener { _, checkedId ->
-            val priority = when (checkedId) {
-                R.id.rb_meta_first  -> SamplePriority.METADATA_FIRST
-                R.id.rb_user_first  -> SamplePriority.USER_FIRST
-                R.id.rb_always_user -> SamplePriority.ALWAYS_USER
-                R.id.rb_always_meta -> SamplePriority.ALWAYS_META
-                else                -> SamplePriority.METADATA_FIRST
-            }
-            FontRepository.settings = FontRepository.settings.copy(samplePriority = priority)
+    private fun renderShowFullNameSwitch(s: AppSettings) {
+        binding.switchShowFullName.isChecked = s.showFullFontName
+        binding.switchShowFullName.setOnCheckedChangeListener { _, checked ->
+            FontRepository.settings = FontRepository.settings.copy(showFullFontName = checked)
             FontRepository.saveSettings(requireContext())
         }
     }
@@ -175,6 +196,16 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    // ── Prefer meta sample switch ─────────────────────────────────────────
+
+    private fun renderPreferMetaSwitch(s: AppSettings) {
+        binding.switchPreferMeta.isChecked = s.preferMetaSample
+        binding.switchPreferMeta.setOnCheckedChangeListener { _, checked ->
+            FontRepository.settings = FontRepository.settings.copy(preferMetaSample = checked)
+            FontRepository.saveSettings(requireContext())
+        }
+    }
+
     // ── Recursive switch ──────────────────────────────────────────────────
 
     private fun renderRecursiveSwitch(s: AppSettings) {
@@ -182,6 +213,29 @@ class SettingsFragment : Fragment() {
         binding.switchRecursive.setOnCheckedChangeListener { _, checked ->
             FontRepository.settings = FontRepository.settings.copy(folderRecursive = checked)
             FontRepository.saveSettings(requireContext())
+        }
+    }
+
+    // ── Language spinner ──────────────────────────────────────────────────
+
+    private fun renderLangSpinner(s: AppSettings) {
+        val langs = s.langSamples.keys.toList()
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, langs)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerLang.adapter = adapter
+        val idx = langs.indexOf(s.defaultLang).coerceAtLeast(0)
+        binding.spinnerLang.setSelection(idx)
+
+        var ready = false
+        binding.spinnerLang.post { ready = true }
+
+        binding.spinnerLang.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: android.widget.AdapterView<*>?, v: View?, pos: Int, id: Long) {
+                if (!ready) return
+                FontRepository.settings = FontRepository.settings.copy(defaultLang = langs[pos])
+                FontRepository.saveSettings(requireContext())
+            }
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
         }
     }
 
@@ -203,9 +257,18 @@ class SettingsFragment : Fragment() {
                 }
             }
             lb.btnRemove.setOnClickListener {
-                val updated = FontRepository.settings.langSamples.toMutableMap()
+                val current = FontRepository.settings.langSamples
+                if (current.size <= 1) {
+                    Toast.makeText(requireContext(), "At least one sample text must remain.", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                val updated = current.toMutableMap()
                 updated.remove(lang)
-                FontRepository.settings = FontRepository.settings.copy(langSamples = updated)
+                // If deleted lang was the default, reset to first remaining
+                val newDefault = if (FontRepository.settings.defaultLang == lang)
+                    updated.keys.first() else FontRepository.settings.defaultLang
+                FontRepository.settings = FontRepository.settings.copy(
+                    langSamples = updated, defaultLang = newDefault)
                 FontRepository.saveSettings(requireContext())
                 renderLangList(FontRepository.settings)
                 renderLangSpinner(FontRepository.settings)
@@ -215,46 +278,48 @@ class SettingsFragment : Fragment() {
         binding.btnAddLang.setOnClickListener { showAddLangDialog() }
     }
 
-    private fun renderLangSpinner(s: AppSettings) {
-        val langs = s.langSamples.keys.toList()
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, langs)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.spinnerLang.adapter = adapter
-        val idx = langs.indexOf(s.defaultLang).coerceAtLeast(0)
-        binding.spinnerLang.setSelection(idx)
-        binding.spinnerLang.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: android.widget.AdapterView<*>?, v: View?, pos: Int, id: Long) {
-                FontRepository.settings = FontRepository.settings.copy(defaultLang = langs[pos])
-                FontRepository.saveSettings(requireContext())
-            }
-            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
-        }
-    }
+    // ── Add language dialog ───────────────────────────────────────────────
 
     private fun showAddLangDialog() {
-        val dialogView = LayoutInflater.from(
-            ContextThemeWrapper(requireContext(), ThemeManager.currentThemeResId(requireContext()))
-        ).inflate(R.layout.dialog_add_lang, null)
-        val etName = dialogView.findViewById<TextInputEditText>(R.id.et_lang_name)
-        val etText = dialogView.findViewById<TextInputEditText>(R.id.et_lang_sample)
-        AlertDialog.Builder(ContextThemeWrapper(requireContext(), ThemeManager.currentThemeResId(requireContext())))
-            .setTitle(getString(R.string.add_language))
-            .setView(dialogView)
-            .setPositiveButton(getString(R.string.save)) { _, _ ->
-                val name = etName.text?.toString()?.trim() ?: ""
-                val text = etText.text?.toString()?.trim() ?: ""
-                if (name.isNotEmpty()) {
-                    val updated = FontRepository.settings.langSamples.toMutableMap()
-                    updated[name] = text
-                    FontRepository.settings = FontRepository.settings.copy(langSamples = updated)
-                    FontRepository.saveSettings(requireContext())
-                    renderLangList(FontRepository.settings)
-                    renderLangSpinner(FontRepository.settings)
-                }
+        val themed = ContextThemeWrapper(requireContext(), ThemeManager.currentThemeResId(requireContext()))
+        val dialogView = LayoutInflater.from(themed).inflate(R.layout.dialog_add_lang, null)
+
+        val etName   = dialogView.findViewById<TextInputEditText>(R.id.et_lang_name)
+        val etSample = dialogView.findViewById<TextInputEditText>(R.id.et_lang_sample)
+        val btnCancel = dialogView.findViewById<TextView>(R.id.btn_dialog_cancel)
+        val btnSave   = dialogView.findViewById<TextView>(R.id.btn_dialog_save)
+
+        val dialog = Dialog(themed, R.style.Theme_FontLens_Dialog)
+        dialog.setContentView(dialogView)
+        dialog.window?.apply {
+            setBackgroundDrawableResource(android.R.color.transparent)
+            setLayout(
+                (requireContext().resources.displayMetrics.widthPixels * 0.92f).toInt(),
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
+
+        btnCancel.setOnClickListener { dialog.dismiss() }
+        btnSave.setOnClickListener {
+            val name = etName.text?.toString()?.trim() ?: ""
+            val text = etSample.text?.toString()?.trim() ?: ""
+            if (name.isEmpty()) {
+                etName.error = "Language name required"
+                return@setOnClickListener
             }
-            .setNegativeButton(getString(R.string.cancel), null)
-            .show()
+            val updated = FontRepository.settings.langSamples.toMutableMap()
+            updated[name] = text
+            FontRepository.settings = FontRepository.settings.copy(langSamples = updated)
+            FontRepository.saveSettings(requireContext())
+            renderLangList(FontRepository.settings)
+            renderLangSpinner(FontRepository.settings)
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
+
+    private fun restartActivity() { requireActivity().recreate() }
 
     override fun onDestroyView() { super.onDestroyView(); _binding = null }
 }
