@@ -62,16 +62,11 @@ jobs:
         run: ./gradlew assembleRelease --stacktrace
         env:
           GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-
-      - name: List APKs
-        run: find . -name "*.apk"
         
       - name: Upload APK
         uses: actions/upload-artifact@v7
         with:
           name: FontLens
-          # path: app/build/outputs/apk/debug/app-debug.apk
-          # path: app/build/outputs/apk/release/app-release-unsigned.apk
-          path: app/build/outputs/apk/release/app-release.apk
+          path: '**/*.apk'
           archive: false
           retention-days: 30
