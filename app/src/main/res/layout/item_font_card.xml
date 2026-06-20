@@ -13,85 +13,142 @@
     app:strokeColor="?attr/dividerColor"
     app:strokeWidth="1dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:padding="@dimen/card_padding">
 
-        <TextView
-            android:id="@+id/tv_font_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textColor="?attr/textPrimary"
-            android:textSize="13sp"
-            android:letterSpacing="0.05"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@id/btn_remove"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tv_font_sub"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:textColor="?attr/textMuted"
-            android:textSize="11sp"
-            app:layout_constraintEnd_toStartOf="@id/btn_remove"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_font_name" />
-
-        <ImageView
-            android:id="@+id/btn_remove"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:padding="7dp"
-            android:src="@drawable/ic_delete"
-            app:tint="@color/ic_delete_tint"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            app:layout_constraintEnd_toStartOf="@id/btn_favorite"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:id="@+id/btn_favorite"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:padding="6dp"
-            android:src="@drawable/ic_star_outline"
-            app:tint="@color/ic_tint_muted"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <!-- Single preview TextView, 2 lines, same size and color -->
-        <TextView
-            android:id="@+id/tv_preview_large"
+        <!-- Row 1: [type badge + names] (left) + [fav, delete] (right) -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:textColor="?attr/textSecondary"
-            android:textSize="26sp"
-            android:maxLines="2"
-            android:ellipsize="end"
-            android:lineSpacingMultiplier="1.2"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_font_sub" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-        <!-- Hidden — kept so binding doesn't crash, zero size -->
+            <!-- Family · Subfamily name (takes remaining space) -->
+            <TextView
+                android:id="@+id/tv_font_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="?attr/textPrimary"
+                android:textSize="15sp"
+                android:maxLines="1"
+                android:ellipsize="marquee" />
+
+            <!-- Font type badge — wrap_content, sits before the name -->
+            <TextView
+                android:id="@+id/tv_font_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:gravity="center"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:letterSpacing="0.08"
+                android:fontFamily="monospace"
+                android:textColor="?attr/colorPrimary"
+                android:paddingStart="7dp"
+                android:paddingEnd="7dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:clickable="false"
+                android:focusable="false" />
+
+            <!-- tv_font_sub: kept for binding compat only -->
+            <TextView
+                android:id="@+id/tv_font_sub"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="gone" />
+
+            <!-- Favorite -->
+            <ImageView
+                android:id="@+id/btn_favorite"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:padding="7dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                android:src="@drawable/ic_star_outline"
+                android:scaleType="fitCenter"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <!-- Delete -->
+            <ImageView
+                android:id="@+id/btn_remove"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:padding="7dp"
+                android:src="@drawable/ic_delete"
+                android:scaleType="fitCenter"
+                android:clickable="true"
+                android:focusable="true" />
+
+        </LinearLayout>
+
+        <!-- Row 2: Script label row — pipe-separated tappable names -->
+        <HorizontalScrollView
+            android:id="@+id/hsv_script_chips"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:scrollbars="none"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:id="@+id/ll_script_chips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical" />
+
+        </HorizontalScrollView>
+
+        <!-- Row 3: Preview text -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/btn_cycle_script"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:gravity="center"
+                android:text="↻"
+                android:textSize="16sp"
+                android:textColor="?attr/colorPrimary"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="gone"
+                android:layout_marginEnd="6dp" />
+
+            <TextView
+                android:id="@+id/tv_preview_large"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="?attr/textSecondary"
+                android:textSize="26sp"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:lineSpacingMultiplier="1.2" />
+
+        </LinearLayout>
+
         <TextView
             android:id="@+id/tv_preview_small"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_preview_large" />
+            android:visibility="gone" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>

@@ -35,9 +35,7 @@
             android:paddingTop="14dp"
             android:paddingBottom="32dp">
 
-            <!-- ══════════════════════════════════════════════════════════
-                 THEME SECTION
-            ══════════════════════════════════════════════════════════ -->
+            <!-- ══ APPEARANCE ══════════════════════════════════════════════ -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -65,7 +63,6 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <!-- Theme Color label -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -83,7 +80,6 @@
                         android:textSize="12sp"
                         android:layout_marginBottom="14dp" />
 
-                    <!-- Color chip grid — 2×2 -->
                     <LinearLayout
                         android:id="@+id/color_chip_container"
                         android:layout_width="match_parent"
@@ -91,14 +87,12 @@
                         android:orientation="vertical"
                         android:layout_marginBottom="20dp" />
 
-                    <!-- Divider -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="?attr/dividerColor"
                         android:layout_marginBottom="16dp" />
 
-                    <!-- Theme Mode label -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -111,12 +105,11 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="System Default hides the mode toggle in the library"
+                        android:text="System Default follows your device setting"
                         android:textColor="?attr/textMuted"
                         android:textSize="12sp"
                         android:layout_marginBottom="12dp" />
 
-                    <!-- Mode dropdown -->
                     <Spinner
                         android:id="@+id/spinner_theme_mode"
                         android:layout_width="match_parent"
@@ -130,9 +123,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ══════════════════════════════════════════════════════════
-                 DISPLAY SECTION
-            ══════════════════════════════════════════════════════════ -->
+            <!-- ══ DISPLAY ════════════════════════════════════════════════ -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -159,50 +150,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
-
-                    <!-- Show Full Font Name -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="14dp">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Show Full Font Name"
-                                android:textColor="?attr/textPrimary"
-                                android:textSize="14sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Display full font names instead of family names"
-                                android:textColor="?attr/textMuted"
-                                android:textSize="12sp"
-                                android:layout_marginTop="2dp" />
-
-                        </LinearLayout>
-
-                        <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/switch_show_full_name"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="?attr/dividerColor"
-                        android:layout_marginBottom="14dp" />
 
                     <!-- Glyph -->
                     <LinearLayout
@@ -244,9 +191,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ══════════════════════════════════════════════════════════
-                 SAMPLE TEXT SECTION
-            ══════════════════════════════════════════════════════════ -->
+            <!-- ══ SAMPLE TEXT ════════════════════════════════════════════ -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -274,7 +219,7 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <!-- Prefer Metadata Sample -->
+                    <!-- Built-in sample text toggle -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -291,14 +236,15 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Prefer Metadata Sample Text"
+                                android:text="Use Built-in Sample Text"
                                 android:textColor="?attr/textPrimary"
                                 android:textSize="14sp" />
 
                             <TextView
+                                android:id="@+id/tv_builtin_sample_desc"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="When available, use sample text stored inside the font file"
+                                android:text="ON: use the font's embedded sample text when available"
                                 android:textColor="?attr/textMuted"
                                 android:textSize="12sp"
                                 android:layout_marginTop="2dp" />
@@ -318,78 +264,55 @@
                         android:background="?attr/dividerColor"
                         android:layout_marginBottom="14dp" />
 
-                    <!-- Default Language -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Default Preview Language"
-                        android:textColor="?attr/textPrimary"
-                        android:textSize="14sp"
-                        android:layout_marginBottom="8dp" />
-
-                    <Spinner
-                        android:id="@+id/spinner_lang"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_spinner"
-                        android:paddingStart="12dp"
-                        android:paddingEnd="12dp"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp"
-                        android:layout_marginBottom="14dp" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="?attr/dividerColor"
-                        android:layout_marginBottom="14dp" />
-
-                    <!-- Language Samples header -->
+                    <!-- Edit Sample Texts row -->
                     <LinearLayout
+                        android:id="@+id/row_edit_samples"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:layout_marginBottom="10dp">
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp">
 
-                        <TextView
+                        <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Language Sample Texts"
-                            android:textColor="?attr/textPrimary"
-                            android:textSize="14sp" />
+                            android:orientation="vertical">
 
-                        <TextView
-                            android:id="@+id/btn_add_lang"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="+ Add"
-                            android:textColor="?attr/colorPrimary"
-                            android:textSize="13sp"
-                            android:paddingStart="10dp"
-                            android:paddingEnd="10dp"
-                            android:paddingTop="6dp"
-                            android:paddingBottom="6dp"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:background="?attr/selectableItemBackgroundBorderless" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Edit Sample Texts"
+                                android:textColor="?attr/textPrimary"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Edit texts and set script priority order"
+                                android:textColor="?attr/textMuted"
+                                android:textSize="12sp"
+                                android:layout_marginTop="2dp" />
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_back"
+                            android:scaleX="-1"
+                            app:tint="?attr/textMuted" />
 
                     </LinearLayout>
-
-                    <!-- Language list -->
-                    <LinearLayout
-                        android:id="@+id/lang_list_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ══════════════════════════════════════════════════════════
-                 FOLDER SCANNING SECTION
-            ══════════════════════════════════════════════════════════ -->
+            <!-- ══ FOLDER SCANNING ════════════════════════════════════════ -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -7,17 +7,17 @@ import java.nio.ByteOrder
 
 object FontParser {
 
-    fun parse(stream: InputStream): FontMeta {
+    fun parse(stream: InputStream, langCoverageThreshold: Int = 40): FontMeta {
         return try {
             val bytes = stream.readBytes()
             val buf = ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN)
-            parseBuffer(buf, bytes)
+            parseBuffer(buf, bytes, langCoverageThreshold)
         } catch (e: Exception) {
             FontMeta()
         }
     }
 
-    private fun parseBuffer(buf: ByteBuffer, raw: ByteArray): FontMeta {
+    private fun parseBuffer(buf: ByteBuffer, raw: ByteArray, langCoverageThreshold: Int): FontMeta {
         buf.position(0)
         val numTables = buf.getShort(4).toInt() and 0xFFFF
         val tableMap = mutableMapOf<String, Pair<Int, Int>>() // tag -> (offset, length)
@@ -104,6 +104,7 @@ object FontParser {
         }
 
         val supportedChars = parseCmap(buf, raw, tableMap)
+        val scriptCodes = ScriptCoverageAnalyzer.analyze(supportedChars, langCoverageThreshold)
 
         val weightName = mapOf(
             100 to "Thin", 200 to "ExtraLight", 300 to "Light", 400 to "Regular",
@@ -120,7 +121,8 @@ object FontParser {
             isFixedPitch = isFixedPitch, boldSupport = boldSupport, italicSupport = italicSupport,
             condensedSupport = condensedSupport, extendedSupport = extendedSupport,
             isBold = isBold, isItalic = isItalic, isRegular = isRegular,
-            tables = tableMap.keys.toList(), supportedChars = supportedChars
+            tables = tableMap.keys.toList(), supportedChars = supportedChars,
+            scriptCodes = scriptCodes
         )
     }
 

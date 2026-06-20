@@ -31,7 +31,8 @@ data class FontMeta(
     val isItalic: Boolean = false,
     val isRegular: Boolean = true,
     val tables: List<String> = emptyList(),
-    val supportedChars: List<Int> = emptyList()
+    val supportedChars: List<Int> = emptyList(),
+    val scriptCodes: List<String> = emptyList()
 )
 
 data class FontItem(
@@ -62,24 +63,88 @@ data class FontItem(
 }
 
 data class AppSettings(
-    val langSamples: Map<String, String> = mapOf(
-        "English" to "The quick brown fox jumps over the lazy dog 0123456789",
-        "Bengali" to "আমার সোনার বাংলা আমি তোমায় ভালোবাসি"
-    ),
+    // langSamples: keyed by script code (e.g. "en", "hi"). Values are the sample texts.
+    val langSamples: Map<String, String> = defaultLangSamples(),
+    // User-defined priority order of script codes. Drives chip order and preview priority.
+    val scriptOrder: List<String> = defaultLangSamples().keys.toList(),
     val samplePriority: SamplePriority = SamplePriority.METADATA_FIRST,
     val glyphShowAll: Boolean = false,
-    val defaultLang: String = "English",
+    // Legacy kept for Gson backward compat
+    val defaultLangs: List<String> = listOf("en"),
+    val defaultLang: String = "en",
     val folderRecursive: Boolean = true,
     val colorTheme: ColorTheme = ColorTheme.GREEN,
     val darkMode: Boolean = false,
     val followSystem: Boolean = false,
-    // New fields
-    val themeMode: ThemeMode = ThemeMode.DAY,   // replaces followSystem+darkMode
-    val preferMetaSample: Boolean = true,        // replaces 4-option SamplePriority
-    val showFullFontName: Boolean = false,        // new display option
-    // Legacy (kept for Gson backward compat)
+    val themeMode: ThemeMode = ThemeMode.DAY,
+    val preferMetaSample: Boolean = false,
+    val langCoverageThreshold: Int = 40,
+    // Legacy
     val theme: AppTheme = AppTheme.DAY
 )
+
+/** Built-in sample texts for all 29 scripts in ScriptCoverageAnalyzer */
+fun defaultLangSamples(): Map<String, String> = linkedMapOf(
+    "latin"       to "The quick brown fox jumps over the lazy dog",
+    "devanagari"  to "सभी मनुष्यों को गौरव और अधिकारों के मामले में जन्मजात स्वतन्त्रता",
+    "bengali"     to "আমার সোনার বাংলা আমি তোমায় ভালোবাসি",
+    "arabic"      to "الحروف العربية جميلة ومتنوعة في أشكالها",
+    "hebrew"      to "כָּל בְּנֵי הָאָדָם נוֹלְדוּ בְּנֵי חוֹרִין",
+    "han"         to "人人生而自由，在尊嚴和權利上一律平等",
+    "kana"        to "いろはにほへとちりぬるをわかよたれそ",
+    "hangul"      to "나랏말싸미 듕귁에 달아 문자와로 서로 사맛디",
+    "tamil"       to "அனைத்து மனிதர்களும் சுதந்திரமாகவே பிறக்கின்றனர்",
+    "telugu"      to "అన్ని మానవులు స్వేచ్ఛగా జన్మిస్తారు",
+    "kannada"     to "ಎಲ್ಲಾ ಮಾನವರೂ ಸ್ವತಂತ್ರರಾಗಿ ಜನಿಸಿದ್ದಾರೆ",
+    "malayalam"   to "എല്ലാ മനുഷ്യരും സ്വതന്ത്രരായി ജനിക്കുന്നു",
+    "gujarati"    to "બધા મનુષ્યો સ્વતંત્ર અને સમાન ગૌરવ સાથે જન્મ્યા છે",
+    "gurmukhi"    to "ਸਾਰੇ ਮਨੁੱਖ ਆਜ਼ਾਦ ਅਤੇ ਬਰਾਬਰ ਪੈਦਾ ਹੁੰਦੇ ਹਨ",
+    "odia"        to "ସମସ୍ତ ମଣିଷ ସ୍ୱାଧୀନ ଭାବରେ ଜନ୍ମ ଲାଭ କରନ୍ତି",
+    "sinhala"     to "සියලු මනුෂ්‍යයෝ නිදහස් ව උපත ලබති",
+    "thai"        to "มนุษย์ทุกคนเกิดมามีอิสระและเท่าเทียมกัน",
+    "khmer"       to "មនុស្សទាំងអស់កើតមកមានសេរីភាព",
+    "myanmar"     to "လူသားအားလုံးသည် လွတ်လပ်စွာမွေးဖွားလာကြသည်",
+    "georgian"    to "ყველა ადამიანი იბადება თავისუფალი",
+    "armenian"    to "Բոլոր մարդիկ ծնվում են ազատ",
+    "ethiopic"    to "ሁሉም ሰዎች ነፃ ሆነው ይወለዳሉ",
+    "cyrillic"    to "Все люди рождаются свободными и равными",
+    "greek"       to "Όλοι οι άνθρωποι γεννιούνται ελεύθεροι",
+    "tibetan"     to "མི་རིགས་ཀྱི་གོ་མཐོ་དང་ཐོབ་ཐང་གི་ཐད་ནས་རང་དབང་ཡོད།",
+    "lao"         to "ມະນຸດທຸກຄົນເກີດມາມີສິດທິເທົ່າທຽມກັນ",
+    "mongolian"   to "Хүн бүр төрөлхийн эрх чөлөөтэй"
+)
+
+/** Display name for each script code */
+fun scriptDisplayName(code: String): String = when (code) {
+    "latin"      -> "Latin"
+    "devanagari" -> "Devanagari"
+    "bengali"    -> "Bengali"
+    "arabic"     -> "Arabic"
+    "hebrew"     -> "Hebrew"
+    "han"        -> "Han"
+    "kana"       -> "Kana"
+    "hangul"     -> "Hangul"
+    "tamil"      -> "Tamil"
+    "telugu"     -> "Telugu"
+    "kannada"    -> "Kannada"
+    "malayalam"  -> "Malayalam"
+    "gujarati"   -> "Gujarati"
+    "gurmukhi"   -> "Gurmukhi"
+    "odia"       -> "Odia"
+    "sinhala"    -> "Sinhala"
+    "thai"       -> "Thai"
+    "khmer"      -> "Khmer"
+    "myanmar"    -> "Myanmar"
+    "georgian"   -> "Georgian"
+    "armenian"   -> "Armenian"
+    "ethiopic"   -> "Ethiopic"
+    "cyrillic"   -> "Cyrillic"
+    "greek"      -> "Greek"
+    "tibetan"    -> "Tibetan"
+    "lao"        -> "Lao"
+    "mongolian"  -> "Mongolian"
+    else         -> code.replaceFirstChar { it.uppercase() }
+}
 
 enum class SamplePriority { METADATA_FIRST, USER_FIRST, ALWAYS_USER, ALWAYS_META }
 enum class AppTheme { SYSTEM, DAY, NIGHT }

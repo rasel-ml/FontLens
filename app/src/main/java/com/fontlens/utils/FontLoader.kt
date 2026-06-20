@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import com.fontlens.data.FontItem
 import com.fontlens.data.FontMeta
+import com.fontlens.data.FontRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -25,7 +26,8 @@ object FontLoader {
                 val cr = context.contentResolver
                 val name = getFileName(context, uri)
                 val id = "${name}_${uri.hashCode()}"
-                val meta = cr.openInputStream(uri)?.use { FontParser.parse(it) } ?: return@forEachIndexed
+                val threshold = FontRepository.settings.langCoverageThreshold
+                val meta = cr.openInputStream(uri)?.use { FontParser.parse(it, threshold) } ?: return@forEachIndexed
                 val displayName = meta.family.ifEmpty { name.substringBeforeLast(".") }
                 result.add(FontItem(
                     id = id, displayName = displayName, uri = uri, meta = meta,

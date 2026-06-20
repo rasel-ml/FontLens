@@ -206,16 +206,42 @@ object FontRepository {
             .apply()
     }
 
+    /**
+     * Returns the best sample text for a font card / preview.
+     * Priority:
+     *   1. Font's built-in metadata sample text (if preferMetaSample ON)
+     *   2. First script in scriptOrder that has a user sample and the font supports
+     *   3. First script in scriptOrder that has a user sample (regardless of font support)
+     *   4. Fallback
+     */
     fun getSampleText(font: FontItem): String {
         val s = settings
-        val userText = s.langSamples[s.defaultLang] ?: ""
         val metaText = font.effectiveMeta.sampleText
-        val default  = "The quick brown fox jumps over the lazy dog 0123456789"
-        // New simple switch: preferMetaSample (true = metadata first, false = always user)
-        return if (s.preferMetaSample) {
-            metaText.ifEmpty { userText.ifEmpty { default } }
-        } else {
-            userText.ifEmpty { default }
+        if (s.preferMetaSample && metaText.isNotEmpty()) return metaText
+        val fontCodes = font.effectiveMeta.scriptCodes.toSet()
+        // Try highest-priority supported script first
+        val fromSupported = s.scriptOrder.firstNotNullOfOrNull { code ->
+            if (fontCodes.contains(code)) s.langSamples[code]?.ifEmpty { null } else null
         }
+        if (fromSupported != null) return fromSupported
+        // Fall back to any sample in order
+        val fromOrder = s.scriptOrder.firstNotNullOfOrNull { code ->
+            s.langSamples[code]?.ifEmpty { null }
+        }
+        return fromOrder ?: "The quick brown fox jumps over the lazy dog"
+    }
+
+    /** Returns sample text for a specific script code, or null if none exists. */
+    fun getSampleForLang(langCode: String): String? =
+        settings.langSamples[langCode]?.ifEmpty { null }
+
+    /**
+     * Returns script codes to display on a font card, ordered by user's scriptOrder,
+     * limited to scripts the font actually supports.
+     */
+    fun orderedScriptCodesForFont(font: FontItem): List<String> {
+        val s = settings
+        val fontCodes = font.effectiveMeta.scriptCodes.toSet()
+        return s.scriptOrder.filter { fontCodes.contains(it) }
     }
 }

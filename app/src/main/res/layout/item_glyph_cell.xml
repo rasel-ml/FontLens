@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="@dimen/glyph_cell_size"
-    android:layout_height="@dimen/glyph_cell_size"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="4dp"
+    android:padding="6dp"
     android:background="@drawable/bg_glyph_cell"
     android:clickable="true"
     android:focusable="true">
@@ -13,20 +13,24 @@
     <TextView
         android:id="@+id/tv_glyph"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
         android:gravity="center"
-        android:textSize="26sp"
+        android:textSize="28sp"
+        android:paddingTop="6dp"
+        android:paddingBottom="4dp"
         android:textColor="?attr/textPrimary"
         android:maxLines="1" />
 
     <TextView
         android:id="@+id/tv_codepoint"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="8sp"
+        android:gravity="center"
+        android:textSize="7sp"
+        android:paddingBottom="4dp"
         android:textColor="?attr/textMuted"
         android:fontFamily="monospace"
-        android:maxLines="1" />
+        android:maxLines="1"
+        android:ellipsize="none" />
 
 </LinearLayout>
