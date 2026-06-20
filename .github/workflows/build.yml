@@ -51,7 +51,7 @@ jobs:
     
       - name: Create keystore properties
         run: |
-          echo "storeFile=fontlens-release-key.jks" > keystore.properties
+          echo "storeFile=app/fontlens-release-key.jks" > keystore.properties
           echo "storePassword=${{ secrets.KEYPASS }}" >> keystore.properties
           echo "keyAlias=${{ secrets.KEY }}" >> keystore.properties
           echo "keyPassword=${{ secrets.KEYPASS }}" >> keystore.properties

@@ -36,10 +36,12 @@ android {
             keyPassword keystoreProperties['keyPassword']
         }
     }
+    
     buildTypes {
         release {
             minifyEnabled false
             shrinkResources false
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
