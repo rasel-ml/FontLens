@@ -36,8 +36,9 @@
     <fragment android:id="@+id/previewFragment"
         android:name="com.fontlens.ui.preview.PreviewFragment"
         android:label="@string/preview">
-        <argument android:name="fontId"   app:argType="string" />
-        <argument android:name="tempMode" app:argType="boolean" android:defaultValue="false" />
+        <argument android:name="fontId"            app:argType="string" />
+        <argument android:name="tempMode"          app:argType="boolean" android:defaultValue="false" />
+        <argument android:name="initialSampleText" app:argType="string"  android:defaultValue="" />
         <action android:id="@+id/action_preview_to_glyph" app:destination="@id/glyphFragment" />
         <action android:id="@+id/action_preview_to_meta"  app:destination="@id/metaFragment" />
         <action android:id="@+id/action_preview_to_info"  app:destination="@id/fontInfoFragment" />

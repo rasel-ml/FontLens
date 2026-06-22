@@ -101,7 +101,9 @@ class PreviewFragment : Fragment() {
             FontRepository.toggleFavorite(font.id, requireContext()); updateFav()
         }
 
-        binding.etPreview.setText(FontRepository.getSampleText(font))
+        binding.etPreview.setText(
+            args.initialSampleText.ifEmpty { FontRepository.getSampleText(font) }
+        )
 
         // Apply typeface immediately if already loaded, otherwise load on demand
         fun applyTypeface() {

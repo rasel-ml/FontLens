@@ -60,7 +60,20 @@ class FavoritesFragment : Fragment() {
 
         adapter = FontListAdapter(
             onFontClick = { font ->
-                findNavController().navigate(FavoritesFragmentDirections.actionFavToPreview(font.id))
+                findNavController().navigate(R.id.action_fav_to_preview,
+                    android.os.Bundle().apply {
+                        putString("fontId", font.id)
+                        putBoolean("tempMode", false)
+                        putString("initialSampleText", "")
+                    })
+            },
+            onSampleClick = { font, sampleText ->
+                findNavController().navigate(R.id.action_fav_to_preview,
+                    android.os.Bundle().apply {
+                        putString("fontId", font.id)
+                        putBoolean("tempMode", false)
+                        putString("initialSampleText", sampleText)
+                    })
             },
             onFavoriteClick = { font ->
                 FontRepository.toggleFavorite(font.id, requireContext())

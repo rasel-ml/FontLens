@@ -86,7 +86,22 @@ class FontListFragment : Fragment() {
         }
 
         adapter = FontListAdapter(
-            onFontClick     = { font -> findNavController().navigate(FontListFragmentDirections.actionListToPreview(font.id)) },
+            onFontClick     = { font ->
+                findNavController().navigate(R.id.action_list_to_preview,
+                    android.os.Bundle().apply {
+                        putString("fontId", font.id)
+                        putBoolean("tempMode", false)
+                        putString("initialSampleText", "")
+                    })
+            },
+            onSampleClick   = { font, sampleText ->
+                findNavController().navigate(R.id.action_list_to_preview,
+                    android.os.Bundle().apply {
+                        putString("fontId", font.id)
+                        putBoolean("tempMode", false)
+                        putString("initialSampleText", sampleText)
+                    })
+            },
             onFavoriteClick = { font -> FontRepository.toggleFavorite(font.id, requireContext()); adapter.notifyDataSetChanged() },
             onRemoveClick   = { font ->
                 DeleteFontDialog.show(

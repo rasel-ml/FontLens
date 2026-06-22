@@ -121,7 +121,16 @@ object ScriptCoverageAnalyzer {
             for (range in def.ranges) {
                 for (cp in range) { if (charSet.contains(cp)) matched++ }
             }
-            if (matched * 100 / total >= thresholdPercent) result.add(def.code)
+            if (def.code == "latin") {
+                // A font qualifies as Latin if it covers ≥ 80% of just A-Z/a-z (52 chars),
+                // even if it has no extended Latin chars (which would dilute the full-range score).
+                val basicMatched = (0x0041..0x005A).count { charSet.contains(it) } +
+                                   (0x0061..0x007A).count { charSet.contains(it) }
+                if (basicMatched * 100 / 52 >= 80 || matched * 100 / total >= thresholdPercent)
+                    result.add("latin")
+            } else {
+                if (matched * 100 / total >= thresholdPercent) result.add(def.code)
+            }
         }
         return result
     }

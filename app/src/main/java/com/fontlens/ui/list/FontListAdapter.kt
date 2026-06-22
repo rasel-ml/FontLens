@@ -26,6 +26,7 @@ import com.fontlens.utils.TypefaceLoader
 
 class FontListAdapter(
     private val onFontClick: (FontItem) -> Unit,
+    private val onSampleClick: (FontItem, String) -> Unit,
     private val onFavoriteClick: (FontItem) -> Unit,
     private val onRemoveClick: (FontItem) -> Unit,
     private val isFavorite: (String) -> Boolean,
@@ -216,13 +217,21 @@ class FontListAdapter(
             if (selectionMode) {
                 if (selected.contains(font.id)) selected.remove(font.id) else selected.add(font.id)
                 onSelectionChanged(selected.toSet()); notifyItemChanged(holder.adapterPosition)
-            } else onFontClick(font)
+            }
+            // Non-selection tap on card body does nothing — tap sample text to preview
         }
         b.root.setOnLongClickListener {
             if (!selectionMode) {
                 selectionMode = true; selected.add(font.id)
                 onSelectionChanged(selected.toSet()); notifyDataSetChanged()
             }; true
+        }
+
+        // ── Sample text click → open preview with current sample ──────────
+        b.tvPreviewLarge.isClickable = true
+        b.tvPreviewLarge.isFocusable = true
+        b.tvPreviewLarge.setOnClickListener {
+            if (!selectionMode) onSampleClick(font, b.tvPreviewLarge.text.toString())
         }
     }
 
@@ -246,6 +255,22 @@ class FontListAdapter(
         container.removeAllViews()
 
         val totalLabels = (if (showDefault) 1 else 0) + codes.size
+        if (font.effectiveMeta.isAnsiLegacy) {
+            // ANSI legacy: show a single non-interactive "ANSI" badge
+            b.hsvScriptChips.visibility = View.VISIBLE
+            container.removeAllViews()
+            val dp = ctx.resources.displayMetrics.density
+            val tv = TextView(ctx)
+            tv.text     = "ANSI"
+            tv.textSize = 12.5f
+            tv.setTextColor(p.accent)
+            tv.setTypeface(tv.typeface, Typeface.BOLD)
+            tv.setPadding((4f * dp).toInt(), (2f * dp).toInt(), (4f * dp).toInt(), (2f * dp).toInt())
+            tv.layoutParams = ViewGroup.MarginLayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            container.addView(tv)
+            return
+        }
         if (totalLabels == 0) {
             b.hsvScriptChips.visibility = View.GONE
             return
@@ -420,9 +445,12 @@ class FontListAdapter(
         activeIdx: Int,   // -1 = Default
         tf: Typeface
     ) {
+        val m = font.effectiveMeta
         val text = when {
-            activeIdx == -1 && showDefault ->
-                font.effectiveMeta.sampleText
+            // ANSI legacy: embedded sample text highest priority always, else "ANSI" label
+            m.isAnsiLegacy && m.sampleText.isNotEmpty() -> m.sampleText
+            m.isAnsiLegacy -> FontRepository.getSampleForLang("ansi") ?: "ANSI"
+            activeIdx == -1 && showDefault -> m.sampleText
             codes.isNotEmpty() && activeIdx in codes.indices -> {
                 val code = codes[activeIdx]
                 FontRepository.getSampleForLang(code) ?: getSample(font)
