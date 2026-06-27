@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:background="?attr/bgPrimary">
 
+    <!-- ── Header: back button + font title only ── -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
@@ -15,183 +16,188 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_back"
-        app:navigationIconTint="?attr/textSecondary">
+        app:navigationIconTint="?attr/textSecondary"
+        app:title=""
+        app:titleTextColor="?attr/textPrimary">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tv_font_name"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingEnd="8dp">
+            android:textColor="?attr/textPrimary"
+            android:textSize="16sp"
+            android:fontFamily="serif"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:letterSpacing="0.04" />
 
-            <TextView
-                android:id="@+id/tv_font_name"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textColor="?attr/textPrimary"
-                android:textSize="16sp"
-                android:fontFamily="serif"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:letterSpacing="0.04" />
-
-            <!-- Add to Library (temp mode only) -->
-            <TextView
-                android:id="@+id/btn_add_to_library"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="+ Add"
-                android:textSize="13sp"
-                android:textColor="?attr/colorOnPrimary"
-                android:background="@drawable/bg_accent_btn"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
-                android:layout_marginEnd="4dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:visibility="gone" />
-
-            <ImageView
-                android:id="@+id/btn_delete"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:padding="8dp"
-                android:src="@drawable/ic_delete"
-                app:tint="@color/ic_delete_tint"
-                android:clickable="true"
-                android:focusable="true"
-                android:visibility="gone"
-                android:background="?attr/selectableItemBackgroundBorderless" />
-
-            <ImageView
-                android:id="@+id/btn_info"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:padding="8dp"
-                android:src="@drawable/ic_info"
-                app:tint="@color/ic_tint_secondary"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackgroundBorderless" />
-
-            <ImageView
-                android:id="@+id/btn_meta"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:padding="8dp"
-                android:src="@drawable/ic_meta"
-                app:tint="@color/ic_tint_secondary"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackgroundBorderless" />
-
-            <ImageView
-                android:id="@+id/btn_glyph"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:padding="8dp"
-                android:src="@drawable/ic_glyph"
-                app:tint="@color/ic_tint_secondary"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackgroundBorderless" />
-
-            <ImageView
-                android:id="@+id/btn_favorite"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:padding="7dp"
-                android:src="@drawable/ic_star_outline"
-                app:tint="@color/ic_tint_muted"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackgroundBorderless" />
-
-        </LinearLayout>
     </androidx.appcompat.widget.Toolbar>
 
+    <!-- ── Menu bar: info · meta · glyph · add · delete · favorite ── -->
     <LinearLayout
-        android:id="@+id/controls_bar"
+        android:id="@+id/menu_bar"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="10dp"
-        android:background="?attr/bgSidebar"
+        android:gravity="center"
+        android:background="?attr/bgSurface"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar">
 
+        <!-- Font Info -->
+        <ImageView
+            android:id="@+id/btn_info"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="12dp"
+            android:src="@drawable/ic_info"
+            app:tint="?attr/textMuted"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <!-- Metadata -->
+        <ImageView
+            android:id="@+id/btn_meta"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="12dp"
+            android:src="@drawable/ic_meta"
+            app:tint="?attr/textMuted"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <!-- Glyph Map -->
+        <ImageView
+            android:id="@+id/btn_glyph"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="12dp"
+            android:src="@drawable/ic_glyph"
+            app:tint="?attr/textMuted"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="24dp"
+            android:background="?attr/dividerColor"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp" />
+
+        <!-- Reset styles -->
+        <ImageView
+            android:id="@+id/btn_reset"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="12dp"
+            android:src="@drawable/ic_refresh"
+            app:tint="?attr/textMuted"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <!-- Capture to PNG -->
+        <ImageView
+            android:id="@+id/btn_capture"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="12dp"
+            android:src="@drawable/ic_camera"
+            app:tint="?attr/textMuted"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <!-- Add to Library (temp mode) -->
         <TextView
-            android:id="@+id/tv_size_label"
+            android:id="@+id/btn_add_to_library"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="32px"
-            android:textColor="?attr/textMuted"
+            android:text="+ Add"
             android:textSize="12sp"
-            android:minWidth="52dp" />
+            android:textColor="?attr/colorOnPrimary"
+            android:background="@drawable/bg_accent_btn"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone" />
 
-        <SeekBar
-            android:id="@+id/seekbar_size"
+        <!-- Delete -->
+        <ImageView
+            android:id="@+id/btn_delete"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:max="152"
-            android:progress="24"
-            android:progressTint="?attr/accentColor"
-            android:thumbTint="?attr/accentColor" />
-
-        <TextView
-            android:id="@+id/btn_bold"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="8dp"
-            android:gravity="center"
-            android:text="B"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="?attr/textMuted"
-            android:background="@drawable/bg_style_btn"
+            android:padding="12dp"
+            android:src="@drawable/ic_delete"
+            app:tint="?attr/textMuted"
             android:clickable="true"
-            android:focusable="true" />
+            android:focusable="true"
+            android:visibility="gone"
+            android:background="?attr/selectableItemBackgroundBorderless" />
 
-        <TextView
-            android:id="@+id/btn_italic"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="6dp"
-            android:gravity="center"
-            android:text="I"
-            android:textSize="16sp"
-            android:textStyle="italic"
-            android:fontFamily="serif"
-            android:textColor="?attr/textMuted"
-            android:background="@drawable/bg_style_btn"
+        <!-- Favorite -->
+        <ImageView
+            android:id="@+id/btn_favorite"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="11dp"
+            android:src="@drawable/ic_star_outline"
+            app:tint="?attr/textMuted"
             android:clickable="true"
-            android:focusable="true" />
+            android:focusable="true"
+            android:visibility="gone"
+            android:background="?attr/selectableItemBackgroundBorderless" />
 
     </LinearLayout>
 
     <View
-        android:id="@+id/divider"
+        android:id="@+id/divider_menu"
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:background="?attr/dividerColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/controls_bar" />
+        app:layout_constraintTop_toBottomOf="@id/menu_bar" />
 
+    <!-- ── Background image layer (behind preview) ── -->
+    <ImageView
+        android:id="@+id/iv_bg_image"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/divider_menu"
+        app:layout_constraintBottom_toTopOf="@id/bottom_panel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- ── Preview text area ── -->
     <ScrollView
+        android:id="@+id/scroll_preview"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@android:color/transparent"
+        app:layout_constraintTop_toBottomOf="@id/divider_menu"
+        app:layout_constraintBottom_toTopOf="@id/bottom_panel"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <EditText
             android:id="@+id/et_preview"
@@ -209,5 +215,219 @@
             android:lineSpacingMultiplier="1.4" />
 
     </ScrollView>
+
+    <!-- ── Bottom panel: slider + style buttons ── -->
+    <LinearLayout
+        android:id="@+id/bottom_panel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="?attr/bgSurface"
+        android:elevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?attr/dividerColor" />
+
+        <!-- Font size label centered above slider -->
+        <TextView
+            android:id="@+id/tv_size_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:text="32px"
+            android:textColor="?attr/textSecondary"
+            android:textSize="11sp"
+            android:letterSpacing="0.04" />
+
+        <!-- Slider row: − [seekbar] + -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
+
+            <TextView
+                android:id="@+id/btn_size_minus"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:gravity="center"
+                android:text="−"
+                android:textSize="20sp"
+                android:textColor="?attr/textSecondary"
+                android:background="@drawable/bg_style_btn"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <SeekBar
+                android:id="@+id/seekbar_size"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:max="152"
+                android:progress="24"
+                android:progressTint="?attr/colorPrimary"
+                android:thumbTint="?attr/colorPrimary" />
+
+            <TextView
+                android:id="@+id/btn_size_plus"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:gravity="center"
+                android:text="+"
+                android:textSize="20sp"
+                android:textColor="?attr/textSecondary"
+                android:background="@drawable/bg_style_btn"
+                android:clickable="true"
+                android:focusable="true" />
+
+        </LinearLayout>
+
+        <!-- Style buttons row: Bold · Italic · Font color · BG color -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="12dp"
+            android:weightSum="6">
+
+            <!-- Bold -->
+            <TextView
+                android:id="@+id/btn_bold"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:gravity="center"
+                android:text="B"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="?attr/textMuted"
+                android:background="@drawable/bg_style_btn"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <!-- Italic -->
+            <TextView
+                android:id="@+id/btn_italic"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:gravity="center"
+                android:text="I"
+                android:textSize="16sp"
+                android:textStyle="italic"
+                android:fontFamily="serif"
+                android:textColor="?attr/textMuted"
+                android:background="@drawable/bg_style_btn"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <!-- Align -->
+            <ImageView
+                android:id="@+id/btn_align"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:padding="10dp"
+                android:src="@drawable/ic_format_align"
+                app:tint="?attr/textMuted"
+                android:background="@drawable/bg_style_btn"
+                android:clickable="true"
+                android:focusable="true"
+                android:scaleType="fitCenter" />
+
+            <!-- Font color -->
+            <FrameLayout
+                android:id="@+id/btn_font_color"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/bg_style_btn"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="A"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/textPrimary" />
+
+                <View
+                    android:id="@+id/font_color_indicator"
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:layout_gravity="bottom"
+                    android:background="?attr/textPrimary" />
+
+            </FrameLayout>
+
+            <!-- Background color -->
+            <FrameLayout
+                android:id="@+id/btn_bg_color"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/bg_style_btn"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="A"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/textPrimary" />
+
+                <View
+                    android:id="@+id/bg_color_indicator"
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:layout_gravity="bottom"
+                    android:background="?attr/bgPrimary" />
+
+            </FrameLayout>
+
+            <!-- Background image -->
+            <ImageView
+                android:id="@+id/btn_bg_image"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:padding="10dp"
+                android:src="@drawable/ic_image"
+                app:tint="?attr/textMuted"
+                android:background="@drawable/bg_style_btn"
+                android:clickable="true"
+                android:focusable="true"
+                android:scaleType="fitCenter" />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

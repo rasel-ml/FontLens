@@ -122,8 +122,8 @@ object ScriptCoverageAnalyzer {
                 for (cp in range) { if (charSet.contains(cp)) matched++ }
             }
             if (def.code == "latin") {
-                // A font qualifies as Latin if it covers ≥ 80% of just A-Z/a-z (52 chars),
-                // even if it has no extended Latin chars (which would dilute the full-range score).
+                // Also qualify if ≥ 80% of just A-Z/a-z (52 chars) are present —
+                // a Basic-Latin-only font is still a Latin font even with no extended chars.
                 val basicMatched = (0x0041..0x005A).count { charSet.contains(it) } +
                                    (0x0061..0x007A).count { charSet.contains(it) }
                 if (basicMatched * 100 / 52 >= 80 || matched * 100 / total >= thresholdPercent)

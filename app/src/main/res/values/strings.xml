@@ -51,4 +51,18 @@
     <string name="default_lang_title">Default Preview Language</string>
     <string name="lang_samples_title">Language Sample Texts</string>
     <string name="glyph_settings_title">Glyph Keyboard</string>
+    <!-- Preview screen tooltips -->
+    <string name="tooltip_font_info">Font Info</string>
+    <string name="tooltip_font_metadata">Font Metadata</string>
+    <string name="tooltip_glyph_map">Glyph Map</string>
+    <string name="tooltip_delete">Delete</string>
+    <string name="tooltip_favorite">Add to Favourites</string>
+    <string name="tooltip_reset">Reset</string>
+    <string name="tooltip_bold">Bold</string>
+    <string name="tooltip_italic">Italic</string>
+    <string name="tooltip_alignment">Alignment</string>
+    <string name="tooltip_text_color">Text Color</string>
+    <string name="tooltip_bg_color">Background Color</string>
+    <string name="tooltip_bg_image">Background Image</string>
+    <string name="tooltip_capture">Capture</string>
 </resources>

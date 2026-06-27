@@ -206,42 +206,109 @@ object FontRepository {
             .apply()
     }
 
+    /** Returns ISO codes that are currently visible (above divider). */
+    fun visibleIsos(): Set<String> {
+        val s = settings
+        val div = s.dividerPosition
+        return if (div < 0) s.langOrder.toSet()
+               else s.langOrder.take(div).toSet()
+    }
+
     /**
      * Returns the best sample text for a font card / preview.
      * Priority:
      *   1. Font's built-in metadata sample text (if preferMetaSample ON)
-     *   2. First script in scriptOrder that has a user sample and the font supports
-     *   3. First script in scriptOrder that has a user sample (regardless of font support)
-     *   4. Fallback
+     *   2. First visible language in langOrder that the font supports
+     *   3. First visible language in langOrder regardless of font support
+     *   4. Fallback pangram
      */
     fun getSampleText(font: FontItem): String {
         val s = settings
         val metaText = font.effectiveMeta.sampleText
         if (s.preferMetaSample && metaText.isNotEmpty()) return metaText
-        val fontCodes = font.effectiveMeta.scriptCodes.toSet()
-        // Try highest-priority supported script first
-        val fromSupported = s.scriptOrder.firstNotNullOfOrNull { code ->
-            if (fontCodes.contains(code)) s.langSamples[code]?.ifEmpty { null } else null
+        val charSet = font.effectiveMeta.supportedChars.toHashSet()
+        val visible = visibleIsos()
+        val fromSupported = s.langOrder.firstNotNullOfOrNull { iso ->
+            if (iso !in visible) return@firstNotNullOfOrNull null
+            val lang = com.fontlens.data.ALL_LANGUAGES.find { it.isoCode == iso } ?: return@firstNotNullOfOrNull null
+            if (lang.requiredChars.all { charSet.contains(it) })
+                s.langSamplesByIso[iso]?.ifEmpty { null }
+            else null
         }
         if (fromSupported != null) return fromSupported
-        // Fall back to any sample in order
-        val fromOrder = s.scriptOrder.firstNotNullOfOrNull { code ->
-            s.langSamples[code]?.ifEmpty { null }
-        }
-        return fromOrder ?: "The quick brown fox jumps over the lazy dog"
+        return s.langOrder.firstNotNullOfOrNull { iso ->
+            if (iso !in visible) null else s.langSamplesByIso[iso]?.ifEmpty { null }
+        } ?: "The quick brown fox jumps over the lazy dog"
     }
 
-    /** Returns sample text for a specific script code, or null if none exists. */
-    fun getSampleForLang(langCode: String): String? =
-        settings.langSamples[langCode]?.ifEmpty { null }
+    /** Returns sample text for a specific ISO language code, or null if none. */
+    fun getSampleForIso(isoCode: String): String? =
+        settings.langSamplesByIso[isoCode]?.ifEmpty { null }
+            ?: com.fontlens.data.defaultLanguageSamples()[isoCode]
 
     /**
-     * Returns script codes to display on a font card, ordered by user's scriptOrder,
-     * limited to scripts the font actually supports.
+     * Default sample for a script = first visible language in langOrder
+     * belonging to this script that the font supports.
+     */
+    fun getDefaultSampleForScript(font: FontItem, scriptCode: String): String? {
+        val s = settings
+        val charSet = font.effectiveMeta.supportedChars.toHashSet()
+        val scriptLangs = com.fontlens.data.languagesForScript(scriptCode)
+        val scriptIsos = scriptLangs.map { it.isoCode }.toSet()
+        val visible = visibleIsos()
+        return s.langOrder.firstNotNullOfOrNull { iso ->
+            if (iso !in visible || iso !in scriptIsos) return@firstNotNullOfOrNull null
+            val lang = scriptLangs.find { it.isoCode == iso } ?: return@firstNotNullOfOrNull null
+            if (lang.requiredChars.all { charSet.contains(it) })
+                s.langSamplesByIso[iso]?.ifEmpty { null }
+            else null
+        } ?: s.langOrder.firstNotNullOfOrNull { iso ->
+            if (iso !in visible || iso !in scriptIsos) null
+            else s.langSamplesByIso[iso]?.ifEmpty { null }
+        }
+    }
+
+    /**
+     * Returns visible languages supported by this font for a given script, in langOrder.
+     * Hidden languages (below divider) are excluded.
+     * Empty if fewer than 2 pass.
+     */
+    fun getSupportedLanguages(font: FontItem, scriptCode: String): List<com.fontlens.data.LanguageDef> {
+        val charSet = font.effectiveMeta.supportedChars.toHashSet()
+        val visible = visibleIsos()
+        return com.fontlens.data.supportedLanguages(scriptCode, charSet, settings.langOrder)
+            .filter { it.isoCode in visible }
+            .let { if (it.size <= 1) emptyList() else it }
+    }
+
+    /**
+     * Returns script codes to show on font card.
+     * A script is hidden if ALL its languages are below the divider.
      */
     fun orderedScriptCodesForFont(font: FontItem): List<String> {
-        val s = settings
-        val fontCodes = font.effectiveMeta.scriptCodes.toSet()
-        return s.scriptOrder.filter { fontCodes.contains(it) }
+        val fontScripts = font.effectiveMeta.scriptCodes.toSet()
+        val visible = visibleIsos()
+        val seen = mutableSetOf<String>()
+        val ordered = mutableListOf<String>()
+        for (iso in settings.langOrder) {
+            if (iso == "ansi") continue  // ANSI shown as special badge, not script chip
+            val scriptCode = com.fontlens.data.ALL_LANGUAGES.find { it.isoCode == iso }?.scriptCode ?: continue
+            if (scriptCode in fontScripts && seen.add(scriptCode)) {
+                val hasVisibleLang = com.fontlens.data.languagesForScript(scriptCode)
+                    .filter { it.isoCode != "ansi" }
+                    .any { it.isoCode in visible }
+                if (hasVisibleLang) ordered.add(scriptCode)
+            }
+        }
+        for (code in font.effectiveMeta.scriptCodes) {
+            if (code == "ansi") continue
+            if (code !in seen) {
+                val hasVisibleLang = com.fontlens.data.languagesForScript(code)
+                    .filter { it.isoCode != "ansi" }
+                    .any { it.isoCode in visible }
+                if (hasVisibleLang) ordered.add(code)
+            }
+        }
+        return ordered
     }
 }

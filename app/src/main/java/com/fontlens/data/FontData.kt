@@ -64,10 +64,13 @@ data class FontItem(
 }
 
 data class AppSettings(
-    // langSamples: keyed by script code (e.g. "en", "hi"). Values are the sample texts.
-    val langSamples: Map<String, String> = defaultLangSamples(),
-    // User-defined priority order of script codes. Drives chip order and preview priority.
-    val scriptOrder: List<String> = defaultLangSamples().keys.toList(),
+    // langSamplesByIso: sample texts keyed by ISO language code (e.g. "en", "es")
+    val langSamplesByIso: Map<String, String> = defaultLanguageSamples(),
+    // langOrder: user-defined order of ISO language codes — drives row order and default sample
+    val langOrder: List<String> = defaultLanguageSamples().keys.toList(),
+    // dividerPosition: index in langOrder where hidden languages start (inclusive)
+    // -1 means no divider / nothing hidden
+    val dividerPosition: Int = -1,
     val samplePriority: SamplePriority = SamplePriority.METADATA_FIRST,
     val glyphShowAll: Boolean = false,
     // Legacy kept for Gson backward compat

@@ -30,14 +30,14 @@
             app:tint="?attr/textMuted"
             android:layout_marginEnd="12dp" />
 
-        <!-- Script info + editable text -->
+        <!-- Content -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <!-- Script name + code row -->
+            <!-- Top row: ISO badge · name · restore button -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -45,6 +45,7 @@
                 android:gravity="center_vertical"
                 android:layout_marginBottom="6dp">
 
+                <!-- Language · Script name -->
                 <TextView
                     android:id="@+id/tv_script_name"
                     android:layout_width="0dp"
@@ -54,19 +55,36 @@
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
+                <!-- ISO badge left, beside name, accent_bg -->
                 <TextView
                     android:id="@+id/tv_script_code"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="?attr/colorPrimary"
-                    android:textSize="11sp"
+                    android:textColor="#FFFFFF"
+                    android:textSize="10sp"
                     android:textAllCaps="true"
-                    android:letterSpacing="0.08"
+                    android:letterSpacing="0.06"
                     android:background="@drawable/bg_chip_active"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:paddingTop="3dp"
-                    android:paddingBottom="3dp" />
+                    android:backgroundTint="?attr/colorPrimary"
+                    android:paddingStart="7dp"
+                    android:paddingEnd="7dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:layout_marginEnd="8dp" />
+                    
+                <!-- Restore default icon button: small, square with rounded edges, accent_bg -->
+                <ImageButton
+                    android:id="@+id/btn_restore_default"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@drawable/ic_refresh"
+                    android:background="@drawable/bg_icon_btn"
+                    android:backgroundTint="?attr/accentDim"
+                    app:tint="#FFFFFF"
+                    android:padding="5dp"
+                    android:contentDescription="Restore default"
+                    android:scaleType="fitCenter" />
 
             </LinearLayout>
 
@@ -82,19 +100,6 @@
                 android:inputType="text|textMultiLine"
                 android:maxLines="3"
                 android:minLines="1" />
-
-            <!-- Restore default link -->
-            <TextView
-                android:id="@+id/btn_restore_default"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="Restore default"
-                android:textColor="?attr/colorPrimary"
-                android:textSize="12sp"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackgroundBorderless" />
 
         </LinearLayout>
 
