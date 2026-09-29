@@ -54,6 +54,9 @@ class FontPreviewActivity : AppCompatActivity() {
             val font = items.first()
             FontRepository.addTempFont(font)
 
+            // Load typeface into cache NOW so PreviewFragment and GlyphUiHelper find it
+            com.fontlens.utils.TypefaceLoader.loadSingle(this@FontPreviewActivity, font.id, font.uri)
+
             supportFragmentManager.beginTransaction()
                 .replace(R.id.preview_container,
                     com.fontlens.ui.preview.StandalonePreviewFragment().apply {

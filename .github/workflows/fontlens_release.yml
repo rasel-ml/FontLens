@@ -70,3 +70,17 @@ jobs:
           path: '**/*.apk'
           archive: false
           retention-days: 30
+
+  - name: Generate tag
+    id: tag
+    run: echo "tag=v$(date +'%Y.%m.%d-%H%M%S')" >> "$GITHUB_OUTPUT"
+
+  - name: Create Release
+    uses: softprops/action-gh-release@v2
+    with:
+      tag_name: ${{ steps.tag.outputs.tag }}
+      name: FontLens ${{ steps.tag.outputs.tag }}
+      files: app/build/outputs/apk/release/*.apk
+      generate_release_notes: true
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

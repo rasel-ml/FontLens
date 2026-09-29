@@ -35,12 +35,31 @@ class StandalonePreviewFragment : Fragment() {
 
         val fontId = arguments?.getString("fontId") ?: run { requireActivity().finish(); return }
         val font   = FontRepository.getById(fontId)  ?: run { requireActivity().finish(); return }
-        val tf = TypefaceLoader.getTypeface(font.id)
 
         binding.tvFontName.text = font.effectiveMeta.family.ifEmpty { font.displayName }
         binding.toolbar.setNavigationOnClickListener { requireActivity().finish() }
 
-        // ── Add to Library ────────────────────────────────────────────────────
+        // ── Load typeface (may not be cached yet) ─────────────────────────────
+        fun applyTypeface(tf: android.graphics.Typeface?) {
+            if (tf == null) return
+            val style = when {
+                isBold && isItalic -> android.graphics.Typeface.BOLD_ITALIC
+                isBold             -> android.graphics.Typeface.BOLD
+                isItalic           -> android.graphics.Typeface.ITALIC
+                else               -> android.graphics.Typeface.NORMAL
+            }
+            binding.etPreview.setTypeface(tf, style)
+        }
+
+        val cachedTf = TypefaceLoader.getTypeface(font.id)
+        if (cachedTf != null) {
+            applyTypeface(cachedTf)
+        } else {
+            lifecycleScope.launch {
+                val tf = TypefaceLoader.loadSingle(requireContext(), font.id, font.uri)
+                if (_binding != null) applyTypeface(tf)
+            }
+        }
         fun refreshButtons() {
             val inLibrary = FontRepository.isInLibrary(font.id)
             binding.btnAddToLibrary.visibility = if (!inLibrary) View.VISIBLE else View.GONE
@@ -78,7 +97,6 @@ class StandalonePreviewFragment : Fragment() {
 
         // ── Preview text ──────────────────────────────────────────────────────
         binding.etPreview.setText(FontRepository.getSampleText(font))
-        if (tf != null) binding.etPreview.typeface = tf
 
         // ── Size seekbar ──────────────────────────────────────────────────────
         fontSize = 32
@@ -98,6 +116,7 @@ class StandalonePreviewFragment : Fragment() {
 
         // ── Bold / Italic ─────────────────────────────────────────────────────
         fun updateStyle() {
+            val tf = TypefaceLoader.getTypeface(font.id)
             val style = when {
                 isBold && isItalic -> android.graphics.Typeface.BOLD_ITALIC
                 isBold             -> android.graphics.Typeface.BOLD
