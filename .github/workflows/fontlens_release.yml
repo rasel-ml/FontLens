@@ -79,11 +79,11 @@ jobs:
         run: echo "tag=v$(date +'%Y.%m.%d-%H%M%S')" >> "$GITHUB_OUTPUT"
     
       - name: Create Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
           name: FontLens ${{ steps.tag.outputs.tag }}
-          files: app/build/outputs/apk/release/*.apk
+          files: '**/*.apk'
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
