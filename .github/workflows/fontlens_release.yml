@@ -28,9 +28,10 @@ jobs:
           echo "id=$id" >> "$GITHUB_OUTPUT"
 
       - name: Download APK artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
-          name: FontLens
+          pattern: '*.apk'
+          merge-multiple: true
           run-id: ${{ steps.run.outputs.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
