@@ -1,8 +1,13 @@
 name: Build FontLens APK
 
 on:
-  # push:
-    # branches: [ main, master ]
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'app/**'
+      - 'build.gradle*'
+      - 'settings.gradle*'
+      - 'gradle/**'
   # pull_request:
     # branches: [ main, master ]
   workflow_dispatch:
