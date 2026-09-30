@@ -2,7 +2,7 @@
 <p align="center"></p>
 <h1 align="center"><img src=".github/raw/icon.png" alt="App Icon" height="30" width="30">  <b>FontLens</b></h1>
 
-<p align="center">A fully offline Android font viewer and inspector</p>
+<p align="center">A fully offline Android font viewer and inspector app</p>
 
 ## Features
 - Completely offline. No permission required.
@@ -15,12 +15,12 @@
 
 ## Screenshots
 
-<div><img src=".github/raw/ss_1.png" alt="Library" width="32%"></img>
-<img src=".github/raw/ss_2.png" alt="Favorite" width="32%"></img>
-<img src=".github/raw/ss_3.png" alt="Preview" width="32%"></img></div>
-<div><img src=".github/raw/ss_4.png" alt="Font Info" width="32%"></img>
-<img src=".github/raw/ss_5.png" alt="Font Metadata" width="32%"></img>
-<img src=".github/raw/ss_6.png" alt="Glyph Map" width="32%"></img></div>
+<div><img src=".github/raw/ss1.png" alt="Library" width="32%"></img>
+<img src=".github/raw/ss2.png" alt="Preview" width="32%"></img>
+<img src=".github/raw/ss3.png" alt="Settings" width="32%"></img></div>
+<div><img src=".github/raw/ss4.png" alt="Font Info" width="32%"></img>
+<img src=".github/raw/ss5.png" alt="Font Metadata" width="32%"></img>
+<img src=".github/raw/ss6.png" alt="Glyph Map" width="32%"></img></div>
 
 ## Building
 
@@ -32,13 +32,6 @@
 ### Via GitHub Actions
 Push to `main` or `master` — the workflow builds a debug APK automatically.
 Download it from the **Actions** tab → latest run → **Artifacts**.
-
-### First-time Gradle wrapper setup
-If `gradle/wrapper/gradle-wrapper.jar` is missing, run once locally:
-```bash
-gradle wrapper --gradle-version 8.4
-```
-This generates the `gradlew` binary and `.jar` needed by CI.
 
 ## Project Structure
 ```
