@@ -1,89 +1,43 @@
-name: Build FontLens APK
+name: Release FontLens APK
 
 on:
-  push:
-    branches: [ main, master ]
-  # pull_request:
-    # branches: [ main, master ]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag'
+        required: true
+        default: 'v1.0.0-alpha.1'
 
 permissions:
   contents: write
+  actions: read
 
 jobs:
-  build:
-    name: Build APK
+  release:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v5
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Cache Gradle distribution (bin.zip)
-        uses: actions/cache@v5
-        with:
-          path: ~/.gradle/wrapper/dists
-          key: gradle-dist-8.7
-          restore-keys: gradle-dist-8.7
-
-      - name: Cache Gradle build cache
-        uses: actions/cache@v5
-        with:
-          path: ~/.gradle/caches
-          key: gradle-cache-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: gradle-cache-
-
-      - name: Download gradle-wrapper.jar
-        run: |
-          mkdir -p gradle/wrapper
-          curl -Lo gradle/wrapper/gradle-wrapper.jar \
-            https://github.com/gradle/gradle/raw/v8.7.0/gradle/wrapper/gradle-wrapper.jar
-
-      - name: Grant execute permission to gradlew
-        run: chmod +x gradlew
-        
-      - name: Decode keystore
-        run: |
-          echo "${{ secrets.KEYSTORE }}" | base64 --decode > app/fontlens-release-key.jks
-    
-      - name: Create keystore properties
-        run: |
-          echo "storeFile=fontlens-release-key.jks" > keystore.properties
-          echo "storePassword=${{ secrets.KEYPASS }}" >> keystore.properties
-          echo "keyAlias=${{ secrets.KEY }}" >> keystore.properties
-          echo "keyPassword=${{ secrets.KEYPASS }}" >> keystore.properties
-          
-      # - name: Build debug APK
-        # run: ./gradlew assembleDebug --stacktrace
-      - name: Build release APK
-        run: ./gradlew assembleRelease --stacktrace
+      - name: Get latest successful build run
+        id: run
         env:
-          GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-        
-      - name: Upload APK
-        uses: actions/upload-artifact@v7
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          id=$(gh run list -R ${{ github.repository }} \
+            --workflow "Build FontLens APK" --branch main \
+            --status success --limit 1 \
+            --json databaseId -q '.[0].databaseId')
+          echo "id=$id" >> "$GITHUB_OUTPUT"
+
+      - name: Download APK artifact
+        uses: actions/download-artifact@v5
         with:
           name: FontLens
-          path: '**/*.apk'
-          archive: false
-          retention-days: 30
+          run-id: ${{ steps.run.outputs.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate tag
-        id: tag
-        run: echo "tag=v$(date +'%Y.%m.%d-%H%M%S')" >> "$GITHUB_OUTPUT"
-    
       - name: Create Release
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ steps.tag.outputs.tag }}
-          name: FontLens ${{ steps.tag.outputs.tag }}
+          tag_name: ${{ inputs.tag }}
+          name: FontLens ${{ inputs.tag }}
           files: '**/*.apk'
           generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
