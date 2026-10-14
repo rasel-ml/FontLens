@@ -13,25 +13,16 @@
 - Favorites system
 - Multiple sample texts support with configurable priority
 
+> [!CAUTION]
+> **Alpha release:** Expect bugs, incomplete features, and unexpected behavior.»
+
 ## Screenshots
-
-<div><img src=".github/raw/ss1.png" alt="Library" width="32%"></img>
-<img src=".github/raw/ss2.png" alt="Preview" width="32%"></img>
-<img src=".github/raw/ss3.png" alt="Settings" width="32%"></img></div>
-<div><img src=".github/raw/ss4.png" alt="Font Info" width="32%"></img>
-<img src=".github/raw/ss5.png" alt="Font Metadata" width="32%"></img>
-<img src=".github/raw/ss6.png" alt="Glyph Map" width="32%"></img></div>
-
-## Building
-
-### In Android Studio
-1. Open the `FontLens/` folder
-2. Wait for Gradle sync
-3. Run ▶ on a device or emulator (min SDK 26)
-
-### Via GitHub Actions
-Push to `main` — the workflow builds a APK automatically.
-Download it from the **Actions** tab → latest run → **Artifacts**.
+<div><img src=".github/raw/ss1.jpg" alt="Library" width="32%"></img>
+<img src=".github/raw/ss2.jpg" alt="Preview" width="32%"></img>
+<img src=".github/raw/ss3.jpg" alt="Settings" width="32%"></img></div>
+<div><img src=".github/raw/ss4.jpg" alt="Font Info" width="32%"></img>
+<img src=".github/raw/ss5.jpg" alt="Font Metadata" width="32%"></img>
+<img src=".github/raw/ss6.jpg" alt="Glyph Map" width="32%"></img></div>
 
 ## Development
 This app is developed with the help of
