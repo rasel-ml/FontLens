@@ -14,7 +14,7 @@
 - Multiple sample texts support with configurable priority
 
 > [!CAUTION]
-> **Alpha release:** Expect bugs, incomplete features, and unexpected behavior.»
+> **Alpha release:** Expect bugs, incomplete features, and unexpected behavior.
 
 ## Screenshots
 <div><img src=".github/raw/ss1.jpg" alt="Library" width="32%"></img>
